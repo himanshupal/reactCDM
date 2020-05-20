@@ -1,121 +1,131 @@
-import gql from "graphql-tag";
+// import gql from "graphql-tag";
 import "./table.css";
-import React, { useState } from "react";
-import { Table, Checkbox, Input, Button, Grid, Form } from "semantic-ui-react";
+import React, { useState, useEffect } from "react";
+import { Table, Checkbox, Segment, Button, Grid } from "semantic-ui-react";
 // import { useQuery } from "@apollo/react-hooks";
 
-const students = ["Himanshu", "Arshad", "Ranvir", "Shivam", "Chetan"];
+const students = ["Himanshu", "Arshad", "Ranvir", "Suyash", "Shivam", "Chetan"];
 
-const daysInMonth = (month, year) => {
-	return new Date(year, month + 1, 0).getDate();
-};
+const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
 
-const EachDay = ({ date }) => {
+const EachDay = ({ date, student, allStudents }) => {
+	const [checked, setChecked] = useState([]);
+	useEffect(() => setChecked(allStudents), [allStudents]);
+	const toggle = (index) =>
+		!checked.includes(index)
+			? setChecked([...checked, index])
+			: setChecked(
+					checked.filter((val) => {
+						return val !== index;
+					})
+			  );
 	return date.map((day) => (
-		<Table.Cell
-			verticalAlign="middle"
-			textAlign="center"
-			onClick={(day) => {
-				return day++;
-			}}
-			key={day}
-		>
-			<Checkbox toggle />
+		<Table.Cell verticalAlign="middle" textAlign="center" key={day}>
+			<Checkbox checked={checked.includes(day)} onClick={() => toggle(day)} />
 		</Table.Cell>
 	));
 };
 
-const SingleStudent = ({ stName }) =>
+const SingleStudent = ({ stName, days, allStudents }) =>
 	stName.map((student, idx) => (
-		<Table.Row>
+		<Table.Row key={idx}>
 			<Table.Cell verticalAlign="middle">{student}</Table.Cell>
-			<EachDay key={idx} date={new Array(31).fill().map((_, x) => ++x)} />
+			<EachDay
+				student={student}
+				allStudents={allStudents}
+				date={new Array(daysInMonth(days.month, days.year))
+					.fill()
+					.map((_, x) => ++x)}
+			/>
 		</Table.Row>
 	));
 
 const MonthView = (props) => {
-	let fgh;
-	const [month, changeMonth] = useState({
+	const [month, setMonth] = useState({
 		month: new Date().getMonth(),
 		year: new Date().getFullYear(),
 	});
-	const [classs, changeClasss] = useState(``);
-	const classsChange = (event) => changeClasss(event.target.value);
-	const getClass = () => {
-		console.log(classs);
-		fgh = classs;
-	};
+	const [setChecked, selectsetChecked] = useState([]);
+	// const [data, setData] = useState([
+	// 	{
+	// 		day: String,
+	// 		students: [],
+	// 	},
+	// ]);
+	const prevMonth = () =>
+		month.month > 0
+			? setMonth({ ...month, month: month.month - 1 })
+			: setMonth({ month: 11, year: month.year - 1 });
+	const nextMonth = () =>
+		month.month < 11
+			? setMonth({ ...month, month: month.month + 1 })
+			: setMonth({ month: 0, year: month.year + 1 });
+	const headerClicked = (date) =>
+		!setChecked.includes(date)
+			? selectsetChecked([...setChecked, date])
+			: selectsetChecked(
+					setChecked.filter((val) => {
+						return val !== date;
+					})
+			  );
 
 	return (
-		<Grid celled>
-			<Grid.Row>
-				<Grid.Column>
-					<Form onSubmit={getClass}>
-						<Form.Input
-							onChange={classsChange}
-							label="Search Class:"
-							value={classs}
-							fluid
-						/>
-						<Button fluid>Search</Button>
-					</Form>
-				</Grid.Column>
-			</Grid.Row>
-			{classs && (
-				<Grid.Row>
+		<Segment>
+			<Grid>
+				<Grid.Row columns="3">
+					<Grid.Column textAlign="left">
+						<Button onClick={prevMonth}>Previous</Button>
+					</Grid.Column>
 					<Grid.Column>
-						<div className="tableSegment">
-							<Table unstackable color="violet" selectable striped>
-								<Table.Header>
-									<Table.Row>
-										<Table.HeaderCell verticalAlign="middle" textAlign="center">
-											{/*Students ↓*/} Date →
-										</Table.HeaderCell>
-										{new Array(daysInMonth(month.month, month.year))
-											.fill()
-											.map((_, date) => (
-												<Table.HeaderCell
-													verticalAlign="middle"
-													textAlign="center"
-													key={date}
-												>
-													{++date}
-												</Table.HeaderCell>
-											))}
-									</Table.Row>
-								</Table.Header>
-								<Table.Body>
-									<SingleStudent stName={students} />
-								</Table.Body>
-							</Table>
-						</div>
+						Showing {month.month + 1}, {month.year}
+					</Grid.Column>
+					<Grid.Column textAlign="right">
+						<Button onClick={nextMonth}>Next</Button>
 					</Grid.Column>
 				</Grid.Row>
-			)}
-		</Grid>
+			</Grid>
+			<Segment basic>
+				<div className="tableSegment">
+					<Table
+						compact
+						// selectable
+						striped
+						celled
+						sortable
+						size="small"
+						color="violet"
+					>
+						<Table.Header>
+							<Table.Row>
+								<Table.HeaderCell verticalAlign="middle" textAlign="center">
+									{/*Students ↓*/} Date →
+								</Table.HeaderCell>
+								{new Array(daysInMonth(month.month, month.year))
+									.fill()
+									.map((_, date) => (
+										<Table.HeaderCell
+											verticalAlign="middle"
+											textAlign="center"
+											onClick={() => headerClicked(date)}
+											key={++date}
+										>
+											{date}
+										</Table.HeaderCell>
+									))}
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							<SingleStudent
+								stName={students}
+								days={month}
+								allStudents={setChecked}
+							/>
+						</Table.Body>
+					</Table>
+				</div>
+			</Segment>
+		</Segment>
 	);
 };
-
-// const CLASS_DETAILS = gql`
-// 	query getClassDetails() {
-// 		getClass(_id: "BCA-2nd-Yr") {
-// 			className
-// 			classTeacher
-// 			students {
-// 				name {
-// 					first
-// 				}
-// 			}
-// 			totalStudents
-// 			attendence {
-// 				totalStudents
-// 				createdAt
-// 				lastUpdated
-// 				holiday
-// 				students
-// 			}
-// 		}
-// 	}
-// `;
 
 export default MonthView;
