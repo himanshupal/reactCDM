@@ -10,7 +10,15 @@ const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
 
 const EachDay = ({ date, student, allStudents }) => {
 	const [checked, setChecked] = useState([]);
-	useEffect(() => setChecked(allStudents), [allStudents]);
+	useEffect(() => {
+		// setChecked(allStudents);
+		const addDay = allStudents.filter((x) => {
+			if (!checked.includes(x)) return x;
+			return;
+		});
+		setChecked([...checked, Number(addDay)]);
+	}, [allStudents]);
+	console.log(checked);
 	const toggle = (index) =>
 		!checked.includes(index)
 			? setChecked([...checked, index])

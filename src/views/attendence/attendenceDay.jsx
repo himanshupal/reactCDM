@@ -26,13 +26,15 @@ const SingleStudent = ({ names, setPresent }) => {
 	}, [checked, setPresent]);
 	return names.map((name, idx) => (
 		<Grid.Row verticalAlign="middle" textAlign="center" key={name}>
-			<label className="contract_toggle">
-				{name}
-				<input type="checkbox" onClick={() => toggle(idx)} />
-				<div className="toggle_bar">
-					<div className="toggle_square" />
-				</div>
-			</label>
+			<div>
+				<label className="contract_toggle">
+					{name}
+					<input type="checkbox" onClick={() => toggle(idx)} />
+					<div className="toggle_bar">
+						<div className="toggle_square" />
+					</div>
+				</label>
+			</div>
 		</Grid.Row>
 	));
 };

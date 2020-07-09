@@ -1,5 +1,5 @@
-// import userDetails from "../src/context/redux";
-// import { createStore, StoreProvider } from "easy-peasy";
+import store from "../src/context/redux";
+import { useStoreState, StoreProvider } from "easy-peasy";
 
 import React from "react";
 import Router from "./routes/router";
@@ -26,17 +26,15 @@ const authLink = setContext(() => {
 	};
 });
 
-// const store = createStore(userDetails);
-
 const client = new ApolloClient({
 	link: authLink.concat(httpLink),
 	cache: new InMemoryCache(),
 });
 
 export default (
-	// <StoreProvider store={store}>
-	<ApolloProvider client={client}>
-		<Router />
-	</ApolloProvider>
-	// </StoreProvider>
+	<StoreProvider store={store}>
+		<ApolloProvider client={client}>
+			<Router />
+		</ApolloProvider>
+	</StoreProvider>
 );

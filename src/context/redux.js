@@ -1,13 +1,25 @@
-import { action } from "easy-peasy";
-
-export default {
-	user: null,
-	token: null,
-	login: action((state, details) => {
-		state.user = details.data.login.username;
-		state.token = details.data.login.token;
-	}),
-	logout: action((state) => {
-		state = null;
-	}),
-};
+import { action, createStore, persist } from "easy-peasy";
+import { setContext } from "apollo-link-context";
+import { verify } from "jsonwebtoken";
+export default createStore(
+	persist(
+		{
+			loggedInUser: {},
+			login: action((state, token) => {
+				const { username, iat, exp } = verify(token, `MySuperSecretAuthKey`);
+				state.loggedInUser = {
+					username,
+					iat,
+					exp,
+					token,
+				};
+			}),
+			logout: action((state) => {
+				state = null;
+			}),
+		},
+		{
+			storage: "localStorage",
+		}
+	)
+);

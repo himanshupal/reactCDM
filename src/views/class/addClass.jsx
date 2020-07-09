@@ -1,72 +1,65 @@
-import React from "react";
-import { Grid, Form, Dropdown, Label } from "semantic-ui-react";
+import React, { useState } from "react";
+import { Form } from "semantic-ui-react";
 
-const countryOptions = [
-	{ key: "af", value: "af", flag: "af", text: "Afghanistan" },
-	{ key: "ax", value: "ax", flag: "ax", text: "Aland Islands" },
-	{ key: "al", value: "al", flag: "al", text: "Albania" },
-	{ key: "dz", value: "dz", flag: "dz", text: "Algeria" },
-	{ key: "as", value: "as", flag: "as", text: "American Samoa" },
-	{ key: "ad", value: "ad", flag: "ad", text: "Andorra" },
-	{ key: "ao", value: "ao", flag: "ao", text: "Angola" },
-	{ key: "ai", value: "ai", flag: "ai", text: "Anguilla" },
-	{ key: "ag", value: "ag", flag: "ag", text: "Antigua" },
-	{ key: "ar", value: "ar", flag: "ar", text: "Argentina" },
-	{ key: "am", value: "am", flag: "am", text: "Armenia" },
-	{ key: "aw", value: "aw", flag: "aw", text: "Aruba" },
-	{ key: "au", value: "au", flag: "au", text: "Australia" },
-	{ key: "at", value: "at", flag: "at", text: "Austria" },
-	{ key: "az", value: "az", flag: "az", text: "Azerbaijan" },
-	{ key: "bs", value: "bs", flag: "bs", text: "Bahamas" },
-	{ key: "bh", value: "bh", flag: "bh", text: "Bahrain" },
-	{ key: "bd", value: "bd", flag: "bd", text: "Bangladesh" },
-	{ key: "bb", value: "bb", flag: "bb", text: "Barbados" },
-	{ key: "by", value: "by", flag: "by", text: "Belarus" },
-	{ key: "be", value: "be", flag: "be", text: "Belgium" },
-	{ key: "bz", value: "bz", flag: "bz", text: "Belize" },
-	{ key: "bj", value: "bj", flag: "bj", text: "Benin" },
+const teachers = [
+	{ key: "amitSaxena", text: "Amit Saxena", value: "amitSaxena:id" },
+	{ key: "dhanishTandon", text: "Dhanish Tandon", value: "dhanishTandon:id" },
+	{ key: "rajeshVerma", text: "Rajesh Verma", value: "rajeshVerma:id" },
+];
+const departments = [
+	{ key: "IT", text: "IT", value: "IT" },
+	{ key: "Engineering", text: "Engineering", value: "Engineering" },
+	{ key: "Science", text: "Science", value: "Science" },
+	{ key: "Pharmacy", text: "Pharmacy", value: "Pharmacy" },
+	{ key: "Education", text: "Education", value: "Education" },
+	{ key: "Other", text: "Other", value: "Other" },
 ];
 
-const addClass = () => {
+const AddClass = () => {
+	// const [data, setData] = useState({
+	// 	year,
+	// 	batch,
+	// 	semester,
+	// 	classs,
+	// 	department,
+	// 	classTeacher,
+	// 	sessionEnd,
+	// 	sessionStart,
+	// });
+
 	return (
-		<Grid>
-			<Grid.Row>New Class</Grid.Row>
-
-			<Grid.Row columns="3">
-				<Grid.Column>
-					<Form.Input fluid label="Classname" />
-				</Grid.Column>
-				<Grid.Column>
-					<Form.Input fluid label="Year" />
-				</Grid.Column>
-				<Grid.Column>
-					<Form.Input fluid label="Semester" />
-				</Grid.Column>
-			</Grid.Row>
-
-			<Grid.Row columns="4">
-				<Grid.Column>
-					<Form.Input fluid label="Class Teacher" />
-				</Grid.Column>
-				<Grid.Column>
-					<Form.Input fluid label="Session Start on" />
-				</Grid.Column>
-				<Grid.Column>
-					<Form.Input fluid label="Batch" />
-				</Grid.Column>
-				<Grid.Column>
-					<Label fluid>Select Country</Label>
-					<Dropdown
-						placeholder="Select Country"
-						fluid
-						search
-						selection
-						options={countryOptions}
-					/>
-				</Grid.Column>
-			</Grid.Row>
-		</Grid>
+		<Form widths="equal" onSubmit={() => console.log(`Submitted`)}>
+			<Form.Group>
+				<Form.Input placeholder="eg. BCA" label="Class" />
+				<Form.Input type="number" label="Year" />
+				<Form.Input type="number" label="Semester" />
+				<Form.Input type="number" label="Batch" placeholder="Year" />
+			</Form.Group>
+			<Form.Group>
+				<Form.Select
+					search
+					clearable
+					closeOnBlur
+					openOnFocus
+					options={departments}
+					label="Department"
+				/>
+				<Form.Select
+					search
+					clearable
+					closeOnBlur
+					openOnFocus
+					options={teachers}
+					label="Class Teacher"
+				/>
+			</Form.Group>
+			<Form.Group>
+				<Form.Input type="date" label="Session Start Date" />
+				<Form.Input type="date" label="Session End Date" />
+			</Form.Group>
+			<Form.Button floated="right">Add Class</Form.Button>
+		</Form>
 	);
 };
 
-export default addClass;
+export default AddClass;

@@ -1,87 +1,349 @@
-import React from "react";
-import { Form, Input, TextArea, Button, Select } from "semantic-ui-react";
-const genderOptions = [
-	{ key: "m", text: "Male", value: "male" },
-	{ key: "f", text: "Female", value: "female" },
-	{ key: "o", text: "Other", value: "other" },
-];
+import React, { useState } from "react";
+import { Form, Image, Button, Segment, Divider } from "semantic-ui-react";
+import addTeacher_mut from "../../queries/mutation/addTeacher";
+import { useMutation } from "@apollo/react-hooks";
+import selection from "../common";
+import src from "./logo512.png";
 
-const Teacherprofile = () => (
-	<Form>
-		<Form.Group widths="equal">
-			<Form.Field
-				id="form-input-control-first-name"
-				control={Input}
-				label="First name"
-				placeholder="First name"
-			/>
-			<Form.Field
-				id="form-input-control-last-name"
-				control={Input}
-				label="Last name"
-				placeholder="Last name"
-			/>
-		</Form.Group>
-		<Form.Group widths="equal">
-			<Form.Field
-				id="form-input-control-dob"
-				control={Input}
-				label="Date of birth"
-				placeholder="dd/mm/yy"
-			/>
-			<Form.Field
-				control={Select}
-				options={genderOptions}
-				label={{ children: "Gender", htmlFor: "form-select-control-gender" }}
-				placeholder="Gender"
-				search
-				searchInput={{ id: "form-select-control-gender" }}
-			/>
-		</Form.Group>
-		<Form.Group widths="equal">
-			<Form.Field
-				id="form-input-control-father-name"
-				control={Input}
-				label="Father name"
-				placeholder="Father name"
-			/>
-			<Form.Field
-				id="form-input-control-mother-name"
-				control={Input}
-				label="Mother name"
-				placeholder="mother name"
-			/>
-		</Form.Group>
+const TeacherProfile = (props) => {
+	const [error, setError] = useState({}),
+		[variables, setVariables] = useState({}),
+		[addTeacher, { loading }] = useMutation(addTeacher_mut, {
+			update: (_, res) => {
+				setError({});
+			},
+			onError: ({ graphQLErrors, networkError, message }) => {
+				setError({
+					...error,
+					error:
+						graphQLErrors[0].extensions.error ||
+						networkError[0].extensions.error ||
+						message,
+				});
+			},
+			variables,
+		}),
+		handleSubmit = async (e) => {
+			e.preventDefault();
+			await addTeacher();
+		};
 
-		<Form.Field
-			id="form-input-control-error-email"
-			control={Input}
-			label="Email"
-			placeholder="joe@schmoe.com"
-			// error={{
-			//   content: 'Please enter a valid email address',
-			//   pointing: 'below',
-			// }}
-		/>
-		<Form.Field
-			id="form-textarea-control-opinion"
-			control={TextArea}
-			label="Address"
-			placeholder="Address"
-		/>
-		<Form.Field
-			id="form-input-control-adhaar"
-			control={Input}
-			label="Adhaar Number"
-			placeholder="0000 0000 0000"
-		/>
-		<Form.Field
-			id="form-button-control-public"
-			control={Button}
-			content="Confirm"
-			label="Submit "
-		/>
-	</Form>
-);
+	return (
+		<Segment>
+			<Form
+				widths="equal"
+				onSubmit={handleSubmit}
+				className={loading ? `loading` : ``}
+			>
+				<Image size="small" centered rounded src={src} />
+				<Form.Group>
+					<Form.Select
+						width="12"
+						required
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						search
+						clearable
+						closeOnBlur
+						openOnFocus
+						name="designation"
+						options={selection.designation}
+						label="Designation"
+						placeholder="Designation"
+					/>
+					<Form.Input
+						width="4"
+						fluid
+						focus
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="photo"
+						label="Update Photo"
+						// transparent
+						type="file"
+					/>
+				</Form.Group>
+				<Divider horizontal>Teacher Details</Divider>
+				<Form.Group>
+					<Form.Input
+						required
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="registrationNumber"
+						label="Registration Number"
+						placeholder="Registration Number"
+					/>
+					<Form.Select
+						required
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						search
+						clearable
+						closeOnBlur
+						openOnFocus
+						name="major"
+						options={selection.subjects}
+						label="Primary Subject"
+						placeholder="Major"
+					/>
+					<Form.Input
+						required
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="username"
+						label="Username"
+						placeholder="A unique Username"
+					/>
+				</Form.Group>
+				<Form.Group>
+					<Form.Input
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="firstName"
+						required
+						label="First Name"
+						placeholder="First Name"
+					/>
+					<Form.Input
+						name="lastName"
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						label="Last Name"
+						placeholder="Last Name"
+					/>
+					<Form.Select
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						required
+						search
+						clearable
+						closeOnBlur
+						openOnFocus
+						options={selection.genders}
+						name="gender"
+						label="Gender"
+						placeholder="Gender"
+						search
+					/>
+				</Form.Group>
+				<Form.Group widths="equal">
+					<Form.Input
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="dateOfJoining"
+						type="date"
+						label="Date of Joining"
+					/>
+					<Form.Input
+						required
+						type="date"
+						name="dateOfBirth"
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						label="Date of Birth"
+					/>
+					<Form.Input
+						required
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="contactNumber"
+						label="Contact Number"
+						placeholder="+91-XXX-XXX-XXXX"
+					/>
+				</Form.Group>
+				<Form.Group>
+					<Form.Input
+						required
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="fatherName"
+						label="Father's Name"
+						placeholder="Father's Name"
+					/>
+					<Form.Input
+						required
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="fatherOccupation"
+						label="Father's Occupation"
+						placeholder="Father's Occupation"
+					/>
+					<Form.Input
+						required
+						type="number"
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="fatherAnnualIncome"
+						label="Parent's Annual Income"
+						placeholder="INR/Yr."
+					/>
+				</Form.Group>
+				<Form.Group>
+					<Form.Select
+						required
+						search
+						clearable
+						closeOnBlur
+						name="caste"
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						openOnFocus
+						label="Caste"
+						options={selection.castes}
+						placeholder="Caste"
+					/>
+					<Form.Select
+						required
+						search
+						clearable
+						closeOnBlur
+						openOnFocus
+						name="religion"
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						label="Religion"
+						options={selection.religions}
+						placeholder="Religion"
+					/>
+					<Form.Select
+						required
+						search
+						clearable
+						closeOnBlur
+						openOnFocus
+						name="bloodGroup"
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						label="Blood Group"
+						options={selection.bloodGroups}
+						placeholder="Blood Type"
+					/>
+				</Form.Group>
+				<Form.Group>
+					<Form.Input
+						required
+						type="email"
+						label="Email"
+						name="email"
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						placeholder="teacher@rbmi.in"
+					/>
+					<Form.Input
+						required
+						type="phone"
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="alternativeContact"
+						label="Alternative Contact Number"
+						placeholder="+91-XXX-XXX-XXXX"
+					/>
+					<Form.Input
+						required
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="aadharNumber"
+						label="Aadhaar Number"
+						placeholder="XXXX-XXXX-XXXX"
+					/>
+				</Form.Group>
+				<label>
+					<b>Current Address*</b>
+				</label>
+				<Form.Group widths="equal">
+					<Form.Input
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="addressCurrentLocality"
+						width="1"
+						required
+						placeholder="Locality"
+					/>
+					<Form.Input
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="addressCurrentDistrict"
+						width="1"
+						required
+						placeholder="District"
+					/>
+					<Form.Input
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="addressCurrentCity"
+						width="1"
+						required
+						placeholder="City"
+					/>
+				</Form.Group>
+				<label>
+					<b>Permanent Address*</b>
+				</label>
+				<Form.Group widths="equal">
+					<Form.Input
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="addressPermanentLocality"
+						width="1"
+						required
+						placeholder="Locality"
+					/>
+					<Form.Input
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="addressPermanentDistrict"
+						width="1"
+						required
+						placeholder="District"
+					/>
+					<Form.Input
+						onChange={(_, { name, value }) =>
+							setVariables({ ...variables, [name]: value })
+						}
+						name="addressPermanentCity"
+						width="1"
+						required
+						placeholder="City"
+					/>
+				</Form.Group>
+				<Button color="orange" fluid disabled={Object.keys(error).length > 0}>
+					Submit
+				</Button>
+			</Form>
+			{Object.keys(error).length > 0 && (
+				<div className="ui error message">
+					{Object.values(error).map((err) => (
+						<h5 key={err}>{err}</h5>
+					))}
+				</div>
+			)}
+		</Segment>
+	);
+};
 
-export default Teacherprofile;
+export default TeacherProfile;

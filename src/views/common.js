@@ -1,0 +1,53 @@
+export default {
+	genders: [
+		{ text: "Male", value: "Male" },
+		{ text: "Female", value: "Female" },
+		{ text: "Other", value: "Other" },
+	],
+	bloodGroups: [
+		{ text: "A +", value: "A+" },
+		{ text: "A -", value: "A-" },
+		{ text: "B +", value: "B+" },
+		{ text: "B -", value: "B-" },
+		{ text: "O +", value: "O+" },
+		{ text: "O -", value: "O-" },
+		{ text: "AB +", value: "AB+" },
+		{ text: "AB -", value: "AB-" },
+		{ text: "Unknown", value: "Unknown" },
+	],
+	castes: [
+		{ text: "General", value: "General" },
+		{ text: "OBC", value: "OBC" },
+		{ text: "SC", value: "SC" },
+		{ text: "ST", value: "ST" },
+		{ text: "Other", value: "Other" },
+	],
+	religions: [
+		{ text: "Hinduism", value: "Hinduism" },
+		{ text: "Islam", value: "Islam" },
+		{ text: "Sikhism", value: "Sikhism" },
+		{ text: "Christianity", value: "Christianity" },
+		{ text: "Jainism", value: "Jainism" },
+		{ text: "Buddhism", value: "Buddhism" },
+		{ text: "Other", value: "Other" },
+	],
+	subjects: [
+		{ text: "IT", value: "IT" },
+		{ text: "Engineering", value: "Engineering" },
+		{ text: "Science", value: "Science" },
+		{ text: "Pharmacy", value: "Pharmacy" },
+		{ text: "Education", value: "Education" },
+		{ text: "Other", value: "Other" },
+	],
+	classes: [
+		{ text: "BCA 1st Yr.", value: "BCA 1st Yr." },
+		{ text: "BCA 2nd Yr.", value: "BCA 2nd Yr." },
+		{ text: "BCA 3rd Yr.", value: "BCA 3rd Yr." },
+	],
+	designation: [
+		{ text: "Assistant Professor", value: "Assistant Professor" },
+		{ text: "Associate Professor", value: "Associate Professor" },
+		{ text: "Head of Department", value: "Head of Department" },
+		{ text: "Director", value: "Director" },
+	],
+};

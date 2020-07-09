@@ -1,65 +1,62 @@
-import gql from "graphql-tag";
-// import { useStoreActions } from "easy-peasy";
-import { AuthContext } from "../../context/Auth";
-import { useMutation } from "@apollo/react-hooks";
-import React, { useState, useContext } from "react";
 import { Form, Button, Segment } from "semantic-ui-react";
-
-const usernameRegex = /^[a-zA-z0-9_.]+$/;
+import login_mut from "../../queries/mutation/login";
+import React, { useState, useContext } from "react";
+import { useMutation } from "@apollo/react-hooks";
+// import { useStoreActions } from "easy-peasy";
+// import { toast, ToastContainer } from "react-toastify";
+import { AuthContext } from "../../context/Auth";
+const usernameRegex = /^[a-zA-z0-9._-]+$/;
 
 const Login = (props) => {
 	const { login } = useContext(AuthContext),
 		[error, setError] = useState({}),
-		[values, setValues] = useState({
-			username: ``,
-			password: ``,
-		}),
-		// login = useStoreActions((actions) => actions.login);
-		onChange = (event) => {
-			setValues({ ...values, [event.target.name]: event.target.value });
-		},
-		[loginUser, { loading }] = useMutation(LOGIN_CRED, {
-			update: (proxy, res) => {
-				setError([]);
-				login(res.data.login);
+		[variables, setVariables] = useState({}),
+		// login = useStoreActions((actions) => actions.login),
+		[loginUser, { loading }] = useMutation(login_mut, {
+			update: (_, { data }) => {
+				setError({});
+				login(data.login);
 				props.history.push(`/`);
 			},
 			onError: ({ graphQLErrors, networkError, message }) => {
-				networkError === null
-					? setError({ ...error, dbError: graphQLErrors[0].extensions.code })
-					: setError({
-							...error,
-							dbError: graphQLErrors[0].extensions.error,
-					  });
+				// toast.error(prompt, {
+				// 	position: "bottom-right",
+				// });
+				setError({
+					...error,
+					error:
+						graphQLErrors[0].extensions.error ||
+						networkError[0].extensions.error ||
+						message,
+				});
 			},
-			variables: values,
+			variables,
 		}),
-		handleSubmit = (e) => {
+		handleSubmit = async (e) => {
 			e.preventDefault();
-			if (values.username.trim() === `` || values.password.trim() === ``) {
+			if (variables.username.trim() === `` || variables.password.trim() === ``)
 				return setError({
 					...error,
 					username: `Username or Password can't be empty !!!`,
 				});
-			}
-			if (!usernameRegex.test(values.username)) {
+			if (!usernameRegex.test(variables.username))
 				return setError({
 					...error,
 					regexError: `Invalid username !!!`,
 				});
-			}
-			setError([]);
-			loginUser();
+			setError({});
+			await loginUser();
 		};
 
 	return (
 		<Segment>
-			<Form onSubmit={handleSubmit} className={loading ? "loading" : ``}>
+			<Form onSubmit={handleSubmit} className={loading ? `loading` : ``}>
 				<Form.Input
 					label="Username"
 					name="username"
-					value={values.username}
-					onChange={onChange}
+					onChange={(_, { name, value }) =>
+						setVariables({ ...variables, [name]: value })
+					}
 					autoComplete="username"
 					placeholder="Enter username..."
 				/>
@@ -67,8 +64,9 @@ const Login = (props) => {
 					label="Password"
 					name="password"
 					type="password"
-					value={values.password}
-					onChange={onChange}
+					onChange={(_, { name, value }) =>
+						setVariables({ ...variables, [name]: value })
+					}
 					autoComplete="current-password"
 					placeholder="Enter password..."
 				/>
@@ -83,14 +81,19 @@ const Login = (props) => {
 					))}
 				</div>
 			)}
+			{/* <ToastContainer
+			position="bottom-right"
+			autoClose={5000}
+			hideProgressBar={false}
+			newestOnTop={false}
+			closeOnClick
+			rtl={false}
+			pauseOnFocusLoss
+			draggable
+			pauseOnHover
+			/> */}
 		</Segment>
 	);
 };
-
-const LOGIN_CRED = gql`
-	mutation login($username: String!, $password: String!) {
-		login(data: { username: $username, password: $password })
-	}
-`;
 
 export default Login;
