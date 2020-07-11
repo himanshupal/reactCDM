@@ -13,12 +13,13 @@ import { AuthProvider } from "../context/Auth";
 import NoReturn from "./protectedRoute";
 import { Container } from "semantic-ui-react";
 import { BrowserRouter, Route } from "react-router-dom";
-
+import SideNavigation from "../common/side nav";
 const Router = (props) => {
 	return (
 		<AuthProvider>
 			<BrowserRouter>
 				<Navigator />
+				<SideNavigation/>
 				<Container>
 					{/* <Container textAlign="center"> */}
 					<Route exact path="/" component={Home} />
