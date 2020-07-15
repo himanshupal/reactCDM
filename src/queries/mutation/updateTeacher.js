@@ -1,22 +1,22 @@
 import gql from "graphql-tag";
 
 export default gql`
-	mutation addTeacher(
+	mutation updateTeacher(
+		$teacherId: ID!
 		$firstName: String
 		$lastName: String
 		$bloodGroup: String
-		$username: String
 		$caste: String
 		$photo: String
 		$email: String
 		$gender: String
 		$religion: String
-		$department: String
 		$designation: String
 		$dateOfBirth: String
 		$aadharNumber: String
 		$contactNumber: String
 		$dateOfJoining: String
+		$dateOfLeaving: String
 		$registrationNumber: String
 		$alternativeContact: String
 		$addressCurrentTehsil: String
@@ -26,17 +26,16 @@ export default gql`
 		$addressPermanentDistrict: String
 		$addressPermanentLocality: String
 	) {
-		addTeacher(
+		updateTeacher(
+			tid: $teacherId
 			data: {
 				name: { first: $firstName, last: $lastName }
 				bloodGroup: $bloodGroup
-				username: $username
 				caste: $caste
 				photo: $photo
 				email: $email
 				gender: $gender
 				religion: $religion
-				department: $department
 				designation: $designation
 				dateOfBirth: $dateOfBirth
 				aadharNumber: $aadharNumber
@@ -48,6 +47,7 @@ export default gql`
 				}
 				alternativeContact: $alternativeContact
 				dateOfJoining: $dateOfJoining
+				dateOfLeaving: $dateOfLeaving
 			}
 		)
 	}
