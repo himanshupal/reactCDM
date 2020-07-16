@@ -23,11 +23,8 @@ const AddCourse = (props) => {
 		variables,
 	});
 	if (dptFetch) return <h2>Loading...</h2>;
-	if (fetchErr) {
-		// props.history.push(`/login`);
-		// return null;
-		return <h2>Connectivity Error ⚠</h2>;
-	}
+	if (fetchErr) return <h2>Connectivity Error ⚠</h2>;
+
 	const mapData = () =>
 		setDpts(
 			data.departments.departments.map((x) => {
@@ -41,6 +38,7 @@ const AddCourse = (props) => {
 		setNotification([]);
 		setVariables({ ...variables, [name]: value });
 	};
+
 	return (
 		<Segment className={loading ? `loading` : ``}>
 			<h1>Add New Course</h1>
@@ -52,8 +50,23 @@ const AddCourse = (props) => {
 					addCourse();
 				}}
 			>
+				<Form.Input
+					required
+					pattern="[\w\s',\-]+"
+					name="name"
+					label="Course name"
+					placeholder="Full name of the Course"
+					onChange={onChange}
+				/>
 				<Form.Group>
-					<Form.Input required name="name" label="Course name" placeholder="Cannot be changed later !" onChange={onChange} />
+					<Form.Input
+						required
+						pattern="[\w\.\s]+"
+						name="identifier"
+						label="Course Abbreviation"
+						placeholder="e.g. BCA"
+						onChange={onChange}
+					/>
 					<Form.Select
 						search
 						required
@@ -61,7 +74,7 @@ const AddCourse = (props) => {
 						name="duration"
 						onChange={onChange}
 						label="Duration"
-						placeholder="Cannot be changed later !"
+						placeholder="Duration of the course"
 						options={constants.duration}
 					/>
 					<Form.Select
@@ -76,7 +89,7 @@ const AddCourse = (props) => {
 							setDpts([...dpts, { text: value, value }]);
 						}}
 						label="Department"
-						placeholder="Cannot be changed later !"
+						placeholder="Select / Add Department"
 						options={dpts}
 					/>
 				</Form.Group>
@@ -88,7 +101,7 @@ const AddCourse = (props) => {
 						name="director"
 						onChange={onChange}
 						label="Director"
-						placeholder="Can be changed later"
+						placeholder="Select Teacher"
 						options={data.departments.teachers.map((x) => {
 							return {
 								text: `${x.name.first} ${x.name.last}`,
@@ -102,8 +115,8 @@ const AddCourse = (props) => {
 						wrapSelection
 						name="headOfDepartment"
 						onChange={onChange}
-						label="Head of department"
-						placeholder="Can be changed later"
+						label="Head of Department"
+						placeholder="Select Teacher"
 						options={data.departments.teachers.map((x) => {
 							return {
 								text: `${x.name.first} ${x.name.last}`,

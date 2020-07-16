@@ -24,11 +24,7 @@ const TeacherProfile = ({ update }) => {
 		variables,
 	});
 	if (dptFetch) return <h2>Loading...</h2>;
-	if (fetchErr) {
-		// props.history.push(`/login`);
-		// return null;
-		return <h2>Connectivity Error ⚠</h2>;
-	}
+	if (fetchErr) return <h2>Connectivity Error ⚠</h2>;
 	const onChange = (_, { name, value }) => {
 		setNotification([]);
 		setVariables({ ...variables, [name]: value });
