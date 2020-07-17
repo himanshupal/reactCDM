@@ -4,10 +4,13 @@ import MUTATION_NEWSESSION from "../../queries/mutation/newSession";
 import QUERY_COURSES from "../../queries/query/courses";
 import { AuthContext } from "../../context/Auth";
 import Notify from "../../common/Notify";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 
-const SingleClass = ({ loop, course, session, variables, setVariables, teachersArray }) => {
-	const onChange = (_, { name, value }) => setVariables({ ...variables, [name]: value });
+const SingleClass = ({ loop, course, session, variables, setVariables, notification, setNotification, teachersArray }) => {
+	const onChange = (_, { name, value }) => {
+		if (notification.length > 0) setNotification([]);
+		setVariables({ ...variables, [name]: value });
+	};
 	const suffix = [`st`, `nd`, `rd`, ...new Array(9).fill(`th`)];
 	const date = new Date();
 	const today = date.toISOString().slice(0, 10);
@@ -175,7 +178,6 @@ const NewSesssion = (props) => {
 				widths="equal"
 				onSubmit={(e) => {
 					e.preventDefault();
-					console.log(variables);
 					newSession();
 				}}
 			>
@@ -215,47 +217,31 @@ const NewSesssion = (props) => {
 						}}
 					/>
 				</Form.Group>
-				{course.duration &&
-					(session % 2
-						? [
-								...Array(
-									new Date().getFullYear() - new Date(course.createdAt).getFullYear() < Number(course.duration.match(/\d/)[0])
-										? new Date().getFullYear() - new Date(course.createdAt).getFullYear() + 1
-										: Number(course.duration.match(/\d/)[0])
-								),
-						  ].map((_, idx) => (
-								<SingleClass
-									key={idx}
-									loop={idx}
-									course={course}
-									session={session}
-									variables={variables}
-									setVariables={setVariables}
-									teachersArray={data.departments.teachers.map((x) => {
-										return { text: `${x.name.first} ${x.name.last}`, value: x._id };
-									})}
-								/>
-						  ))
-						: [
-								...Array(
-									new Date().getFullYear() - new Date(course.createdAt).getFullYear() < Number(course.duration.match(/\d/)[0])
-										? new Date().getFullYear() - new Date(course.createdAt).getFullYear() + 1
-										: Number(course.duration.match(/\d/)[0])
-								),
-						  ].map((_, idx) => (
-								<SingleClass
-									key={idx}
-									loop={idx}
-									course={course}
-									session={session}
-									variables={variables}
-									setVariables={setVariables}
-									teachersArray={data.departments.teachers.map((x) => {
-										return { text: `${x.name.first} ${x.name.last}`, value: x._id };
-									})}
-								/>
-						  )))}
-				<Form.Button fluid color="purple" disabled={Object.keys(variables).length < 0 || notification.length > 0}>
+				{course.name &&
+					[
+						...Array(
+							new Date().getFullYear() - new Date(course.createdAt).getFullYear() < Number(course.duration.match(/\d/)[0])
+								? new Date().getFullYear() - new Date(course.createdAt).getFullYear() + 1
+								: session
+								? Number(course.duration.match(/\d/)[0])
+								: Number(course.duration.match(/\d/)[0]) + 1
+						),
+					].map((_, idx) => (
+						<SingleClass
+							key={idx}
+							loop={idx}
+							course={course}
+							session={session}
+							variables={variables}
+							setVariables={setVariables}
+							notification={notification}
+							setNotification={setNotification}
+							teachersArray={data.departments.teachers.map((x) => {
+								return { text: `${x.name.first} ${x.name.last}`, value: x._id };
+							})}
+						/>
+					))}
+				<Form.Button fluid color="purple" disabled={notification.length > 0}>
 					Submit
 				</Form.Button>
 			</Form>

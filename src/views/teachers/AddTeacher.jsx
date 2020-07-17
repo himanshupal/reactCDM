@@ -28,9 +28,10 @@ const TeacherProfile = ({ update }) => {
 	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>;
 
 	const onChange = (_, { name, value }) => {
-		setNotification([]);
+		if (notification.length > 0) setNotification([]);
 		setVariables({ ...variables, [name]: value });
 	};
+
 	const date = new Date();
 	const today = date.toISOString().slice(0, 10);
 	const minDOB = date.getFullYear() - 85 + `-` + date.toISOString().slice(5, 10);

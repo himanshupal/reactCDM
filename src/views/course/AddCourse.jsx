@@ -25,17 +25,8 @@ const AddCourse = (props) => {
 	if (dptFetch) return <h2>Loading...</h2>;
 	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>;
 
-	const mapData = () =>
-		setDpts(
-			data.departments.departments.map((x) => {
-				return {
-					text: x.name,
-					value: x.name,
-				};
-			})
-		);
 	const onChange = (_, { name, value }) => {
-		setNotification([]);
+		if (notification.length > 0) setNotification([]);
 		setVariables({ ...variables, [name]: value });
 	};
 
@@ -83,7 +74,16 @@ const AddCourse = (props) => {
 						wrapSelection
 						allowAdditions
 						name="department"
-						onFocus={mapData}
+						onFocus={() =>
+							setDpts(
+								data.departments.departments.map((x) => {
+									return {
+										text: x.name,
+										value: x.name,
+									};
+								})
+							)
+						}
 						onChange={onChange}
 						onAddItem={(_, { value }) => {
 							setDpts([...dpts, { text: value, value }]);
