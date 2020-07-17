@@ -23,8 +23,10 @@ const TeacherProfile = ({ update }) => {
 		},
 		variables,
 	});
+
 	if (dptFetch) return <h2>Loading...</h2>;
-	if (fetchErr) return <h2>Connectivity Error ⚠</h2>;
+	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>;
+
 	const onChange = (_, { name, value }) => {
 		setNotification([]);
 		setVariables({ ...variables, [name]: value });

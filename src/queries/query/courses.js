@@ -11,6 +11,7 @@ export default gql`
 					name
 					duration
 					identifier
+					createdAt
 					semesterBased
 				}
 			}

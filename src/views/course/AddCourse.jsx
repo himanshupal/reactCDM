@@ -17,13 +17,13 @@ const AddCourse = (props) => {
 			setNotification([...notification, { message: data.addCourse }]);
 		},
 		onError: ({ graphQLErrors, networkError, message }) => {
-			if (networkError) setNotification([...notification, { error: `Internet Connectivity Error ⚠` }]);
+			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }]);
 			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }]);
 		},
 		variables,
 	});
 	if (dptFetch) return <h2>Loading...</h2>;
-	if (fetchErr) return <h2>Connectivity Error ⚠</h2>;
+	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>;
 
 	const mapData = () =>
 		setDpts(

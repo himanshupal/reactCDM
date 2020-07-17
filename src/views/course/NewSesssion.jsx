@@ -4,9 +4,7 @@ import MUTATION_NEWSESSION from "../../queries/mutation/newSession";
 import QUERY_COURSES from "../../queries/query/courses";
 import { AuthContext } from "../../context/Auth";
 import Notify from "../../common/Notify";
-import React, { useState, useContext } from "react";
-
-// Semester check and data mapping to `variables` to be done
+import React, { useState, useEffect, useContext } from "react";
 
 const SingleClass = ({ loop, course, session, variables, setVariables, teachersArray }) => {
 	const onChange = (_, { name, value }) => setVariables({ ...variables, [name]: value });
@@ -14,7 +12,7 @@ const SingleClass = ({ loop, course, session, variables, setVariables, teachersA
 	const date = new Date();
 	const today = date.toISOString().slice(0, 10);
 	const sessionEndMax = date.getFullYear() + Number(course.duration.match(/\d/)[0]) + `-` + date.toISOString().slice(5, 10);
-	const sessionEndDate = date.getFullYear() + 1 + `-` + date.toISOString().slice(5, 10);
+	const sessionEnd = date.getFullYear() + 1 + `-` + date.toISOString().slice(5, 10);
 	let sem = loop + 1;
 
 	return (
@@ -38,35 +36,55 @@ const SingleClass = ({ loop, course, session, variables, setVariables, teachersA
 			<Form.Group>
 				<Form.Input
 					disabled={!session && loop === 0}
-					required={session && loop === 0}
-					onChange={onChange}
-					name={`name` + loop}
-					label="Current Name"
-					value={
-						variables[`name` + loop]
-							? variables[`name` + loop]
-							: !session
-							? loop === 0
-								? `Class doesn't exist`
-								: `${course.identifier} Year ${loop} Sem ${sem * 2 - 2}`
-							: `${course.identifier} Year ${loop + 1} Sem ${sem}`
+					required={
+						course.semesterBased ? (session && loop === 0 ? loop === 0 : loop !== 0) : session && loop !== 0 ? loop === 0 : loop !== 0
 					}
+					name={`name` + loop}
 					placeholder="Previous name of the class"
+					label="Current Name"
+					value={variables[`name` + loop] || ``}
+					onChange={onChange}
+					onFocus={
+						variables[`name` + loop]
+							? null
+							: ({ target: { name } }) => {
+									const value = course.semesterBased
+										? !session
+											? loop === 0
+												? `Class doesn't exist`
+												: `${course.identifier} Year ${loop} Sem ${sem * 2 - 2}`
+											: `${course.identifier} Year ${loop + 1} Sem ${sem}`
+										: variables[`name` + loop]
+										? variables[`name` + loop]
+										: loop === 0
+										? `Class doesn't exist`
+										: `${course.identifier} Year ${loop}`;
+									setVariables({ ...variables, [name]: value });
+							  }
+					}
 				/>
 				<Form.Input
 					required
-					onChange={onChange}
 					name={`newName` + loop}
 					placeholder="New name of the class"
 					label={loop === Number(course.duration.match(/\d/)[0]) ? `Archive Name` : `New Name`}
-					value={
+					value={variables[`newName` + loop] || ``}
+					onChange={onChange}
+					onFocus={
 						variables[`newName` + loop]
-							? variables[`newName` + loop]
-							: session
-							? `${course.identifier} Year ${loop + 1} Sem ${++sem}`
-							: loop === Number(course.duration.match(/\d/)[0])
-							? `${course.identifier} ${date.getFullYear() - course.duration.match(/\d/)[0]}`
-							: `${course.identifier} Year ${loop + 1} Sem ${loop * 2 + 1}`
+							? null
+							: ({ target: { name } }) => {
+									const value = course.semesterBased
+										? session
+											? `${course.identifier} Year ${loop + 1} Sem ${++sem}`
+											: loop === Number(course.duration.match(/\d/)[0])
+											? `${course.identifier} ${date.getFullYear() - course.duration.match(/\d/)[0]}`
+											: `${course.identifier} Year ${loop + 1} Sem ${loop * 2 + 1}`
+										: loop === Number(course.duration.match(/\d/)[0])
+										? `${course.identifier} ${date.getFullYear() - course.duration.match(/\d/)[0]}`
+										: `${course.identifier} Year ${loop + 1}`;
+									setVariables({ ...variables, [name]: value });
+							  }
 					}
 				/>
 				{loop !== Number(course.duration.match(/\d/)[0]) && (
@@ -76,6 +94,7 @@ const SingleClass = ({ loop, course, session, variables, setVariables, teachersA
 						placeholder="Select a teacher"
 						name={`classTeacher` + loop}
 						label="Class Teacher"
+						value={variables[`classTeacher` + loop] ? variables[`classTeacher` + loop] : ``}
 					/>
 				)}
 			</Form.Group>
@@ -88,7 +107,8 @@ const SingleClass = ({ loop, course, session, variables, setVariables, teachersA
 						onChange={onChange}
 						name={`sessionStart` + loop}
 						label="Session Start date"
-						value={variables[`sessionStart` + loop] ? variables[`sessionStart` + loop] : today}
+						value={variables[`sessionStart` + loop] ? variables[`sessionStart` + loop] : ``}
+						onFocus={variables[`sessionStart` + loop] ? null : ({ target: { name } }) => setVariables({ ...variables, [name]: today })}
 					/>
 					<Form.Input
 						type="date"
@@ -97,7 +117,10 @@ const SingleClass = ({ loop, course, session, variables, setVariables, teachersA
 						onChange={onChange}
 						name={`sessionEnd` + loop}
 						label="Session End date"
-						value={variables[`sessionEnd` + loop] ? variables[`sessionEnd` + loop] : sessionEndDate}
+						value={variables[`sessionEnd` + loop] ? variables[`sessionEnd` + loop] : ``}
+						onFocus={
+							variables[`sessionEnd` + loop] ? null : ({ target: { name } }) => setVariables({ ...variables, [name]: sessionEnd })
+						}
 					/>
 				</Form.Group>
 			)}
@@ -107,7 +130,7 @@ const SingleClass = ({ loop, course, session, variables, setVariables, teachersA
 
 const NewSesssion = (props) => {
 	const { user } = useContext(AuthContext);
-	const privAccess = user.access === `Director`;
+	const privAccess = user && user.access === `Director`;
 	const { loading: crsFetch, error: fetchErr, data } = useQuery(QUERY_COURSES);
 	const [notification, setNotification] = useState([]);
 	const [courseArray, setCourseArray] = useState([]);
@@ -117,17 +140,17 @@ const NewSesssion = (props) => {
 
 	const [newSession, { loading }] = useMutation(MUTATION_NEWSESSION, {
 		update: (_, { data }) => {
-			setNotification([...notification, { message: data.addCourse }]);
+			setNotification([...notification, { message: data.newSession }]);
 		},
 		onError: ({ graphQLErrors, networkError, message }) => {
-			if (networkError) setNotification([...notification, { error: `Internet Connectivity Error ⚠` }]);
+			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }]);
 			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }]);
 		},
 		variables,
 	});
 
 	if (crsFetch) return <h2>Loading...</h2>;
-	if (fetchErr) return <h2>Connectivity Error ⚠</h2>;
+	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>;
 
 	return (
 		<Segment className={loading ? `loading` : ``}>
@@ -153,7 +176,7 @@ const NewSesssion = (props) => {
 				onSubmit={(e) => {
 					e.preventDefault();
 					console.log(variables);
-					// newSession();
+					newSession();
 				}}
 			>
 				<Form.Group>
@@ -187,13 +210,20 @@ const NewSesssion = (props) => {
 									? courseArray.filter((x) => x._id === value)[0]
 									: data.departments.departments[0].courses.filter((x) => x._id === value)[0]
 							);
-							setVariables({ ...variables, [name]: value });
+							setVariables({ [name]: value });
+							setSession(courseArray.filter((x) => x._id === value)[0].semesterBased);
 						}}
 					/>
 				</Form.Group>
 				{course.duration &&
 					(session % 2
-						? [...Array(Number(course.duration.match(/\d/)[0]))].map((_, idx) => (
+						? [
+								...Array(
+									new Date().getFullYear() - new Date(course.createdAt).getFullYear() < Number(course.duration.match(/\d/)[0])
+										? new Date().getFullYear() - new Date(course.createdAt).getFullYear() + 1
+										: Number(course.duration.match(/\d/)[0])
+								),
+						  ].map((_, idx) => (
 								<SingleClass
 									key={idx}
 									loop={idx}
@@ -206,7 +236,13 @@ const NewSesssion = (props) => {
 									})}
 								/>
 						  ))
-						: [...Array(Number(course.duration.match(/\d/)[0]) + 1)].map((_, idx) => (
+						: [
+								...Array(
+									new Date().getFullYear() - new Date(course.createdAt).getFullYear() < Number(course.duration.match(/\d/)[0])
+										? new Date().getFullYear() - new Date(course.createdAt).getFullYear() + 1
+										: Number(course.duration.match(/\d/)[0])
+								),
+						  ].map((_, idx) => (
 								<SingleClass
 									key={idx}
 									loop={idx}
