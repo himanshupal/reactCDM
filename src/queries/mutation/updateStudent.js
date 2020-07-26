@@ -1,8 +1,8 @@
 import gql from "graphql-tag";
 
 export default gql`
-	mutation addStudent(
-		$username: String
+	mutation updateStudent(
+		$studentId: ID!
 		$rollNumber: String
 		$registrationNumber: String
 		$enrollmentNumber: String
@@ -26,6 +26,7 @@ export default gql`
 		$photo: String
 		$email: String
 		$contactNumber: String
+		$dateOfLeaving: String
 		$addressCurrentLocality: String
 		$addressCurrentDistrict: String
 		$addressCurrentTehsil: String
@@ -33,9 +34,9 @@ export default gql`
 		$addressPermanentDistrict: String
 		$addressPermanentTehsil: String
 	) {
-		addStudent(
+		updateStudent(
+			sid: $studentId
 			data: {
-				username: $username
 				rollNumber: $rollNumber
 				registrationNumber: $registrationNumber
 				enrollmentNumber: $enrollmentNumber
@@ -62,6 +63,7 @@ export default gql`
 				photo: $photo
 				email: $email
 				contactNumber: $contactNumber
+				dateOfLeaving: $dateOfLeaving
 				address: {
 					current: { locality: $addressCurrentLocality, district: $addressCurrentDistrict, tehsil: $addressCurrentTehsil }
 					permanent: { locality: $addressPermanentLocality, district: $addressPermanentDistrict, tehsil: $addressPermanentTehsil }
