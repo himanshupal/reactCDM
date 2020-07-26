@@ -20,7 +20,6 @@ const Router = (props) => {
 		<AuthProvider>
 			<BrowserRouter>
 				<Navigator />
-				<SideNavigation />
 				<Container>
 					{/* <Container textAlign="center"> */}
 					<Route exact path="/" component={Home} />
