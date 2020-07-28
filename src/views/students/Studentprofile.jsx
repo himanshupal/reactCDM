@@ -262,7 +262,7 @@ class DashboardCard extends React.Component {
 		return( 
 		<div class="dash-card"> 
 			<AdministratorCardContent />
-		</div>);
+		</div>);git 
 		}
 		}
 	}
@@ -280,6 +280,7 @@ const OverviewCardContent = () => (
 			<h5 class="lg-nmbr">DATE OF BIRTH:</h5>
 			<h5 class="lg-nmbr">FATHER NAME:</h5>
 			<h5 class="lg-nmbr">MOTHER NAME:</h5>
+			<h5 class="lg-nmbr">FATHER'S OCCUPATION: </h5>
 			<h5 class="lg-nmbr">FATHER'S OCCUPATION: </h5>
 		</div>
 		
