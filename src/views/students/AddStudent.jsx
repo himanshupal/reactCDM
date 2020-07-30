@@ -4,7 +4,7 @@ import MUTATION_ADDSTUDENT from "../../queries/mutation/addStudent";
 import MUTATION_UPDATESTUDENT from "../../queries/mutation/updateStudent";
 import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks";
 import { Form, Image, Button, Divider, Segment } from "semantic-ui-react";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { AuthContext } from "../../context/Auth";
 import Notify from "../../common/Notify";
 import constants from "../common";
@@ -23,16 +23,11 @@ const AddStudent = ({ update }) => {
 			setNotification([...notification, { message: data.addStudent }]);
 		},
 		onError: ({ graphQLErrors, networkError, message }) => {
-			console.log(message);
 			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }]);
 			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }]);
 		},
 		variables,
 	});
-
-	useEffect(() => {
-		console.log(variables);
-	}, [variables]);
 
 	if (crsFetch) return <h2>Loading...</h2>;
 	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>;
@@ -58,7 +53,7 @@ const AddStudent = ({ update }) => {
 					addStudent();
 				}}
 			>
-				<Image size="small" centered bordered rounded src={src} />
+				<Image size="small" centered bordered src={src} />
 				<Divider />
 
 				<div className="field">

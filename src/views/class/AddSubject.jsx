@@ -86,7 +86,7 @@ const AddSubject = () => {
 						options={
 							classList
 								? classList.classes.map((x) => {
-										return { key: x._id, text: x.name, value: x._id };
+										return { key: x._id, text: x.name, value: x.name };
 								  })
 								: []
 						}

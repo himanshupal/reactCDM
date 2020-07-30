@@ -44,6 +44,7 @@ export default {
 		{ text: "Head of Department", value: "Head of Department" },
 		{ text: "Director", value: "Director" },
 	],
+	months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
 	district: [
 		{
 			text: "Agra",

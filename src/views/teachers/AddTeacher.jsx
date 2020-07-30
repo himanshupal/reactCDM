@@ -1,4 +1,4 @@
-import { Form, Image, Button, Segment, Divider } from "semantic-ui-react";
+import { Form, Image, Segment, Divider } from "semantic-ui-react";
 import MUTATION_UPDATETEACHER from "../../queries/mutation/updateTeacher";
 import MUTATION_ADDTEACHER from "../../queries/mutation/addTeacher";
 import QUERY_DEPARTMENTS from "../../queries/query/departments";
@@ -52,13 +52,13 @@ const TeacherProfile = ({ update }) => {
 				<Image size="small" centered bordered rounded src={src} />
 				<Divider />
 				<Form.Group>
-					{/* <Form.Input type="file" transparent label="Upload Photo" width={update ? `16` : `8`} /> */}
-					<Form.Field>
+					<Form.Input type="file" transparent label="Upload Photo" />
+					{/* <Form.Field>
 						<label htmlFor="photo">Upload Photo</label>
 						<Button fluid as="p">
 							Choose
 						</Button>
-					</Form.Field>
+					</Form.Field> */}
 					{!update && (
 						<>
 							<Form.Select
@@ -191,7 +191,7 @@ const TeacherProfile = ({ update }) => {
 						placeholder="Select Gender"
 					/>
 				</Form.Group>
-				<Form.Group widths="equal">
+				<Form.Group>
 					<Form.Input
 						required
 						onChange={onChange}
@@ -293,7 +293,7 @@ const TeacherProfile = ({ update }) => {
 				<label>
 					<b>Current Address*</b>
 				</label>
-				<Form.Group widths="equal">
+				<Form.Group>
 					<Form.Input required onChange={onChange} pattern="[\w\s.,-]+" name="addressCurrentLocality" placeholder="Locality" />
 					<Form.Input required onChange={onChange} pattern="[\w\s.,-]+" name="addressCurrentTehsil" placeholder="Tehsil" />
 					<Form.Select
@@ -319,7 +319,7 @@ const TeacherProfile = ({ update }) => {
 						Permanent Address (Click to copy Current Address)
 					</b>
 				</label>
-				<Form.Group widths="equal">
+				<Form.Group>
 					<Form.Input
 						onChange={onChange}
 						pattern="[\w\s.,-]+"
@@ -343,11 +343,11 @@ const TeacherProfile = ({ update }) => {
 						options={constants.district}
 					/>
 				</Form.Group>
-				<Button color="purple" fluid disabled={Object.keys(variables).length < 16 || notification.length > 0}>
+				<Form.Button color="purple" fluid disabled={Object.keys(variables).length < 16 || notification.length > 0}>
 					Submit
-				</Button>
+				</Form.Button>
 			</Form>
-			{Object.keys(notification).length > 0 && <Notify list={notification} />}
+			{notification.length > 0 && <Notify list={notification} />}
 		</Segment>
 	);
 };
