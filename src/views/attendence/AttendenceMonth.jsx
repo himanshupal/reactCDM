@@ -1,9 +1,9 @@
-// import MUTATION_ADD_ATTENDENCE_MANY from "../../queries/mutation/addAttendenceMany";
+import MUTATION_ADD_ATTENDENCE_MANY from "../../queries/mutation/addAttendenceMany";
 import { Table, Checkbox, Segment, Button, Grid, Dropdown } from "semantic-ui-react";
 import QUERY_ATTENDENCE_MONTH from "../../queries/query/attendenceMonth";
-// eslint-disable-next-line
 import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks";
 import React, { useState, useEffect } from "react";
+import Notify from "../../common/Notify";
 import constants from "../common";
 
 const MonthView = (props) => {
@@ -22,11 +22,22 @@ const MonthView = (props) => {
 	const [disDates, setDisDates] = useState([]);
 	const [confirm, setConfirm] = useState(false);
 	const [variables, setVariables] = useState({});
-	// const [notification, setNotification] = useState([]);
+	const [notification, setNotification] = useState([]);
 	const [previousAttendence, setPreviousAttendence] = useState([]);
 	const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
 	const [sundays, setSundays] = useState(getSundays(currentMonth.month, currentMonth.year));
 	const [numberOfDays, setNumberOfDays] = useState(new Array(daysInMonth(currentMonth.month, currentMonth.year)).fill());
+	const [addAttendenceMany, { loading: saving }] = useMutation(MUTATION_ADD_ATTENDENCE_MANY, {
+		update: (_, { data }) => {
+			setConfirm(false);
+			setNotification([...notification, { message: data.addAttendenceMany }]);
+		},
+		onError: ({ graphQLErrors, networkError, message }) => {
+			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }]);
+			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }]);
+		},
+		variables,
+	});
 
 	const prevMonth = () => {
 		currentMonth.month > 0 ? setMonth({ ...currentMonth, month: currentMonth.month - 1 }) : setMonth({ month: 11, year: currentMonth.year - 1 });
@@ -38,36 +49,28 @@ const MonthView = (props) => {
 	};
 
 	useEffect(() => {
-		if (newData) {
-			setDisDates([]);
-			setConfirm(false);
-			setPreviousAttendence(
-				new Array(daysInMonth(currentMonth.month, currentMonth.year)).fill(false).map((x, idx) =>
-					newData.attendenceMonth && newData.attendenceMonth.map((y) => Number(y.day.split(`-`)[2])).includes(idx + 1)
+		setDisDates([]);
+		setConfirm(false);
+		setVariables({ cid: data && data.students[0].class._id });
+		setPreviousAttendence(
+			new Array(daysInMonth(currentMonth.month, currentMonth.year)).fill(false).map((x, idx) =>
+				newData
+					? newData.attendenceMonth && newData.attendenceMonth.map((y) => Number(y.day.split(`-`)[2])).includes(idx + 1)
 						? newData.attendenceMonth
 								.filter((y) => Number(y.day.split(`-`)[2]) === idx + 1)
 								.map((y) => {
 									return { students: y.students || [], holiday: y.holiday };
 								})
 						: x
-				)
-			);
-		} else if (data) {
-			setDisDates([]);
-			setConfirm(false);
-			setVariables({ cid: data.students[0].class._id });
-			setPreviousAttendence(
-				new Array(daysInMonth(currentMonth.month, currentMonth.year)).fill(false).map((x, idx) =>
-					data.attendenceMonth && data.attendenceMonth.map((y) => Number(y.day.split(`-`)[2])).includes(idx + 1)
-						? data.attendenceMonth
-								.filter((y) => Number(y.day.split(`-`)[2]) === idx + 1)
-								.map((y) => {
-									return { students: y.students || [], holiday: y.holiday };
-								})
-						: x
-				)
-			);
-		}
+					: data && data.attendenceMonth && data.attendenceMonth.map((y) => Number(y.day.split(`-`)[2])).includes(idx + 1)
+					? data.attendenceMonth
+							.filter((y) => Number(y.day.split(`-`)[2]) === idx + 1)
+							.map((y) => {
+								return { students: y.students || [], holiday: y.holiday };
+							})
+					: x
+			)
+		);
 	}, [data, newData, currentMonth]);
 
 	useEffect(() => {
@@ -83,7 +86,7 @@ const MonthView = (props) => {
 	if (error) return <h2>{error.toString().split(`: `)[2]}</h2>;
 
 	return (
-		<Segment className={change ? `loading` : ``}>
+		<Segment className={change || saving ? `loading` : ``}>
 			<Grid>
 				<Grid.Row columns="3">
 					<Grid.Column verticalAlign="middle">
@@ -96,9 +99,18 @@ const MonthView = (props) => {
 								search
 								scrolling
 								text={constants.months[currentMonth.month]}
-								options={constants.months.map((x, idx) => {
-									return { text: x, value: idx };
-								})}
+								options={
+									currentMonth.year === new Date().getFullYear()
+										? constants.months
+												.map((x, idx) => {
+													if (idx <= new Date().getMonth()) return { text: x, value: idx };
+													else return null;
+												})
+												.filter((x) => x)
+										: constants.months.map((x, idx) => {
+												return { text: x, value: idx };
+										  })
+								}
 								onChange={(_, { value }) => {
 									setMonth({ ...currentMonth, month: value });
 									getAttendence();
@@ -110,9 +122,15 @@ const MonthView = (props) => {
 								search
 								scrolling
 								text={currentMonth.year.toString()}
-								options={new Array(new Date().getFullYear() - 1995).fill(new Date().getFullYear()).map((x, idx) => {
-									return { text: (x - idx).toString(), value: x - idx };
-								})}
+								options={
+									currentMonth.month > new Date().getMonth()
+										? new Array(new Date().getFullYear() - 1996).fill(new Date().getFullYear()).map((x, idx) => {
+												return { text: (x - idx - 1).toString(), value: x - idx - 1 };
+										  })
+										: new Array(new Date().getFullYear() - 1995).fill(new Date().getFullYear()).map((x, idx) => {
+												return { text: (x - idx).toString(), value: x - idx };
+										  })
+								}
 								onChange={(_, { value }) => {
 									setMonth({ ...currentMonth, year: value });
 									getAttendence();
@@ -121,7 +139,13 @@ const MonthView = (props) => {
 						</h3>
 					</Grid.Column>
 					<Grid.Column textAlign="right" verticalAlign="middle">
-						<Button onClick={nextMonth} content="Next" icon="right arrow" labelPosition="right" />
+						<Button
+							disabled={currentMonth.month >= new Date().getMonth() && currentMonth.year >= new Date().getFullYear()}
+							onClick={nextMonth}
+							content="Next"
+							icon="right arrow"
+							labelPosition="right"
+						/>
 					</Grid.Column>
 				</Grid.Row>
 			</Grid>
@@ -200,9 +224,10 @@ const MonthView = (props) => {
 																	? variables[`students` + idx]
 																	: [...variables[`students` + idx], student._id]
 																: [...(variables[`students` + idx] || []), student._id],
-														[`day` + idx]: `${currentMonth.year}-${(currentMonth.month + 1).toString().padStart(2, 0)}-${(idx + 1)
-															.toString()
-															.padStart(2, 0)}`,
+														[`day` + idx]:
+															sundays.includes(idx) || disDates.includes(idx)
+																? undefined
+																: `${currentMonth.year}-${(currentMonth.month + 1).toString().padStart(2, 0)}-${(idx + 1).toString().padStart(2, 0)}`,
 													};
 												});
 												return variables;
@@ -228,16 +253,10 @@ const MonthView = (props) => {
 													}
 													onClick={() => {
 														setConfirm(false);
-														variables[`students` + idx] && variables[`students` + idx].includes(student._id)
-															? previousAttendence[idx] && previousAttendence[idx][0].students.includes(student._id)
+														variables[`students` + idx]
+															? variables[`students` + idx].includes(student._id)
 																? setVariables((variables) => {
-																		return {
-																			...variables,
-																			[`students` + idx]: [...variables[`students` + idx].filter((x) => x !== student._id)],
-																		};
-																  })
-																: setVariables((variables) => {
-																		if (variables[`students` + idx].length === 1) {
+																		if (!previousAttendence[idx] && variables[`students` + idx].length === 1) {
 																			delete variables[`students` + idx];
 																			delete variables[`day` + idx];
 																			return { ...variables };
@@ -247,13 +266,13 @@ const MonthView = (props) => {
 																				[`students` + idx]: [...variables[`students` + idx].filter((x) => x !== student._id)],
 																			};
 																  })
-															: previousAttendence[idx] && previousAttendence[idx][0].students.includes(student._id)
-															? variables[`students` + idx] && !variables[`students` + idx].includes(student._id)
-																? setVariables({
+																: setVariables({
 																		...variables,
-																		[`students` + idx]: [...(variables[`students` + idx] || []), student._id],
+																		[`students` + idx]: [...variables[`students` + idx], student._id],
 																  })
-																: setVariables((variables) => {
+															: previousAttendence[idx]
+															? previousAttendence[idx][0].students.includes(student._id)
+																? setVariables((variables) => {
 																		return {
 																			...variables,
 																			[`day` + idx]: `${currentMonth.year}-${(currentMonth.month + 1).toString().padStart(2, 0)}-${(idx + 1)
@@ -262,12 +281,21 @@ const MonthView = (props) => {
 																			[`students` + idx]: previousAttendence[idx][0].students.filter((x) => x !== student._id),
 																		};
 																  })
+																: setVariables((variables) => {
+																		return {
+																			...variables,
+																			[`day` + idx]: `${currentMonth.year}-${(currentMonth.month + 1).toString().padStart(2, 0)}-${(idx + 1)
+																				.toString()
+																				.padStart(2, 0)}`,
+																			[`students` + idx]: [...previousAttendence[idx][0].students, student._id],
+																		};
+																  })
 															: setVariables({
 																	...variables,
 																	[`day` + idx]: `${currentMonth.year}-${(currentMonth.month + 1).toString().padStart(2, 0)}-${(idx + 1)
 																		.toString()
 																		.padStart(2, 0)}`,
-																	[`students` + idx]: [...(variables[`students` + idx] || []), student._id],
+																	[`students` + idx]: [student._id],
 															  });
 													}}
 												/>
@@ -302,7 +330,7 @@ const MonthView = (props) => {
 								{confirm ? (
 									<>
 										<Table.HeaderCell colSpan={numberOfDays.length / 2 + 1}>
-											<Button fluid color="green" as="p" onClick={() => console.log(variables)}>
+											<Button fluid color="green" as="p" onClick={() => addAttendenceMany()}>
 												Yes
 											</Button>
 										</Table.HeaderCell>
@@ -323,6 +351,7 @@ const MonthView = (props) => {
 						</Table.Footer>
 					</Table>
 				</div>
+				{notification.length > 0 && <Notify list={notification} />}
 			</Segment>
 		</Segment>
 	);

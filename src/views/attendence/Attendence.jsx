@@ -1,9 +1,8 @@
 import MUTATION_ADD_ATTENDENCE from "../../queries/mutation/addAttendence";
 import { Segment, Table, Button, Input, Divider } from "semantic-ui-react";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import QUERY_STUDENTS from "../../queries/query/students";
-import { AuthContext } from "../../context/Auth";
 import Notify from "../../common/Notify";
 
 const StudentsList = ({ students, present, setPresent, holiday }) =>
@@ -31,8 +30,6 @@ const StudentsList = ({ students, present, setPresent, holiday }) =>
 	));
 
 const Attendence = (props) => {
-	const { user } = useContext(AuthContext);
-	// const privAccess = user && user.access === `Director`;
 	const { loading, error, data } = useQuery(QUERY_STUDENTS);
 	const [notification, setNotification] = useState([]);
 	const [variables, setVariables] = useState({});
@@ -43,7 +40,6 @@ const Attendence = (props) => {
 			setNotification([...notification, { message: data.addAttendence }]);
 		},
 		onError: ({ graphQLErrors, networkError, message }) => {
-			console.log(message);
 			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }]);
 			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }]);
 		},

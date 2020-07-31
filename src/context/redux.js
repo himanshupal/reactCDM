@@ -1,5 +1,5 @@
 import { action, createStore, persist } from "easy-peasy";
-import { setContext } from "apollo-link-context";
+// import { setContext } from "apollo-link-context";
 import { verify } from "jsonwebtoken";
 export default createStore(
 	persist(

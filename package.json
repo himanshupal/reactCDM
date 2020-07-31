@@ -1,47 +1,51 @@
 {
-  "name": "reactcdm",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@apollo/react-hooks": "^3.1.5",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
-    "apollo-cache-inmemory": "^1.6.5",
-    "apollo-client": "^2.6.8",
-    "apollo-link-context": "^1.0.20",
-    "apollo-link-http": "^1.5.17",
-    "easy-peasy": "^3.3.0",
-    "graphql": "^15.3.0",
-    "graphql-tag": "^2.10.3",
-    "jsonwebtoken": "^8.5.1",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-router-dom": "^5.1.2",
-    "react-scripts": "3.4.1",
-    "react-toastify": "^6.0.8",
-    "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^0.88.2"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+	"name": "reactcdm",
+	"version": "0.1.0",
+	"private": true,
+	"dependencies": {
+		"@apollo/react-hooks": "^3.1.5",
+		"@testing-library/jest-dom": "^4.2.4",
+		"@testing-library/react": "^9.5.0",
+		"@testing-library/user-event": "^7.2.1",
+		"apollo-cache-inmemory": "^1.6.5",
+		"apollo-client": "^2.6.8",
+		"apollo-link-context": "^1.0.20",
+		"apollo-link-http": "^1.5.17",
+		"graphql": "^15.3.0",
+		"graphql-tag": "^2.10.3",
+		"jsonwebtoken": "^8.5.1",
+		"react": "^16.13.1",
+		"react-calendar": "^3.1.0",
+		"react-dom": "^16.13.1",
+		"react-router-dom": "^5.1.2",
+		"react-scripts": "3.4.1",
+		"react-toastify": "^6.0.8",
+		"semantic-ui-calendar-react": "^0.15.3",
+		"semantic-ui-css": "^2.4.1",
+		"semantic-ui-react": "^0.88.2"
+	},
+	"engines": {
+		"node": "12.x"
+	},
+	"scripts": {
+		"start": "react-scripts start",
+		"build": "react-scripts build",
+		"test": "react-scripts test",
+		"eject": "react-scripts eject"
+	},
+	"eslintConfig": {
+		"extends": "react-app"
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	}
 }

@@ -22,8 +22,6 @@ import { BrowserRouter, Route } from "react-router-dom";
 import SideNavigation from "../common/side nav";
 import Calendar from "../views/attendence/Calendar";
 
-// import TEMP from "./temp";
-
 const Router = (props) => {
 	return (
 		<AuthProvider>
@@ -49,8 +47,6 @@ const Router = (props) => {
 					{/* <Route exact path="/addclass" component={AddClass} /> */}
 					<Route exact path="/addsubject" component={AddSubject} />
 					<NoReturn exact path="/login" component={Login} />
-
-					{/* <Route exact path="/temp" component={TEMP} /> */}
 				</Container>
 			</BrowserRouter>
 		</AuthProvider>
