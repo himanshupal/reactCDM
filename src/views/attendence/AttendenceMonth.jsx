@@ -1,5 +1,5 @@
 // import MUTATION_ADD_ATTENDENCE_MANY from "../../queries/mutation/addAttendenceMany";
-import { Table, Checkbox, Segment, Button, Grid } from "semantic-ui-react";
+import { Table, Checkbox, Segment, Button, Grid, Dropdown } from "semantic-ui-react";
 import QUERY_ATTENDENCE_MONTH from "../../queries/query/attendenceMonth";
 // eslint-disable-next-line
 import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks";
@@ -20,6 +20,7 @@ const MonthView = (props) => {
 		return dates;
 	};
 	const [disDates, setDisDates] = useState([]);
+	const [confirm, setConfirm] = useState(false);
 	const [variables, setVariables] = useState({});
 	// const [notification, setNotification] = useState([]);
 	const [previousAttendence, setPreviousAttendence] = useState([]);
@@ -28,40 +29,38 @@ const MonthView = (props) => {
 	const [numberOfDays, setNumberOfDays] = useState(new Array(daysInMonth(currentMonth.month, currentMonth.year)).fill());
 
 	const prevMonth = () => {
-		currentMonth.month > 0
-			? setMonth({ ...currentMonth, month: currentMonth.month - 1 })
-			: setMonth({ month: 11, year: currentMonth.year - 1 });
-		setVariables({ cid: data.students[0].class._id });
+		currentMonth.month > 0 ? setMonth({ ...currentMonth, month: currentMonth.month - 1 }) : setMonth({ month: 11, year: currentMonth.year - 1 });
 		getAttendence();
 	};
 	const nextMonth = () => {
-		currentMonth.month < 11
-			? setMonth({ ...currentMonth, month: currentMonth.month + 1 })
-			: setMonth({ month: 0, year: currentMonth.year + 1 });
-		setVariables({ cid: data.students[0].class._id });
+		currentMonth.month < 11 ? setMonth({ ...currentMonth, month: currentMonth.month + 1 }) : setMonth({ month: 0, year: currentMonth.year + 1 });
 		getAttendence();
 	};
 
 	useEffect(() => {
-		if (newData)
+		if (newData) {
+			setDisDates([]);
+			setConfirm(false);
 			setPreviousAttendence(
 				new Array(daysInMonth(currentMonth.month, currentMonth.year)).fill(false).map((x, idx) =>
-					newData.attendenceMonth && newData.attendenceMonth.map((y) => Number(y.day.split(`-`)[2])).includes(idx)
+					newData.attendenceMonth && newData.attendenceMonth.map((y) => Number(y.day.split(`-`)[2])).includes(idx + 1)
 						? newData.attendenceMonth
-								.filter((y) => Number(y.day.split(`-`)[2]) === idx)
+								.filter((y) => Number(y.day.split(`-`)[2]) === idx + 1)
 								.map((y) => {
 									return { students: y.students || [], holiday: y.holiday };
 								})
 						: x
 				)
 			);
-		else if (data) {
+		} else if (data) {
+			setDisDates([]);
+			setConfirm(false);
 			setVariables({ cid: data.students[0].class._id });
 			setPreviousAttendence(
 				new Array(daysInMonth(currentMonth.month, currentMonth.year)).fill(false).map((x, idx) =>
-					data.attendenceMonth && data.attendenceMonth.map((y) => Number(y.day.split(`-`)[2])).includes(idx)
+					data.attendenceMonth && data.attendenceMonth.map((y) => Number(y.day.split(`-`)[2])).includes(idx + 1)
 						? data.attendenceMonth
-								.filter((y) => Number(y.day.split(`-`)[2]) === idx)
+								.filter((y) => Number(y.day.split(`-`)[2]) === idx + 1)
 								.map((y) => {
 									return { students: y.students || [], holiday: y.holiday };
 								})
@@ -77,7 +76,7 @@ const MonthView = (props) => {
 	}, [currentMonth]);
 
 	useEffect(() => {
-		setDisDates((disDates) => [...disDates, ...previousAttendence.map((x, idx) => x && x[0].holiday && --idx).filter((x) => x)]);
+		setDisDates((disDates) => [...disDates, ...previousAttendence.map((x, idx) => x && x[0].holiday && idx).filter((x) => x)]);
 	}, [previousAttendence]);
 
 	if (loading) return <h2>Loading...</h2>;
@@ -92,7 +91,33 @@ const MonthView = (props) => {
 					</Grid.Column>
 					<Grid.Column textAlign="center" verticalAlign="middle">
 						<h3>
-							{constants.months[currentMonth.month]}, {currentMonth.year}
+							<Dropdown
+								inline
+								search
+								scrolling
+								text={constants.months[currentMonth.month]}
+								options={constants.months.map((x, idx) => {
+									return { text: x, value: idx };
+								})}
+								onChange={(_, { value }) => {
+									setMonth({ ...currentMonth, month: value });
+									getAttendence();
+								}}
+							/>
+							&nbsp;
+							<Dropdown
+								inline
+								search
+								scrolling
+								text={currentMonth.year.toString()}
+								options={new Array(new Date().getFullYear() - 1995).fill(new Date().getFullYear()).map((x, idx) => {
+									return { text: (x - idx).toString(), value: x - idx };
+								})}
+								onChange={(_, { value }) => {
+									setMonth({ ...currentMonth, year: value });
+									getAttendence();
+								}}
+							/>
 						</h3>
 					</Grid.Column>
 					<Grid.Column textAlign="right" verticalAlign="middle">
@@ -102,17 +127,17 @@ const MonthView = (props) => {
 			</Grid>
 			<Segment basic style={{ padding: 0 }}>
 				<div style={{ overflowX: `scroll`, overflowY: `hidden` }}>
-					<Table compact striped celled sortable size="small" color="violet">
+					<Table compact striped celled sortable selectable size="small" color="violet">
 						<Table.Header>
 							<Table.Row>
-								<Table.HeaderCell verticalAlign="middle">Date →{/* <br />
-									Students ↓ */}</Table.HeaderCell>
+								<Table.HeaderCell verticalAlign="middle">Date →</Table.HeaderCell>
 								{numberOfDays.map((_, date) => (
 									<Table.HeaderCell
 										verticalAlign="middle"
 										textAlign="center"
 										key={date}
 										onDoubleClick={() => {
+											setConfirm(false);
 											if (sundays.includes(date)) return;
 											setVariables((variables) => {
 												data.students &&
@@ -129,6 +154,7 @@ const MonthView = (props) => {
 											});
 										}}
 										onClick={() => {
+											setConfirm(false);
 											if (sundays.includes(date)) return;
 											variables[`holiday` + date]
 												? setVariables((variables) => {
@@ -160,45 +186,50 @@ const MonthView = (props) => {
 								<Table.Row key={idx}>
 									<Table.Cell
 										verticalAlign="middle"
-										onDoubleClick={() =>
+										onDoubleClick={() => {
+											setConfirm(false);
 											setVariables((variables) => {
 												numberOfDays.forEach((_, idx) => {
 													variables = {
 														...variables,
-														[`students` + idx]: variables[`students` + idx]
-															? variables[`students` + idx].includes(student._id)
-																? variables[`students` + idx]
-																: [...variables[`students` + idx], student._id]
-															: [...(variables[`students` + idx] || []), student._id],
+														[`students` + idx]:
+															sundays.includes(idx) || disDates.includes(idx)
+																? undefined
+																: variables[`students` + idx]
+																? variables[`students` + idx].includes(student._id)
+																	? variables[`students` + idx]
+																	: [...variables[`students` + idx], student._id]
+																: [...(variables[`students` + idx] || []), student._id],
 														[`day` + idx]: `${currentMonth.year}-${(currentMonth.month + 1).toString().padStart(2, 0)}-${(idx + 1)
 															.toString()
 															.padStart(2, 0)}`,
 													};
 												});
 												return variables;
-											})
-										}
+											});
+										}}
 									>
-										<b>
+										<em>
 											{student.name.first}&nbsp;{student.name.last}
-										</b>
+										</em>
 									</Table.Cell>
 									{numberOfDays.map((_, idx) => (
 										<Table.Cell verticalAlign="middle" textAlign="center" key={idx}>
 											{sundays.includes(idx) ? (
-												`S`
+												<em>S</em>
 											) : disDates.includes(idx) ? (
-												`H`
+												<em>H</em>
 											) : (
 												<Checkbox
 													checked={
 														variables[`students` + idx]
 															? variables[`students` + idx].includes(student._id)
-															: previousAttendence[idx + 1] && previousAttendence[idx + 1][0].students.includes(student._id)
+															: previousAttendence[idx] && previousAttendence[idx][0].students.includes(student._id)
 													}
-													onClick={() =>
+													onClick={() => {
+														setConfirm(false);
 														variables[`students` + idx] && variables[`students` + idx].includes(student._id)
-															? previousAttendence[idx + 1] && previousAttendence[idx + 1][0].students.includes(student._id)
+															? previousAttendence[idx] && previousAttendence[idx][0].students.includes(student._id)
 																? setVariables((variables) => {
 																		return {
 																			...variables,
@@ -216,7 +247,7 @@ const MonthView = (props) => {
 																				[`students` + idx]: [...variables[`students` + idx].filter((x) => x !== student._id)],
 																			};
 																  })
-															: previousAttendence[idx + 1] && previousAttendence[idx + 1][0].students.includes(student._id)
+															: previousAttendence[idx] && previousAttendence[idx][0].students.includes(student._id)
 															? variables[`students` + idx] && !variables[`students` + idx].includes(student._id)
 																? setVariables({
 																		...variables,
@@ -225,24 +256,20 @@ const MonthView = (props) => {
 																: setVariables((variables) => {
 																		return {
 																			...variables,
-																			[`day` + idx]: `${currentMonth.year}-${(currentMonth.month + 1).toString().padStart(2, 0)}-${(
-																				idx + 1
-																			)
+																			[`day` + idx]: `${currentMonth.year}-${(currentMonth.month + 1).toString().padStart(2, 0)}-${(idx + 1)
 																				.toString()
 																				.padStart(2, 0)}`,
-																			[`students` + idx]: previousAttendence[idx + 1][0].students.filter((x) => x !== student._id),
+																			[`students` + idx]: previousAttendence[idx][0].students.filter((x) => x !== student._id),
 																		};
 																  })
 															: setVariables({
 																	...variables,
-																	[`day` + idx]: `${currentMonth.year}-${(currentMonth.month + 1).toString().padStart(2, 0)}-${(
-																		idx + 1
-																	)
+																	[`day` + idx]: `${currentMonth.year}-${(currentMonth.month + 1).toString().padStart(2, 0)}-${(idx + 1)
 																		.toString()
 																		.padStart(2, 0)}`,
 																	[`students` + idx]: [...(variables[`students` + idx] || []), student._id],
-															  })
-													}
+															  });
+													}}
 												/>
 											)}
 										</Table.Cell>
@@ -250,29 +277,48 @@ const MonthView = (props) => {
 								</Table.Row>
 							))}
 							<Table.Row>
-								<Table.Cell textAlign="right">Total :</Table.Cell>
+								<Table.Cell textAlign="right">
+									<b>Total :</b>
+								</Table.Cell>
 								{numberOfDays.map((_, idx) => (
 									<Table.Cell key={idx} textAlign="center">
-										{sundays.includes(idx)
-											? `S`
-											: variables[`holiday` + idx]
-											? 0
-											: variables[`students` + idx]
-											? variables[`students` + idx].length
-											: previousAttendence[idx + 1]
-											? previousAttendence[idx + 1][0].students.length
-											: 0}
+										{sundays.includes(idx) ? (
+											<b>#</b>
+										) : variables[`holiday` + idx] ? (
+											0
+										) : variables[`students` + idx] ? (
+											variables[`students` + idx].length
+										) : previousAttendence[idx] ? (
+											previousAttendence[idx][0].students.length
+										) : (
+											0
+										)}
 									</Table.Cell>
 								))}
 							</Table.Row>
 						</Table.Body>
 						<Table.Footer fullWidth>
 							<Table.Row>
-								<Table.HeaderCell colSpan={numberOfDays.length + 1}>
-									<Button fluid as="p" disabled={Object.keys(variables).length <= 1} onClick={() => console.log(variables)}>
-										Submit
-									</Button>
-								</Table.HeaderCell>
+								{confirm ? (
+									<>
+										<Table.HeaderCell colSpan={numberOfDays.length / 2 + 1}>
+											<Button fluid color="green" as="p" onClick={() => console.log(variables)}>
+												Yes
+											</Button>
+										</Table.HeaderCell>
+										<Table.HeaderCell colSpan={numberOfDays.length % 2 === 0 ? numberOfDays.length / 2 : numberOfDays.length / 2 + 1}>
+											<Button fluid color="youtube" as="p" onClick={() => setConfirm(false)}>
+												No
+											</Button>
+										</Table.HeaderCell>
+									</>
+								) : (
+									<Table.HeaderCell colSpan={numberOfDays.length + 1}>
+										<Button fluid color="violet" as="p" disabled={Object.keys(variables).length <= 1} onClick={() => setConfirm(true)}>
+											Submit
+										</Button>
+									</Table.HeaderCell>
+								)}
 							</Table.Row>
 						</Table.Footer>
 					</Table>
