@@ -1,5 +1,5 @@
-import store from "../src/context/redux";
-import { useStoreState, StoreProvider } from "easy-peasy";
+// import store from "../src/context/redux";
+// import { StoreProvider } from "easy-peasy";
 
 import React from "react";
 import Router from "./routes/router";
@@ -9,10 +9,6 @@ import { createHttpLink } from "apollo-link-http";
 import { ApolloProvider } from "@apollo/react-hooks";
 import { InMemoryCache } from "apollo-cache-inmemory";
 
-const httpLink = createHttpLink({
-	uri: "http://localhost",
-});
-
 const authLink = setContext(() => {
 	let token;
 	if (localStorage.userDetails) {
@@ -21,20 +17,24 @@ const authLink = setContext(() => {
 	}
 	return {
 		headers: {
-			Authorization: localStorage.userDetails ? `Bearer#${token}` : ``,
+			Authorization: localStorage.userDetails ? process.env.REACT_APP_AUTH_HEAD + `#` + token : ``,
 		},
 	};
 });
 
 const client = new ApolloClient({
-	link: authLink.concat(httpLink),
+	link: authLink.concat(
+		createHttpLink({
+			uri: process.env.REACT_APP_DB_LINK,
+		})
+	),
 	cache: new InMemoryCache(),
 });
 
 export default (
-	<StoreProvider store={store}>
-		<ApolloProvider client={client}>
-			<Router />
-		</ApolloProvider>
-	</StoreProvider>
+	// <StoreProvider store={store}>
+	<ApolloProvider client={client}>
+		<Router />
+	</ApolloProvider>
+	// </StoreProvider>
 );
