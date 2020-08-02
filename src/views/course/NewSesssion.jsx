@@ -39,9 +39,7 @@ const SingleClass = ({ loop, course, session, variables, setVariables, notificat
 			<Form.Group>
 				<Form.Input
 					disabled={!session && loop === 0}
-					required={
-						course.semesterBased ? (session && loop === 0 ? loop === 0 : loop !== 0) : session && loop !== 0 ? loop === 0 : loop !== 0
-					}
+					required={course.semesterBased ? (session && loop === 0 ? loop === 0 : loop !== 0) : session && loop !== 0 ? loop === 0 : loop !== 0}
 					name={`name` + loop}
 					placeholder="Previous name of the class"
 					label="Current Name"
@@ -121,9 +119,7 @@ const SingleClass = ({ loop, course, session, variables, setVariables, notificat
 						name={`sessionEnd` + loop}
 						label="Session End date"
 						value={variables[`sessionEnd` + loop] ? variables[`sessionEnd` + loop] : ``}
-						onFocus={
-							variables[`sessionEnd` + loop] ? null : ({ target: { name } }) => setVariables({ ...variables, [name]: sessionEnd })
-						}
+						onFocus={variables[`sessionEnd` + loop] ? null : ({ target: { name } }) => setVariables({ ...variables, [name]: sessionEnd })}
 					/>
 				</Form.Group>
 			)}
@@ -139,7 +135,8 @@ const NewSesssion = (props) => {
 	const [courseArray, setCourseArray] = useState([]);
 	const [course, setCourse] = useState({});
 	const [variables, setVariables] = useState({});
-	const [session, setSession] = useState(new Date().getMonth() >= 6);
+	const [override, setOverride] = useState(true);
+	const [session, setSession] = useState(new Date().getMonth() < 6);
 
 	const [newSession, { loading }] = useMutation(MUTATION_NEWSESSION, {
 		update: (_, { data }) => {
@@ -159,19 +156,22 @@ const NewSesssion = (props) => {
 		<Segment className={loading ? `loading` : ``}>
 			<div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
 				<h1 style={{ margin: "0" }}>Change Session</h1>
-				{course.semesterBased && (
-					<Button
-						as="p"
-						color="black"
-						size="medium"
-						onClick={() => {
-							setVariables({ course: variables.course || `` });
-							setSession((session) => !session);
-						}}
-					>
-						{session ? `To Even (Update Classes)` : `To Odd (Add New Class)`}
-					</Button>
-				)}
+				<div className={{ display: `flex`, alignItems: `right` }}>
+					{variables.course && <Button onClick={() => setOverride((override) => !override)} icon="icon flag" color="youtube" />}
+					{course.semesterBased && (
+						<Button
+							as="p"
+							color="black"
+							size="medium"
+							onClick={() => {
+								setVariables({ course: variables.course || `` });
+								setSession((session) => !session);
+							}}
+						>
+							{session ? `To Even (Update Classes)` : `To Odd (Add New Class)`}
+						</Button>
+					)}
+				</div>
 			</div>
 			<Divider />
 			<Form
@@ -208,19 +208,16 @@ const NewSesssion = (props) => {
 						}
 						onChange={(_, { name, value }) => {
 							setCourse(
-								privAccess
-									? courseArray.filter((x) => x._id === value)[0]
-									: data.departments.departments[0].courses.filter((x) => x._id === value)[0]
+								privAccess ? courseArray.filter((x) => x._id === value)[0] : data.departments.departments[0].courses.filter((x) => x._id === value)[0]
 							);
 							setVariables({ [name]: value });
-							setSession(courseArray.filter((x) => x._id === value)[0].semesterBased);
 						}}
 					/>
 				</Form.Group>
 				{course.name &&
 					[
 						...Array(
-							new Date().getFullYear() - new Date(course.createdAt).getFullYear() < Number(course.duration.match(/\d/)[0])
+							new Date().getFullYear() - new Date(course.createdAt).getFullYear() < Number(course.duration.match(/\d/)[0]) && override
 								? new Date().getFullYear() - new Date(course.createdAt).getFullYear() + 1
 								: session
 								? Number(course.duration.match(/\d/)[0])
