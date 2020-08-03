@@ -1,0 +1,30 @@
+textarea {
+	min-width: -moz-available;
+	max-width: -moz-available;
+	min-width: -webkit-fill-available;
+	max-width: -webkit-fill-available;
+	border-radius: 5px;
+	padding: 0.3rem;
+}
+
+.textarea__dark {
+	border: 1px solid #2b2c2d;
+	background: #1b1c1d;
+	color: whitesmoke;
+}
+
+.textarea__dark::selection {
+	background: whitesmoke;
+	color: #1b1b1b;
+}
+
+.textarea__light {
+	border: 1px solid #dedede;
+	background: white;
+	color: #1b1c1d;
+}
+
+.textarea__light::selection {
+	background: #00f;
+	color: white;
+}
