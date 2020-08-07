@@ -6,7 +6,7 @@ import { Segment, Table, Icon } from "semantic-ui-react";
 export default ({ data, history, dark }) => {
 	const getDay = (date) => {
 		const str = date.split(`-`);
-		return Constants.months[Number(str[1])] + ` ` + str[2] + `, ` + +str[0];
+		return Constants.months[Number(str[1]) - 1] + ` ` + str[2] + `, ` + +str[0];
 	};
 
 	return (
@@ -61,6 +61,36 @@ export default ({ data, history, dark }) => {
 						<Table.Row>
 							<Table.Cell content="Date of Birth" />
 							<Table.Cell content={data.dateOfBirth ? getDay(data.dateOfBirth) : null} />
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell colSpan="2" content="Current Address" icon="chevron down" />
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell content="Locality" />
+							<Table.Cell content={data.address.current.locality} />
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell content="Tehsil" />
+							<Table.Cell content={data.address.current.tehsil} />
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell content="District" />
+							<Table.Cell content={data.address.current.district} />
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell colSpan="2" content="Permanent Address" icon="chevron down" />
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell content="Locality" />
+							<Table.Cell content={data.address.permanent.locality} />
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell content="Tehsil" />
+							<Table.Cell content={data.address.permanent.tehsil} />
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell content="District" />
+							<Table.Cell content={data.address.permanent.district} />
 						</Table.Row>
 					</Table.Body>
 				</Table>

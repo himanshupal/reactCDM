@@ -2,6 +2,7 @@ import { Segment, Grid, Image, Button, Menu, Transition, Icon } from "semantic-u
 import QUERY_STUDENT from "../../queries/query/student";
 import { useQuery, useLazyQuery } from "@apollo/react-hooks";
 import QUERY_NOTES from "../../queries/query/notes";
+import Calendar from "../attendence/Calendar";
 import React, { useState } from "react";
 import Notices from "./student/Notices";
 import About from "./student/About";
@@ -62,9 +63,7 @@ const Overview = ({ data, history, dark, setDark, notes, getNotes, loading }) =>
 
 const Attendence = ({ dark }) => (
 	<Segment.Group>
-		<Segment inverted={dark}>Seg 1</Segment>
-		<Segment inverted={dark}>Seg 2</Segment>
-		<Segment inverted={dark}>Seg 3</Segment>
+		<Calendar />
 	</Segment.Group>
 );
 const Performance = ({ dark }) => (
