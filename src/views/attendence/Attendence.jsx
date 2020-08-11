@@ -8,6 +8,7 @@ import Notify from "../../common/Notify";
 const StudentsList = ({ students, present, setPresent, holiday }) =>
 	students.map((student, idx) => (
 		<Table.Row key={idx} children="button">
+			<Table.Cell>{idx + 1}</Table.Cell>
 			<Table.Cell>{student.rollNumber ? student.rollNumber : `- - -`}</Table.Cell>
 			<Table.Cell>{student.name.first}</Table.Cell>
 			<Table.Cell>{student.name.last ? student.name.last : `- - -`}</Table.Cell>
@@ -18,9 +19,7 @@ const StudentsList = ({ students, present, setPresent, holiday }) =>
 					disabled={holiday}
 					color={present.includes(student._id) ? `green` : `youtube`}
 					onClick={() =>
-						present.includes(student._id)
-							? setPresent(present.filter((x) => x !== student._id))
-							: setPresent([...present, student._id])
+						present.includes(student._id) ? setPresent(present.filter((x) => x !== student._id)) : setPresent([...present, student._id])
 					}
 				>
 					{present.includes(student._id) ? `Yes` : `No`}
@@ -84,6 +83,7 @@ const Attendence = (props) => {
 					<Table attached="bottom" sortable compact celled striped>
 						<Table.Header>
 							<Table.Row>
+								<Table.HeaderCell>S. No.</Table.HeaderCell>
 								<Table.HeaderCell>Roll No.</Table.HeaderCell>
 								<Table.HeaderCell>First Name</Table.HeaderCell>
 								<Table.HeaderCell>Last Name</Table.HeaderCell>
@@ -95,7 +95,7 @@ const Attendence = (props) => {
 						</Table.Body>
 						<Table.Footer fullWidth>
 							<Table.Row>
-								<Table.HeaderCell colSpan="1">
+								<Table.HeaderCell colSpan="2">
 									<Button
 										fluid
 										as="p"
@@ -121,7 +121,7 @@ const Attendence = (props) => {
 									</Table.HeaderCell>
 								)}
 								<Table.HeaderCell colSpan={holiday ? 1 : 3} textAlign="right">
-									<Button disabled={!variables.holiday && !variables.students} as="p" onClick={() => addAttendence()}>
+									<Button fluid disabled={!variables.holiday && !variables.students} as="p" onClick={() => addAttendence()}>
 										Submit
 									</Button>
 								</Table.HeaderCell>

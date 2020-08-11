@@ -95,7 +95,7 @@ const TeacherProfile = ({ update }) => {
 								options={data.departments.departments.map((x) => {
 									return {
 										text: x.name,
-										value: x.name,
+										value: x._id,
 									};
 								})}
 							/>
@@ -112,13 +112,7 @@ const TeacherProfile = ({ update }) => {
 					)}
 				</Form.Group>
 				<Form.Group>
-					<Form.Input
-						onChange={onChange}
-						pattern="[\w-]+"
-						name="registrationNumber"
-						label="Registration Number"
-						placeholder="Alphanumeric only"
-					/>
+					<Form.Input onChange={onChange} pattern="[\w-]+" name="registrationNumber" label="Registration Number" placeholder="Alphanumeric only" />
 					{update && (
 						<>
 							<Form.Select
@@ -155,7 +149,7 @@ const TeacherProfile = ({ update }) => {
 								options={data.departments.departments.map((x) => {
 									return {
 										text: x.name,
-										value: x.name,
+										value: x._id,
 									};
 								})}
 							/>
@@ -172,24 +166,9 @@ const TeacherProfile = ({ update }) => {
 					)}
 				</Form.Group>
 				<Form.Group>
-					<Form.Input
-						onChange={onChange}
-						pattern="[\w\s]+"
-						name="firstName"
-						required
-						label="First Name"
-						placeholder="First + Middle Name"
-					/>
+					<Form.Input onChange={onChange} pattern="[\w\s]+" name="firstName" required label="First Name" placeholder="First + Middle Name" />
 					<Form.Input onChange={onChange} pattern="[a-zA-Z]+" name="lastName" label="Last Name" placeholder="Last Name" />
-					<Form.Select
-						search
-						required
-						name="gender"
-						label="Gender"
-						onChange={onChange}
-						options={constants.gender}
-						placeholder="Select Gender"
-					/>
+					<Form.Select search required name="gender" label="Gender" onChange={onChange} options={constants.gender} placeholder="Select Gender" />
 				</Form.Group>
 				<Form.Group>
 					<Form.Input
@@ -235,15 +214,7 @@ const TeacherProfile = ({ update }) => {
 					)}
 				</Form.Group>
 				<Form.Group>
-					<Form.Select
-						search
-						required
-						name="caste"
-						label="Caste"
-						onChange={onChange}
-						options={constants.caste}
-						placeholder="Select Caste"
-					/>
+					<Form.Select search required name="caste" label="Caste" onChange={onChange} options={constants.caste} placeholder="Select Caste" />
 					<Form.Select
 						search
 						required
@@ -264,14 +235,7 @@ const TeacherProfile = ({ update }) => {
 					/>
 				</Form.Group>
 				<Form.Group>
-					<Form.Input
-						required
-						type="email"
-						label="Email Address"
-						name="email"
-						onChange={onChange}
-						placeholder="email.address@site.domain"
-					/>
+					<Form.Input required type="email" label="Email Address" name="email" onChange={onChange} placeholder="email.address@site.domain" />
 					<Form.Input
 						required
 						type="phone"
@@ -296,14 +260,7 @@ const TeacherProfile = ({ update }) => {
 				<Form.Group>
 					<Form.Input required onChange={onChange} pattern="[\w\s.,-]+" name="addressCurrentLocality" placeholder="Locality" />
 					<Form.Input required onChange={onChange} pattern="[\w\s.,-]+" name="addressCurrentTehsil" placeholder="Tehsil" />
-					<Form.Select
-						search
-						required
-						name="addressCurrentDistrict"
-						onChange={onChange}
-						placeholder="District"
-						options={constants.district}
-					/>
+					<Form.Select search required name="addressCurrentDistrict" onChange={onChange} placeholder="District" options={constants.district} />
 				</Form.Group>
 				<label>
 					<b

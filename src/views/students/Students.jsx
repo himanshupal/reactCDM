@@ -55,7 +55,7 @@ const StudentsTable = ({ students }) => (
 	</Table>
 );
 
-const Students = ({ history }) => {
+const Students = (props) => {
 	const { user } = useContext(AuthContext);
 	const privAccess = user && user.access === `Director`;
 	const { loading: crsFetch, error: fetchErr, data } = useQuery(QUERY_COURSES);
@@ -63,8 +63,6 @@ const Students = ({ history }) => {
 	const [getStudents, { loading: loadingStudents, data: studentsList }] = useLazyQuery(QUERY_STUDENTS);
 	const [courseArray, setCourseArray] = useState([]);
 	const [studentsArray, setStudentsArray] = useState([]);
-
-	console.log(history);
 
 	useEffect(() => {
 		if (sessionStorage.Students) {
@@ -122,7 +120,7 @@ const Students = ({ history }) => {
 						search
 						name="class"
 						label="Class"
-						placeholder="Select a Class to add Student in"
+						placeholder="Select a Class to get Student of"
 						options={
 							classList
 								? classList.classes.map((x) => {
@@ -135,9 +133,7 @@ const Students = ({ history }) => {
 				</Form.Group>
 			</Form>
 			{studentsArray.length > 0 && <StudentsTable students={studentsArray} />}
-			{studentsList && studentsList.students.length === 0 && (
-				<Notify list={[{ message: `Class doesn't have any students registered yet !` }]} />
-			)}
+			{studentsList && studentsList.students.length === 0 && <Notify list={[{ message: `Class doesn't have any students registered yet !` }]} />}
 		</Segment>
 	);
 };

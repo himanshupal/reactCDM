@@ -7,13 +7,6 @@ export default gql`
 				_id
 				name
 			}
-			teachers {
-				_id
-				name {
-					first
-					last
-				}
-			}
 		}
 	}
 `;

@@ -53,7 +53,7 @@ const AddStudent = ({ update }) => {
 					addStudent();
 				}}
 			>
-				<Image size="small" centered bordered src={src} />
+				<Image size="small" centered src={src} />
 				<Divider />
 
 				<div className="field">
@@ -118,14 +118,7 @@ const AddStudent = ({ update }) => {
 				</Form.Group>
 
 				<Form.Group>
-					<Form.Input
-						min="1"
-						name="enrollmentNumber"
-						label="Enrollment Number"
-						onChange={onChange}
-						placeholder="Enrollment Number"
-						type="number"
-					/>
+					<Form.Input min="1" name="enrollmentNumber" label="Enrollment Number" onChange={onChange} placeholder="Enrollment Number" type="number" />
 					<Form.Input min="1" name="rollNumber" label="Roll Number" onChange={onChange} placeholder="Roll Number" type="number" />
 					<Form.Input
 						required
@@ -154,27 +147,11 @@ const AddStudent = ({ update }) => {
 
 				<Form.Group>
 					<Form.Select search required name="caste" label="Caste" options={constants.caste} onChange={onChange} placeholder="Caste" />
-					<Form.Select
-						search
-						required
-						name="religion"
-						label="Religion"
-						options={constants.religion}
-						onChange={onChange}
-						placeholder="Religion"
-					/>
+					<Form.Select search required name="religion" label="Religion" options={constants.religion} onChange={onChange} placeholder="Religion" />
 				</Form.Group>
 
 				<Form.Group>
-					<Form.Select
-						search
-						required
-						name="gender"
-						label="Gender"
-						options={constants.gender}
-						onChange={onChange}
-						placeholder="Gender"
-					/>
+					<Form.Select search required name="gender" label="Gender" options={constants.gender} onChange={onChange} placeholder="Gender" />
 					<Form.Select
 						search
 						required
@@ -187,14 +164,7 @@ const AddStudent = ({ update }) => {
 				</Form.Group>
 
 				<Form.Group>
-					<Form.Input
-						required
-						name="fatherName"
-						label="Father's Name"
-						onChange={onChange}
-						placeholder="Father's Name"
-						pattern="[\w\s]+"
-					/>
+					<Form.Input required name="fatherName" label="Father's Name" onChange={onChange} placeholder="Father's Name" pattern="[\w\s]+" />
 					<Form.Input
 						required
 						name="fatherOccupation"
@@ -215,14 +185,7 @@ const AddStudent = ({ update }) => {
 				</Form.Group>
 
 				<Form.Group>
-					<Form.Input
-						required
-						name="motherName"
-						label="Mother's Name"
-						onChange={onChange}
-						placeholder="Mother's Name"
-						pattern="[\w\s]+"
-					/>
+					<Form.Input required name="motherName" label="Mother's Name" onChange={onChange} placeholder="Mother's Name" pattern="[\w\s]+" />
 					<Form.Input
 						name="motherOccupation"
 						label="Mother's Occupation"
@@ -278,14 +241,7 @@ const AddStudent = ({ update }) => {
 						label="Username"
 						placeholder="Alphanumeric only"
 					/>
-					<Form.Input
-						required
-						type="email"
-						label="Email Address"
-						name="email"
-						onChange={onChange}
-						placeholder="email.address@site.domain"
-					/>
+					<Form.Input required type="email" label="Email Address" name="email" onChange={onChange} placeholder="email.address@site.domain" />
 					<Form.Input
 						required
 						onChange={onChange}
@@ -302,14 +258,7 @@ const AddStudent = ({ update }) => {
 				<Form.Group>
 					<Form.Input required onChange={onChange} pattern="[\w\s.,-]+" name="addressCurrentLocality" placeholder="Locality" />
 					<Form.Input required onChange={onChange} pattern="[\w\s.,-]+" name="addressCurrentTehsil" placeholder="Tehsil" />
-					<Form.Select
-						search
-						required
-						name="addressCurrentDistrict"
-						onChange={onChange}
-						placeholder="District"
-						options={constants.district}
-					/>
+					<Form.Select search required name="addressCurrentDistrict" onChange={onChange} placeholder="District" options={constants.district} />
 				</Form.Group>
 				<label>
 					<b
