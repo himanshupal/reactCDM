@@ -1,26 +1,27 @@
-import React from "react";
+import React from "react"
 // import Home from "../views/home";
-import AddCourse from "../views/course/AddCourse";
-import AddSubject from "../views/class/AddSubject";
-import TimeTable from "../views/class/TimeTable";
-import NewSession from "../views/course/NewSesssion";
-import AddTeacher from "../views/teachers/AddTeacher";
-import AddStudent from "../views/students/AddStudent";
-import Teachers from "../views/teachers/Teachers";
-import Teacher from "../views/teachers/Teacher";
-import Students from "../views/students/Students";
-import Student from "../views/students/Student";
-import Login from "../views/auth/Login";
-import Attendence from "../views/attendence/Attendence";
-import AttendenceMonth from "../views/attendence/AttendenceMonth";
+import AddCourse from "../views/course/AddCourse"
+import AddSubject from "../views/class/AddSubject"
+import TimeTable from "../views/class/TimeTable"
+import CreateTimeTable from "../views/class/ChangeTimeTable"
+import NewSession from "../views/course/NewSesssion"
+import AddTeacher from "../views/teachers/AddTeacher"
+import AddStudent from "../views/students/AddStudent"
+import Teachers from "../views/teachers/Teachers"
+import Teacher from "../views/teachers/Teacher"
+import Students from "../views/students/Students"
+import Student from "../views/students/Student"
+import Login from "../views/auth/Login"
+import Attendence from "../views/attendence/Attendence"
+import AttendenceMonth from "../views/attendence/AttendenceMonth"
 
-import Navigator from "../common/navigator";
+import Navigator from "../common/navigator"
 // import AddClass from "../views/class/AddClass";
 // import Logout from "../views/auth/Logout";
-import { AuthProvider } from "../context/Auth";
-import NoReturn from "./protectedRoute";
-import { Container } from "semantic-ui-react";
-import { BrowserRouter, Route } from "react-router-dom";
+import { AuthProvider } from "../context/Auth"
+import NoReturn from "./protectedRoute"
+import { Container } from "semantic-ui-react"
+import { BrowserRouter, Route } from "react-router-dom"
 // import SideNavigation from "../common/side nav";
 
 const Router = (props) => {
@@ -41,6 +42,7 @@ const Router = (props) => {
 					<Route exact path="/attendence" component={Attendence} />
 					<Route exact path="/attendencemonth" component={AttendenceMonth} />
 					<Route exact path="/timetable" component={TimeTable} />
+					<Route exact path="/addtimetable" component={CreateTimeTable} />
 					<Route exact path="/students/:username" component={Student} />
 					<Route exact path="/teacher/:username" component={Teacher} />
 					<Route exact path="/teachers" component={Teachers} />
@@ -51,7 +53,7 @@ const Router = (props) => {
 				</Container>
 			</BrowserRouter>
 		</AuthProvider>
-	);
-};
+	)
+}
 
-export default Router;
+export default Router

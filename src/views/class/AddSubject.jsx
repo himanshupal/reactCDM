@@ -1,42 +1,42 @@
-import QUERY_COURSES from "../../queries/query/courses";
-import QUERY_CLASSES from "../../queries/query/classes";
-import MUTATION_NEWSUBJECT from "../../queries/mutation/addSubject";
-import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks";
-import React, { useState, useContext } from "react";
-import { Form, Segment, Divider } from "semantic-ui-react";
-import { AuthContext } from "../../context/Auth";
-import Notify from "../../common/Notify";
+import QUERY_COURSES from "../../queries/query/courses"
+import QUERY_CLASSES from "../../queries/query/classes"
+import MUTATION_NEWSUBJECT from "../../queries/mutation/addSubject"
+import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks"
+import React, { useState, useContext } from "react"
+import { Form, Segment, Divider } from "semantic-ui-react"
+import { AuthContext } from "../../context/Auth"
+import Notify from "../../common/Notify"
 
 const AddSubject = () => {
-	const { user } = useContext(AuthContext);
-	const privAccess = user && user.access === `Director`;
-	const { loading: crsFetch, error: fetchErr, data } = useQuery(QUERY_COURSES);
-	const [getClasses, { loading: loadingClasses, data: classList }] = useLazyQuery(QUERY_CLASSES);
-	const [numberOfSubjects, changeNumberOfSubjects] = useState([undefined]);
-	const [subjectAdded, changeSubjectAdded] = useState(false);
-	const [notification, setNotification] = useState([]);
-	const [courseArray, setCourseArray] = useState([]);
-	const [confirm, setConfirm] = useState(false);
-	const [variables, setVariables] = useState({});
+	const { user } = useContext(AuthContext)
+	const privAccess = user && user.access === `Director`
+	const { loading: crsFetch, error: fetchErr, data } = useQuery(QUERY_COURSES)
+	const [getClasses, { loading: loadingClasses, data: classList }] = useLazyQuery(QUERY_CLASSES)
+	const [numberOfSubjects, changeNumberOfSubjects] = useState([undefined])
+	const [subjectAdded, changeSubjectAdded] = useState(false)
+	const [notification, setNotification] = useState([])
+	const [courseArray, setCourseArray] = useState([])
+	const [confirm, setConfirm] = useState(false)
+	const [variables, setVariables] = useState({})
 
 	const [addSubject, { loading }] = useMutation(MUTATION_NEWSUBJECT, {
 		update: (_, { data }) => {
-			setNotification([...notification, { message: data.addSubject }]);
+			setNotification([...notification, { message: data.addSubject }])
 		},
 		onError: ({ graphQLErrors, networkError, message }) => {
-			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }]);
-			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }]);
+			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }])
+			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }])
 		},
 		variables,
-	});
+	})
 
-	if (crsFetch) return <h2>Loading...</h2>;
-	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>;
+	if (crsFetch) return <h2>Loading...</h2>
+	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>
 
 	const onChange = (_, { name, value }) => {
-		if (notification.length > 0) setNotification([]);
-		setVariables({ ...variables, [name]: value });
-	};
+		if (notification.length > 0) setNotification([])
+		setVariables({ ...variables, [name]: value })
+	}
 
 	return (
 		<Segment className={loading ? `loading` : ``}>
@@ -45,9 +45,9 @@ const AddSubject = () => {
 			<Form
 				widths="equal"
 				onSubmit={(e) => {
-					if (confirm) addSubject();
-					e.preventDefault();
-					setConfirm(false);
+					if (confirm) addSubject()
+					e.preventDefault()
+					setConfirm(false)
 				}}
 			>
 				<Form.Group>
@@ -57,7 +57,7 @@ const AddSubject = () => {
 							label="Department"
 							placeholder="Select a Department to get Course list of"
 							options={data.departments.departments.map((x) => {
-								return { text: x.name, value: x._id };
+								return { text: x.name, value: x._id }
 							})}
 							onChange={(_, { value }) => setCourseArray(data.departments.departments.filter((x) => x._id === value)[0].courses)}
 						/>
@@ -69,16 +69,16 @@ const AddSubject = () => {
 						options={
 							privAccess
 								? courseArray.map((x) => {
-										return { text: x.name, value: x._id };
+										return { text: x.name, value: x._id }
 								  })
 								: data.departments.departments[0].courses.map((y) => {
-										return { text: y.name, value: y._id };
+										return { text: y.name, value: y._id }
 								  })
 						}
 						onChange={(_, { value }) => {
 							getClasses({
 								variables: { course: value },
-							});
+							})
 						}}
 					/>
 					<Form.Select
@@ -90,7 +90,7 @@ const AddSubject = () => {
 						options={
 							classList
 								? classList.classes.map((x) => {
-										return { key: x._id, text: x.name, value: x.name };
+										return { key: x._id, text: x.name, value: x.name }
 								  })
 								: []
 						}
@@ -118,7 +118,7 @@ const AddSubject = () => {
 								options={
 									classList
 										? data.departments.teachers.map((x) => {
-												return { text: `${x.name.first} ${x.name.last}`, value: x._id };
+												return { text: `${x.name.first} ${x.name.last}`, value: x._id }
 										  })
 										: []
 								}
@@ -147,19 +147,20 @@ const AddSubject = () => {
 						onClick={() => setConfirm(true)}
 					/>
 					{confirm ? (
-						<Form.Button width={8} fluid color="red" content="No" onClick={() => setConfirm(false)} />
+						<Form.Button width={8} fluid color="red" content="No" type="button" onClick={() => setConfirm(false)} />
 					) : (
 						<>
 							<Form.Button
 								fluid
 								width={subjectAdded ? 3 : 6}
 								color="teal"
+								type="button"
 								content="Add Subject"
 								onClick={() => {
-									if (numberOfSubjects.length >= 10) setNotification([...notification, { error: `You can only add 10 subjects at a time.` }]);
-									const len = numberOfSubjects.length <= 9 ? numberOfSubjects.length + 1 : numberOfSubjects.length;
-									changeNumberOfSubjects(new Array(len).fill());
-									changeSubjectAdded(true);
+									if (numberOfSubjects.length >= 10) setNotification([...notification, { error: `You can only add 10 subjects at a time.` }])
+									const len = numberOfSubjects.length <= 9 ? numberOfSubjects.length + 1 : numberOfSubjects.length
+									changeNumberOfSubjects(new Array(len).fill())
+									changeSubjectAdded(true)
 								}}
 							/>
 							{subjectAdded && (
@@ -167,19 +168,20 @@ const AddSubject = () => {
 									fluid
 									width={3}
 									color="brown"
+									type="button"
 									content="Remove Subject"
 									onClick={() => {
-										setNotification([]);
-										if (numberOfSubjects.length <= 2) changeSubjectAdded(false);
-										const len = numberOfSubjects.length;
-										changeNumberOfSubjects(new Array(len - 1).fill());
+										setNotification([])
+										if (numberOfSubjects.length <= 2) changeSubjectAdded(false)
+										const len = numberOfSubjects.length
+										changeNumberOfSubjects(new Array(len - 1).fill())
 										setVariables((variables) => {
-											delete variables[`name` + (len - 1)];
-											delete variables[`teacher` + (len - 1)];
-											delete variables[`subjectCode` + (len - 1)];
-											delete variables[`uniSubjectCode` + (len - 1)];
-											return variables;
-										});
+											delete variables[`name` + (len - 1)]
+											delete variables[`teacher` + (len - 1)]
+											delete variables[`subjectCode` + (len - 1)]
+											delete variables[`uniSubjectCode` + (len - 1)]
+											return variables
+										})
 									}}
 								/>
 							)}
@@ -189,7 +191,7 @@ const AddSubject = () => {
 			</Form>
 			{notification.length > 0 && <Notify list={notification} />}
 		</Segment>
-	);
-};
+	)
+}
 
-export default AddSubject;
+export default AddSubject
