@@ -1,4 +1,5 @@
-import gql from "graphql-tag";
+import gql from "graphql-tag"
+
 export default gql`
 	query students($cid: ID) {
 		students(cid: $cid) {
@@ -16,4 +17,4 @@ export default gql`
 			contactNumber
 		}
 	}
-`;
+`

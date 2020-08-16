@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import gql from "graphql-tag"
 
 export default gql`
 	mutation updateStudent(
@@ -41,18 +41,8 @@ export default gql`
 				registrationNumber: $registrationNumber
 				enrollmentNumber: $enrollmentNumber
 				name: { first: $firstName, last: $lastName }
-				father: {
-					name: $fatherName
-					occupation: $fatherOccupation
-					annualSalary: $fatherAnnualIncome
-					contactNumber: $fatherContactNumber
-				}
-				mother: {
-					name: $motherName
-					occupation: $motherOccupation
-					annualSalary: $motherAnnualIncome
-					contactNumber: $motherContactNumber
-				}
+				father: { name: $fatherName, occupation: $fatherOccupation, annualSalary: $fatherAnnualIncome, contactNumber: $fatherContactNumber }
+				mother: { name: $motherName, occupation: $motherOccupation, annualSalary: $motherAnnualIncome, contactNumber: $motherContactNumber }
 				bloodGroup: $bloodGroup
 				gender: $gender
 				caste: $caste
@@ -71,4 +61,4 @@ export default gql`
 			}
 		)
 	}
-`;
+`

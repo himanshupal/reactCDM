@@ -1,13 +1,13 @@
-import React from "react";
-import Constants from "../../common";
-import { Link } from "react-router-dom";
-import { Segment, Table, Icon } from "semantic-ui-react";
+import React from "react"
+import { Link } from "react-router-dom"
+import Constants from "../../../common/constants"
+import { Segment, Table, Icon } from "semantic-ui-react"
 
 export default ({ data, history, dark }) => {
-	const getDay = (date) => {
-		const str = date.split(`-`);
-		return Constants.months[Number(str[1]) - 1] + ` ` + str[2] + `, ` + +str[0];
-	};
+	const getDay = date => {
+		const str = date.split(`-`)
+		return Constants.months[Number(str[1]) - 1] + ` ` + str[2] + `, ` + +str[0]
+	}
 
 	return (
 		<>
@@ -168,5 +168,5 @@ export default ({ data, history, dark }) => {
 				</Table>
 			</Segment>
 		</>
-	);
-};
+	)
+}

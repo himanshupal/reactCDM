@@ -1,45 +1,45 @@
-import { Segment, Dropdown, Grid, Image, Table, Divider } from "semantic-ui-react";
-import { useQuery, useLazyQuery } from "@apollo/react-hooks";
-import React, { useState, useEffect, useContext } from "react";
-import QUERY_TEACHERS from "../../queries/query/teachers";
-import QUERY_DPTS from "../../queries/query/dptOnly";
-import { AuthContext } from "../../context/Auth";
-import Notify from "../../common/Notify";
-import { Link } from "react-router-dom";
-import Constants from "../common";
-import src from "./logo512.png";
+import { Segment, Dropdown, Grid, Image, Table, Divider } from "semantic-ui-react"
+import React, { useState, useEffect, useContext } from "react"
+import { useQuery, useLazyQuery } from "@apollo/react-hooks"
+import QUERY_TEACHERS from "../../queries/query/teachers"
+import QUERY_DPTS from "../../queries/query/dptOnly"
+import { AuthContext } from "../../common/context"
+import Constants from "../../common/constants"
+import Notify from "../../common/Notify"
+import { Link } from "react-router-dom"
+import src from "../../common/ico.png"
 
 const Teachers = () => {
-	const getDay = (date) => {
-		const str = date.split(`-`);
-		return Constants.months[Number(str[1]) - 1] + ` ` + str[2] + `, ` + str[0];
-	};
+	const getDay = date => {
+		const str = date.split(`-`)
+		return Constants.months[Number(str[1]) - 1] + ` ` + str[2] + `, ` + str[0]
+	}
 
-	const { user } = useContext(AuthContext);
-	const privAccess = user && (user.access === `Director` || user.access === `Head of Department`);
-	const [teachers, setTeachers] = useState([]);
-	const { loading: crsFetch, error: fetchErr, data } = useQuery(QUERY_DPTS);
-	const [getTeachers, { loading: loadingTeachers, data: teachersList }] = useLazyQuery(QUERY_TEACHERS);
+	const { user } = useContext(AuthContext)
+	const privAccess = user && (user.access === `Director` || user.access === `Head of Department`)
+	const [teachers, setTeachers] = useState([])
+	const { loading: crsFetch, error: fetchErr, data } = useQuery(QUERY_DPTS)
+	const [getTeachers, { loading: loadingTeachers, data: teachersList }] = useLazyQuery(QUERY_TEACHERS)
 
 	useEffect(() => {
 		if (sessionStorage.Teachers) {
 			if (teachersList) {
-				setTeachers(JSON.parse(sessionStorage.Teachers));
-				sessionStorage.setItem(`Teachers`, JSON.stringify(teachersList.teachers));
+				setTeachers(JSON.parse(sessionStorage.Teachers))
+				sessionStorage.setItem(`Teachers`, JSON.stringify(teachersList.teachers))
 			}
-			setTeachers(JSON.parse(sessionStorage.Teachers));
+			setTeachers(JSON.parse(sessionStorage.Teachers))
 		} else {
 			if (teachersList) {
-				sessionStorage.setItem(`Teachers`, JSON.stringify(teachersList.teachers));
-				setTeachers(teachersList.teachers);
+				sessionStorage.setItem(`Teachers`, JSON.stringify(teachersList.teachers))
+				setTeachers(teachersList.teachers)
 			}
 		}
-	}, [teachersList]);
+	}, [teachersList])
 
-	useEffect(() => console.log(data && data.departments, teachersList), [data, teachersList]);
+	useEffect(() => console.log(data && data.departments, teachersList), [data, teachersList])
 
-	if (crsFetch) return <h2>Loading...</h2>;
-	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>;
+	if (crsFetch) return <h2>Loading...</h2>
+	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>
 
 	return (
 		<Segment>
@@ -51,8 +51,8 @@ const Teachers = () => {
 				selection
 				loading={loadingTeachers}
 				placeholder="Select a department to get list of teachers"
-				options={data.departments.departments.map((_) => {
-					return { text: _.name, value: _._id };
+				options={data.departments.departments.map(_ => {
+					return { text: _.name, value: _._id }
 				})}
 				onChange={(_, { value }) => getTeachers({ variables: { department: value } })}
 			/>
@@ -116,7 +116,7 @@ const Teachers = () => {
 			)}
 			{teachersList && teachersList.teachers.length === 0 && <Notify list={[{ message: `There are no teachers in this department yet !` }]} />}
 		</Segment>
-	);
-};
+	)
+}
 
-export default Teachers;
+export default Teachers

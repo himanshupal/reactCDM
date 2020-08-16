@@ -1,10 +1,10 @@
+import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks"
+import MUTATION_NEWSUBJECT from "../../queries/mutation/addSubject"
+import { Form, Segment, Divider } from "semantic-ui-react"
 import QUERY_COURSES from "../../queries/query/courses"
 import QUERY_CLASSES from "../../queries/query/classes"
-import MUTATION_NEWSUBJECT from "../../queries/mutation/addSubject"
-import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks"
 import React, { useState, useContext } from "react"
-import { Form, Segment, Divider } from "semantic-ui-react"
-import { AuthContext } from "../../context/Auth"
+import { AuthContext } from "../../common/context"
 import Notify from "../../common/Notify"
 
 const AddSubject = () => {
@@ -44,7 +44,7 @@ const AddSubject = () => {
 			<Divider horizontal content="Class Details" />
 			<Form
 				widths="equal"
-				onSubmit={(e) => {
+				onSubmit={e => {
 					if (confirm) addSubject()
 					e.preventDefault()
 					setConfirm(false)
@@ -56,10 +56,10 @@ const AddSubject = () => {
 							name="department"
 							label="Department"
 							placeholder="Select a Department to get Course list of"
-							options={data.departments.departments.map((x) => {
+							options={data.departments.departments.map(x => {
 								return { text: x.name, value: x._id }
 							})}
-							onChange={(_, { value }) => setCourseArray(data.departments.departments.filter((x) => x._id === value)[0].courses)}
+							onChange={(_, { value }) => setCourseArray(data.departments.departments.filter(x => x._id === value)[0].courses)}
 						/>
 					)}
 					<Form.Select
@@ -68,10 +68,10 @@ const AddSubject = () => {
 						placeholder="Select a Course to get Class list of"
 						options={
 							privAccess
-								? courseArray.map((x) => {
+								? courseArray.map(x => {
 										return { text: x.name, value: x._id }
 								  })
-								: data.departments.departments[0].courses.map((y) => {
+								: data.departments.departments[0].courses.map(y => {
 										return { text: y.name, value: y._id }
 								  })
 						}
@@ -89,7 +89,7 @@ const AddSubject = () => {
 						placeholder="Select a Class to add Subjects to"
 						options={
 							classList
-								? classList.classes.map((x) => {
+								? classList.classes.map(x => {
 										return { key: x._id, text: x.name, value: x.name }
 								  })
 								: []
@@ -117,7 +117,7 @@ const AddSubject = () => {
 								placeholder="Assign a Subject Teacher"
 								options={
 									classList
-										? data.departments.teachers.map((x) => {
+										? data.departments.teachers.map(x => {
 												return { text: `${x.name.first} ${x.name.last}`, value: x._id }
 										  })
 										: []
@@ -175,7 +175,7 @@ const AddSubject = () => {
 										if (numberOfSubjects.length <= 2) changeSubjectAdded(false)
 										const len = numberOfSubjects.length
 										changeNumberOfSubjects(new Array(len - 1).fill())
-										setVariables((variables) => {
+										setVariables(variables => {
 											delete variables[`name` + (len - 1)]
 											delete variables[`teacher` + (len - 1)]
 											delete variables[`subjectCode` + (len - 1)]

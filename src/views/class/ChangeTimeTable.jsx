@@ -1,12 +1,12 @@
-import QUERY_COURSES from "../../queries/query/courses"
-import QUERY_CLASSES from "../../queries/query/classes"
-import QUERY_SUBJECTS from "../../queries/query/subjects"
-import MUTATION_TIMETABLE from "../../queries/mutation/createTimeTable"
 import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks"
 import { Segment, Table, Form, Label, Divider } from "semantic-ui-react"
+import MUTATION_TIMETABLE from "../../queries/mutation/createTimeTable"
+import QUERY_SUBJECTS from "../../queries/query/subjects"
+import QUERY_COURSES from "../../queries/query/courses"
+import QUERY_CLASSES from "../../queries/query/classes"
+import constants from "../../common/constants"
 import Notify from "../../common/Notify"
 import React, { useState } from "react"
-import constants from "../common"
 
 const ChangeTimeTable = () => {
 	const { loading: crsFetch, error: fetchErr, data } = useQuery(QUERY_COURSES)
@@ -35,12 +35,12 @@ const ChangeTimeTable = () => {
 		if (notification.length > 0) setNotification([])
 		setVariables({ ...variables, [name]: value })
 	}
-	const getTeacher = (value) => {
-		const list = subjectsList.subjects.filter((_) => _._id === value)
+	const getTeacher = value => {
+		const list = subjectsList.subjects.filter(_ => _._id === value)
 		return list.length > 0 ? list[0].teacher._id : null
 	}
-	const getTeacherName = (value) => {
-		const list = subjectsList.subjects.filter((_) => _._id === value)
+	const getTeacherName = value => {
+		const list = subjectsList.subjects.filter(_ => _._id === value)
 		return list.length > 0 ? list[0].teacher.name.first + ` ` + list[0].teacher.name.last : `NONE`
 	}
 
@@ -49,7 +49,7 @@ const ChangeTimeTable = () => {
 			<h1>Create Time Table</h1>
 			<Divider />
 			<Form
-				onSubmit={(e) => {
+				onSubmit={e => {
 					e.preventDefault()
 					changeTimeTable()
 				}}
@@ -60,17 +60,17 @@ const ChangeTimeTable = () => {
 						name="department"
 						label="Department"
 						placeholder="Select a Department to get Course list of"
-						options={data.departments.departments.map((x) => {
+						options={data.departments.departments.map(x => {
 							return { text: x.name, value: x._id }
 						})}
-						onChange={(_, { value }) => setCourseArray(data.departments.departments.filter((x) => x._id === value)[0].courses)}
+						onChange={(_, { value }) => setCourseArray(data.departments.departments.filter(x => x._id === value)[0].courses)}
 					/>
 					<Form.Select
 						fluid
 						name="course"
 						label="Course"
 						placeholder="Select a Course to get Class list of"
-						options={courseArray.map((x) => {
+						options={courseArray.map(x => {
 							return { text: x.name, value: x._id }
 						})}
 						onChange={(_, { value }) => {
@@ -87,7 +87,7 @@ const ChangeTimeTable = () => {
 						placeholder="Select a Class to add Subjects to"
 						options={
 							classList
-								? classList.classes.map((x) => {
+								? classList.classes.map(x => {
 										return { key: x._id, text: x.name, value: x.name }
 								  })
 								: []
@@ -110,7 +110,7 @@ const ChangeTimeTable = () => {
 									<Table.Row textAlign="center">
 										<Table.HeaderCell />
 										{constants.days
-											.filter((_) => _ !== `Sunday`)
+											.filter(_ => _ !== `Sunday`)
 											.map((day, idx) => (
 												<Table.HeaderCell content={day} key={idx} />
 											))}
@@ -144,7 +144,7 @@ const ChangeTimeTable = () => {
 												}
 											/>
 											{constants.days
-												.filter((_) => _ !== `Sunday`)
+												.filter(_ => _ !== `Sunday`)
 												.map((_, idx) => (
 													<Table.Cell
 														key={idx}
@@ -154,7 +154,7 @@ const ChangeTimeTable = () => {
 																	search
 																	label="Subject"
 																	name={`day` + odx + idx}
-																	options={[...subjectsList.subjects, { _id: `Recess`, name: `Recess` }].map((_) => {
+																	options={[...subjectsList.subjects, { _id: `Recess`, name: `Recess` }].map(_ => {
 																		return { key: _._id, value: _._id, text: _.name }
 																	})}
 																	onChange={(_, { name, value }) =>
@@ -191,7 +191,7 @@ const ChangeTimeTable = () => {
 								onClick={() => {
 									if (timeArray.length >= 9)
 										setNotification([...notification, { error: `You need to specify atleast one time period to add Time Table.` }])
-									else changeTimeArray((timeArray) => new Array(timeArray.length + 1).fill())
+									else changeTimeArray(timeArray => new Array(timeArray.length + 1).fill())
 								}}
 							/>
 							{timeArray.length > 1 && (
@@ -203,7 +203,7 @@ const ChangeTimeTable = () => {
 									content="Remove Time Period"
 									onClick={() => {
 										setNotification([])
-										setVariables((variables) => {
+										setVariables(variables => {
 											const len = timeArray.length
 											delete variables[`from` + (len - 1)]
 											delete variables[`to` + (len - 1)]
@@ -213,7 +213,7 @@ const ChangeTimeTable = () => {
 											}
 											return variables
 										})
-										changeTimeArray((timeArray) => new Array(timeArray.length - 1).fill())
+										changeTimeArray(timeArray => new Array(timeArray.length - 1).fill())
 									}}
 								/>
 							)}

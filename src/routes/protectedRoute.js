@@ -1,17 +1,10 @@
-import React, { useContext } from "react";
-import { AuthContext } from "../context/Auth";
-import { Route, Redirect } from "react-router-dom";
+import React, { useContext } from "react"
+import { AuthContext } from "../common/context"
+import { Route, Redirect } from "react-router-dom"
 
-const NoReturn = ({ component: Component, ...rest }) => {
-	const { user } = useContext(AuthContext);
-	return (
-		<Route
-			render={(props) =>
-				user ? <Redirect to="/" /> : <Component {...props} />
-			}
-			{...rest}
-		/>
-	);
-};
+const NoReturn = ({ component: Component, ...props }) => {
+	const { user } = useContext(AuthContext)
+	return <Route render={props => (user ? <Redirect to="/" /> : <Component {...props} />)} {...props} />
+}
 
-export default NoReturn;
+export default NoReturn

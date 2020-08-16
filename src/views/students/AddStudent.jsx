@@ -1,45 +1,45 @@
-import QUERY_COURSES from "../../queries/query/courses";
-import QUERY_CLASSES from "../../queries/query/classes";
-import MUTATION_ADDSTUDENT from "../../queries/mutation/addStudent";
-import MUTATION_UPDATESTUDENT from "../../queries/mutation/updateStudent";
-import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks";
-import { Form, Image, Button, Divider, Segment } from "semantic-ui-react";
-import React, { useState, useContext } from "react";
-import { AuthContext } from "../../context/Auth";
-import Notify from "../../common/Notify";
-import constants from "../common";
-import src from "./logo512.png";
+import MUTATION_UPDATESTUDENT from "../../queries/mutation/updateStudent"
+import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks"
+import { Form, Image, Button, Divider, Segment } from "semantic-ui-react"
+import MUTATION_ADDSTUDENT from "../../queries/mutation/addStudent"
+import QUERY_COURSES from "../../queries/query/courses"
+import QUERY_CLASSES from "../../queries/query/classes"
+import React, { useState, useContext } from "react"
+import { AuthContext } from "../../common/context"
+import constants from "../../common/constants"
+import Notify from "../../common/Notify"
+import src from "../../common/ico.png"
 
 const AddStudent = ({ update }) => {
-	const { user } = useContext(AuthContext);
-	const privAccess = user && user.access === `Director`;
-	const { loading: crsFetch, error: fetchErr, data } = useQuery(QUERY_COURSES);
-	const [getClasses, { loading: loadingClasses, data: classList }] = useLazyQuery(QUERY_CLASSES);
-	const [notification, setNotification] = useState([]);
-	const [courseArray, setCourseArray] = useState([]);
-	const [variables, setVariables] = useState({});
+	const { user } = useContext(AuthContext)
+	const privAccess = user && user.access === `Director`
+	const { loading: crsFetch, error: fetchErr, data } = useQuery(QUERY_COURSES)
+	const [getClasses, { loading: loadingClasses, data: classList }] = useLazyQuery(QUERY_CLASSES)
+	const [notification, setNotification] = useState([])
+	const [courseArray, setCourseArray] = useState([])
+	const [variables, setVariables] = useState({})
 	const [addStudent, { loading }] = useMutation(update ? MUTATION_UPDATESTUDENT : MUTATION_ADDSTUDENT, {
 		update: (_, { data }) => {
-			setNotification([...notification, { message: data.addStudent }]);
+			setNotification([...notification, { message: data.addStudent }])
 		},
 		onError: ({ graphQLErrors, networkError, message }) => {
-			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }]);
-			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }]);
+			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }])
+			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }])
 		},
 		variables,
-	});
+	})
 
-	if (crsFetch) return <h2>Loading...</h2>;
-	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>;
+	if (crsFetch) return <h2>Loading...</h2>
+	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>
 
 	const onChange = (_, { name, value }) => {
-		if (notification.length > 0) setNotification([]);
-		setVariables({ ...variables, [name]: value });
-	};
+		if (notification.length > 0) setNotification([])
+		setVariables({ ...variables, [name]: value })
+	}
 
-	const date = new Date();
-	const minDOB = date.getFullYear() - 55 + `-` + date.toISOString().slice(5, 10);
-	const maxDOB = date.getFullYear() - 16 + `-` + date.toISOString().slice(5, 10);
+	const date = new Date()
+	const minDOB = date.getFullYear() - 55 + `-` + date.toISOString().slice(5, 10)
+	const maxDOB = date.getFullYear() - 16 + `-` + date.toISOString().slice(5, 10)
 
 	return (
 		<Segment className={loading || loadingClasses ? `loading` : ``}>
@@ -48,9 +48,9 @@ const AddStudent = ({ update }) => {
 			<Form
 				autoComplete="on"
 				widths="equal"
-				onSubmit={(e) => {
-					e.preventDefault();
-					addStudent();
+				onSubmit={e => {
+					e.preventDefault()
+					addStudent()
 				}}
 			>
 				<Image size="small" centered src={src} />
@@ -59,7 +59,7 @@ const AddStudent = ({ update }) => {
 				<div className="field">
 					<div className="ui fluid action input">
 						<input type="file" />
-						<button onClick={(e) => e.preventDefault()} className="ui button">
+						<button onClick={e => e.preventDefault()} className="ui button">
 							Upload Image
 						</button>
 					</div>
@@ -74,10 +74,10 @@ const AddStudent = ({ update }) => {
 							name="department"
 							label="Department"
 							placeholder="Select a Department to get course list"
-							options={data.departments.departments.map((x) => {
-								return { text: x.name, value: x._id };
+							options={data.departments.departments.map(x => {
+								return { text: x.name, value: x._id }
 							})}
-							onChange={(_, { value }) => setCourseArray(data.departments.departments.filter((x) => x._id === value)[0].courses)}
+							onChange={(_, { value }) => setCourseArray(data.departments.departments.filter(x => x._id === value)[0].courses)}
 						/>
 					)}
 					<Form.Select
@@ -87,17 +87,17 @@ const AddStudent = ({ update }) => {
 						placeholder="Select a Course to get list of Classes"
 						options={
 							privAccess
-								? courseArray.map((x) => {
-										return { text: x.name, value: x._id };
+								? courseArray.map(x => {
+										return { text: x.name, value: x._id }
 								  })
-								: data.departments.departments[0].courses.map((y) => {
-										return { text: y.name, value: y._id };
+								: data.departments.departments[0].courses.map(y => {
+										return { text: y.name, value: y._id }
 								  })
 						}
 						onChange={(_, { value }) => {
 							getClasses({
 								variables: { course: value },
-							});
+							})
 						}}
 					/>
 					<Form.Select
@@ -108,8 +108,8 @@ const AddStudent = ({ update }) => {
 						placeholder="Select a Class to add Student in"
 						options={
 							classList
-								? classList.classes.map((x) => {
-										return { key: x._id, text: x.name, value: x._id };
+								? classList.classes.map(x => {
+										return { key: x._id, text: x.name, value: x._id }
 								  })
 								: []
 						}
@@ -304,7 +304,7 @@ const AddStudent = ({ update }) => {
 			</Form>
 			{(notification.length > 0 || !variables[`class`]) && <Notify list={notification} />}
 		</Segment>
-	);
-};
+	)
+}
 
-export default AddStudent;
+export default AddStudent

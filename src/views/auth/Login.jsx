@@ -1,40 +1,38 @@
-import { Form, Button, Segment } from "semantic-ui-react";
-import login_mut from "../../queries/mutation/login";
-import React, { useState, useContext } from "react";
-import { useMutation } from "@apollo/react-hooks";
-// import { useStoreActions } from "easy-peasy";
-import { AuthContext } from "../../context/Auth";
-import Notify from "../../common/Notify";
+import { Form, Button, Segment } from "semantic-ui-react"
+import login_mut from "../../queries/mutation/login"
+import React, { useState, useContext } from "react"
+import { AuthContext } from "../../common/context"
+import { useMutation } from "@apollo/react-hooks"
+import Notify from "../../common/Notify"
 
-const usernameRegex = /^[a-zA-z0-9._-]+$/;
+const usernameRegex = /^[a-zA-z0-9._-]+$/
 
-const Login = (props) => {
+const Login = ({ history }) => {
 	const { login } = useContext(AuthContext),
 		[error, setError] = useState({}),
 		[variables, setVariables] = useState({}),
 		[notification, setNotification] = useState([]),
-		// login = useStoreActions((actions) => actions.login),
 		[loginUser, { loading }] = useMutation(login_mut, {
 			update: (_, { data }) => {
-				login(data.login);
-				props.history.push(`/`);
+				login(data.login)
+				history.push(`/`)
 			},
 			onError: ({ graphQLErrors, networkError, message }) => {
-				if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }]);
-				else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }]);
+				if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }])
+				else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }])
 			},
 			variables,
 		}),
-		handleSubmit = async (e) => {
-			e.preventDefault();
+		handleSubmit = async e => {
+			e.preventDefault()
 			if (!usernameRegex.test(variables.username))
 				return setError({
 					...error,
 					regexError: `Invalid username !!!`,
-				});
-			setError({});
-			await loginUser();
-		};
+				})
+			setError({})
+			await loginUser()
+		}
 
 	return (
 		<Segment>
@@ -62,7 +60,7 @@ const Login = (props) => {
 			</Form>
 			{notification.length > 0 && <Notify list={notification} />}
 		</Segment>
-	);
-};
+	)
+}
 
-export default Login;
+export default Login

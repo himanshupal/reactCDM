@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import gql from "graphql-tag"
 
 export default gql`
 	query students($sid: ID) {
@@ -25,6 +25,7 @@ export default gql`
 				contactNumber
 			}
 			class {
+				_id
 				name
 			}
 			bloodGroup
@@ -51,4 +52,4 @@ export default gql`
 			updatedAt
 		}
 	}
-`;
+`

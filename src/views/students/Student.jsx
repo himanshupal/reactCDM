@@ -1,20 +1,20 @@
-import { Segment, Grid, Image, Button, Menu, Transition, Icon } from "semantic-ui-react";
-import QUERY_STUDENT from "../../queries/query/student";
-import { useQuery, useLazyQuery } from "@apollo/react-hooks";
-import QUERY_NOTES from "../../queries/query/notes";
-import Calendar from "../attendence/Calendar";
-import React, { useState } from "react";
-import Notices from "./student/Notices";
-import About from "./student/About";
-import Notes from "./student/Notes";
-import src from "./logo512.png";
+import { Segment, Grid, Image, Button, Menu, Transition, Icon } from "semantic-ui-react"
+import { useQuery, useLazyQuery } from "@apollo/react-hooks"
+import QUERY_STUDENT from "../../queries/query/student"
+import QUERY_NOTES from "../../queries/query/notes"
+import Calendar from "../attendence/Calendar"
+import React, { useState } from "react"
+import Notices from "./student/Notices"
+import src from "../../common/ico.png"
+import About from "./student/About"
+import Notes from "./student/Notes"
 
-const Friends = ({ dark }) => <Segment inverted={dark}>{`friends`}</Segment>;
+const Friends = ({ dark }) => <Segment inverted={dark}>{`friends`}</Segment>
 
 const Overview = ({ data, history, dark, setDark, notes, getNotes, loading }) => {
-	const [active, setActive] = useState(`0`);
-	const [newNote, createNewNote] = useState(false);
-	const changeActive = (_, { name }) => setActive(name);
+	const [active, setActive] = useState(`0`)
+	const [newNote, createNewNote] = useState(false)
+	const changeActive = (_, { name }) => setActive(name)
 	return (
 		<>
 			<Menu pointing secondary inverted={dark} stackable>
@@ -23,8 +23,8 @@ const Overview = ({ data, history, dark, setDark, notes, getNotes, loading }) =>
 					name="1"
 					active={active === `1`}
 					onClick={(_, e) => {
-						changeActive(_, e);
-						getNotes();
+						changeActive(_, e)
+						getNotes()
 					}}
 					content="Notes"
 				/>
@@ -36,8 +36,8 @@ const Overview = ({ data, history, dark, setDark, notes, getNotes, loading }) =>
 						<Menu.Item
 							content={
 								<>
-									{active === `1` && <Icon onClick={() => createNewNote((newNote) => !newNote)} name="plus" />}
-									<Icon onClick={() => setDark((dark) => !dark)} name="sun" />
+									{active === `1` && <Icon onClick={() => createNewNote(newNote => !newNote)} name="plus" />}
+									<Icon onClick={() => setDark(dark => !dark)} name="sun" />
 								</>
 							}
 						/>
@@ -58,21 +58,21 @@ const Overview = ({ data, history, dark, setDark, notes, getNotes, loading }) =>
 				</Segment.Group>
 			</div>
 		</>
-	);
-};
+	)
+}
 
 const Attendence = ({ dark }) => (
 	<Segment.Group>
 		<Calendar />
 	</Segment.Group>
-);
+)
 const Performance = ({ dark }) => (
 	<Segment.Group>
 		<Segment inverted={dark}>Seg 3</Segment>
 		<Segment inverted={dark}>Seg 2</Segment>
 		<Segment inverted={dark}>Seg 1</Segment>
 	</Segment.Group>
-);
+)
 
 const Student = ({
 	history,
@@ -80,15 +80,15 @@ const Student = ({
 		params: { username },
 	},
 }) => {
-	const [view, setView] = useState(`0`);
-	const [dark, setDark] = useState(true);
-	const { loading, error, data } = useQuery(QUERY_STUDENT, { variables: { sid: username } });
-	const [getNotes, { loading: loadingNotes, data: notes }] = useLazyQuery(QUERY_NOTES);
+	const [view, setView] = useState(`0`)
+	const [dark, setDark] = useState(true)
+	const { loading, error, data } = useQuery(QUERY_STUDENT, { variables: { sid: username } })
+	const [getNotes, { loading: loadingNotes, data: notes }] = useLazyQuery(QUERY_NOTES)
 
-	if (loading) return <h2>Loading...</h2>;
-	if (error) return <h2>{error.toString().split(`: `)[2]}</h2>;
+	if (loading) return <h2>Loading...</h2>
+	if (error) return <h2>{error.toString().split(`: `)[2]}</h2>
 
-	const changeView = (_, { name }) => setView(name);
+	const changeView = (_, { name }) => setView(name)
 	return (
 		<Segment inverted={dark} raised style={{ minHeight: `100%` }}>
 			<Grid>
@@ -137,7 +137,7 @@ const Student = ({
 				</Grid.Row>
 			</Grid>
 		</Segment>
-	);
-};
+	)
+}
 
-export default Student;
+export default Student

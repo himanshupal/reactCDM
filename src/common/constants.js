@@ -39,7 +39,7 @@ export default {
 		{ text: "Other", value: "Other" },
 	],
 	designation: [
-		{ text: "Assistant Professor", value: "Assistant Professor" },
+		{ text: "Professor", value: "Professor" },
 		{ text: "Associate Professor", value: "Associate Professor" },
 		{ text: "Head of Department", value: "Head of Department" },
 		{ text: "Director", value: "Director" },
@@ -348,4 +348,4 @@ export default {
 			value: "Varanasi",
 		},
 	],
-};
+}

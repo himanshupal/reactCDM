@@ -1,12 +1,12 @@
-import { useQuery, useLazyQuery } from "@apollo/react-hooks";
-import QUERY_COURSES from "../../queries/query/courses";
-import QUERY_CLASSES from "../../queries/query/classes";
-import QUERY_STUDENTS from "../../queries/query/students";
-import React, { useState, useEffect, useContext } from "react";
-import { Form, Segment, Divider, Table, Button } from "semantic-ui-react";
-import { AuthContext } from "../../context/Auth";
-import Notify from "../../common/Notify";
-import { Link } from "react-router-dom";
+import { Form, Segment, Divider, Table, Button } from "semantic-ui-react"
+import React, { useState, useEffect, useContext } from "react"
+import { useQuery, useLazyQuery } from "@apollo/react-hooks"
+import QUERY_STUDENTS from "../../queries/query/students"
+import QUERY_COURSES from "../../queries/query/courses"
+import QUERY_CLASSES from "../../queries/query/classes"
+import { AuthContext } from "../../common/context"
+import Notify from "../../common/Notify"
+import { Link } from "react-router-dom"
 
 const StudentsTable = ({ students }) => (
 	<Table sortable celled striped color="red">
@@ -53,34 +53,34 @@ const StudentsTable = ({ students }) => (
 			</Table.Row>
 		</Table.Footer>
 	</Table>
-);
+)
 
-const Students = (props) => {
-	const { user } = useContext(AuthContext);
-	const privAccess = user && user.access === `Director`;
-	const { loading: crsFetch, error: fetchErr, data } = useQuery(QUERY_COURSES);
-	const [getClasses, { loading: loadingClasses, data: classList }] = useLazyQuery(QUERY_CLASSES);
-	const [getStudents, { loading: loadingStudents, data: studentsList }] = useLazyQuery(QUERY_STUDENTS);
-	const [courseArray, setCourseArray] = useState([]);
-	const [studentsArray, setStudentsArray] = useState([]);
+const Students = props => {
+	const { user } = useContext(AuthContext)
+	const privAccess = user && user.access === `Director`
+	const { loading: crsFetch, error: fetchErr, data } = useQuery(QUERY_COURSES)
+	const [getClasses, { loading: loadingClasses, data: classList }] = useLazyQuery(QUERY_CLASSES)
+	const [getStudents, { loading: loadingStudents, data: studentsList }] = useLazyQuery(QUERY_STUDENTS)
+	const [courseArray, setCourseArray] = useState([])
+	const [studentsArray, setStudentsArray] = useState([])
 
 	useEffect(() => {
 		if (sessionStorage.Students) {
 			if (studentsList) {
-				setStudentsArray(JSON.parse(sessionStorage.Students));
-				sessionStorage.setItem(`Students`, JSON.stringify(studentsList.students));
+				setStudentsArray(JSON.parse(sessionStorage.Students))
+				sessionStorage.setItem(`Students`, JSON.stringify(studentsList.students))
 			}
-			setStudentsArray(JSON.parse(sessionStorage.Students));
+			setStudentsArray(JSON.parse(sessionStorage.Students))
 		} else {
 			if (studentsList) {
-				sessionStorage.setItem(`Students`, JSON.stringify(studentsList.students));
-				setStudentsArray(studentsList.students);
+				sessionStorage.setItem(`Students`, JSON.stringify(studentsList.students))
+				setStudentsArray(studentsList.students)
 			}
 		}
-	}, [studentsList]);
+	}, [studentsList])
 
-	if (crsFetch) return <h2>Loading...</h2>;
-	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>;
+	if (crsFetch) return <h2>Loading...</h2>
+	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>
 
 	return (
 		<Segment className={loadingStudents || loadingClasses ? `loading` : ``}>
@@ -94,10 +94,10 @@ const Students = (props) => {
 							name="department"
 							label="Department"
 							placeholder="Select a Department to get course list"
-							options={data.departments.departments.map((x) => {
-								return { text: x.name, value: x._id };
+							options={data.departments.departments.map(x => {
+								return { text: x.name, value: x._id }
 							})}
-							onChange={(_, { value }) => setCourseArray(data.departments.departments.filter((x) => x._id === value)[0].courses)}
+							onChange={(_, { value }) => setCourseArray(data.departments.departments.filter(x => x._id === value)[0].courses)}
 						/>
 					)}
 					<Form.Select
@@ -107,11 +107,11 @@ const Students = (props) => {
 						placeholder="Select a Course to get list of Classes"
 						options={
 							privAccess
-								? courseArray.map((x) => {
-										return { text: x.name, value: x._id };
+								? courseArray.map(x => {
+										return { text: x.name, value: x._id }
 								  })
-								: data.departments.departments[0].courses.map((y) => {
-										return { text: y.name, value: y._id };
+								: data.departments.departments[0].courses.map(y => {
+										return { text: y.name, value: y._id }
 								  })
 						}
 						onChange={(_, { value }) => getClasses({ variables: { course: value } })}
@@ -123,8 +123,8 @@ const Students = (props) => {
 						placeholder="Select a Class to get Student of"
 						options={
 							classList
-								? classList.classes.map((x) => {
-										return { key: x._id, text: x.name, value: x._id };
+								? classList.classes.map(x => {
+										return { key: x._id, text: x.name, value: x._id }
 								  })
 								: []
 						}
@@ -135,7 +135,7 @@ const Students = (props) => {
 			{studentsArray.length > 0 && <StudentsTable students={studentsArray} />}
 			{studentsList && studentsList.students.length === 0 && <Notify list={[{ message: `Class doesn't have any students registered yet !` }]} />}
 		</Segment>
-	);
-};
+	)
+}
 
-export default Students;
+export default Students

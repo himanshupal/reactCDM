@@ -1,41 +1,41 @@
-import { Form, Image, Segment, Divider } from "semantic-ui-react";
-import MUTATION_UPDATETEACHER from "../../queries/mutation/updateTeacher";
-import MUTATION_ADDTEACHER from "../../queries/mutation/addTeacher";
-import QUERY_DEPARTMENTS from "../../queries/query/departments";
-import { useQuery, useMutation } from "@apollo/react-hooks";
-import Notify from "../../common/Notify";
-import React, { useState } from "react";
-import constants from "../common";
-import src from "./logo512.png";
+import { Form, Image, Segment, Divider } from "semantic-ui-react"
+import MUTATION_UPDATETEACHER from "../../queries/mutation/updateTeacher"
+import MUTATION_ADDTEACHER from "../../queries/mutation/addTeacher"
+import QUERY_DEPARTMENTS from "../../queries/query/departments"
+import { useQuery, useMutation } from "@apollo/react-hooks"
+import constants from "../../common/constants"
+import Notify from "../../common/Notify"
+import React, { useState } from "react"
+import src from "../../common/ico.png"
 
 const TeacherProfile = ({ update }) => {
-	const { loading: dptFetch, error: fetchErr, data } = useQuery(QUERY_DEPARTMENTS);
-	const [notification, setNotification] = useState([]);
-	const [variables, setVariables] = useState({});
+	const { loading: dptFetch, error: fetchErr, data } = useQuery(QUERY_DEPARTMENTS)
+	const [notification, setNotification] = useState([])
+	const [variables, setVariables] = useState({})
 	const [addTeacher, { loading }] = useMutation(update ? MUTATION_UPDATETEACHER : MUTATION_ADDTEACHER, {
 		update: (_, { data }) => {
-			setNotification([...notification, { message: data.addTeacher }]);
+			setNotification([...notification, { message: data.addTeacher }])
 		},
 		onError: ({ graphQLErrors, networkError, message }) => {
-			console.log(message);
-			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }]);
-			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }]);
+			console.log(message)
+			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }])
+			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }])
 		},
 		variables,
-	});
+	})
 
-	if (dptFetch) return <h2>Loading...</h2>;
-	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>;
+	if (dptFetch) return <h2>Loading...</h2>
+	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>
 
 	const onChange = (_, { name, value }) => {
-		if (notification.length > 0) setNotification([]);
-		setVariables({ ...variables, [name]: value });
-	};
+		if (notification.length > 0) setNotification([])
+		setVariables({ ...variables, [name]: value })
+	}
 
-	const date = new Date();
-	const today = date.toISOString().slice(0, 10);
-	const minDOB = date.getFullYear() - 85 + `-` + date.toISOString().slice(5, 10);
-	const maxDOB = date.getFullYear() - 25 + `-` + date.toISOString().slice(5, 10);
+	const date = new Date()
+	const today = date.toISOString().slice(0, 10)
+	const minDOB = date.getFullYear() - 85 + `-` + date.toISOString().slice(5, 10)
+	const maxDOB = date.getFullYear() - 25 + `-` + date.toISOString().slice(5, 10)
 
 	return (
 		<Segment className={loading ? `loading` : ``}>
@@ -44,9 +44,9 @@ const TeacherProfile = ({ update }) => {
 			<Form
 				autoComplete="on"
 				widths="equal"
-				onSubmit={(e) => {
-					e.preventDefault();
-					addTeacher();
+				onSubmit={e => {
+					e.preventDefault()
+					addTeacher()
 				}}
 			>
 				<Image size="small" centered bordered rounded src={src} />
@@ -92,11 +92,11 @@ const TeacherProfile = ({ update }) => {
 								label="Department"
 								onChange={onChange}
 								placeholder="Select Department"
-								options={data.departments.departments.map((x) => {
+								options={data.departments.departments.map(x => {
 									return {
 										text: x.name,
 										value: x._id,
-									};
+									}
 								})}
 							/>
 							<Form.Input
@@ -146,11 +146,11 @@ const TeacherProfile = ({ update }) => {
 								label="Department"
 								onChange={onChange}
 								placeholder="Select Department"
-								options={data.departments.departments.map((x) => {
+								options={data.departments.departments.map(x => {
 									return {
 										text: x.name,
 										value: x._id,
-									};
+									}
 								})}
 							/>
 							<Form.Input
@@ -306,7 +306,7 @@ const TeacherProfile = ({ update }) => {
 			</Form>
 			{notification.length > 0 && <Notify list={notification} />}
 		</Segment>
-	);
-};
+	)
+}
 
-export default TeacherProfile;
+export default TeacherProfile
