@@ -4,7 +4,7 @@ import { useQuery, useLazyQuery } from "@apollo/react-hooks"
 import { Segment, Modal, Button, List } from "semantic-ui-react"
 import QUERY_ATTENDENCE_MONTH from "../../queries/query/attendenceMonth"
 
-export default () => {
+const Calendar = ({ theme }) => {
 	const [modal, showModal] = useState(false)
 	const [onDate, setOnDate] = useState(new Date())
 	const [attendence, setAttendence] = useState([])
@@ -34,7 +34,7 @@ export default () => {
 	if (error) return <h2>{error.toString().split(`: `)[2]}</h2>
 
 	return (
-		<Segment className={change ? `loading` : ``}>
+		<Segment className={change ? `loading` : ``} inverted={theme}>
 			<CalendarTab
 				className="react-calendar"
 				calendarType="US"
@@ -107,3 +107,5 @@ export default () => {
 		</Segment>
 	)
 }
+
+export default Calendar

@@ -1,4 +1,4 @@
-import { Form, Button, Segment } from "semantic-ui-react"
+import { Form, Button, Segment, Divider } from "semantic-ui-react"
 import login_mut from "../../queries/mutation/login"
 import React, { useState, useContext } from "react"
 import { AuthContext } from "../../common/context"
@@ -35,31 +35,35 @@ const Login = ({ history }) => {
 		}
 
 	return (
-		<Segment>
-			<Form onSubmit={handleSubmit} className={loading ? `loading` : ``}>
-				<Form.Input
-					required
-					label="Username"
-					name="username"
-					onChange={(_, { name, value }) => setVariables({ ...variables, [name]: value })}
-					autoComplete="username"
-					placeholder="Enter username..."
-				/>
-				<Form.Input
-					required
-					label="Password"
-					name="password"
-					type="password"
-					onChange={(_, { name, value }) => setVariables({ ...variables, [name]: value })}
-					autoComplete="current-password"
-					placeholder="Enter password..."
-				/>
-				<Button color="brown" type="submit">
-					Submit
-				</Button>
-			</Form>
-			{notification.length > 0 && <Notify list={notification} />}
-		</Segment>
+		<div style={{ display: `grid`, minHeight: `100vh`, placeContent: `center` }}>
+			<Segment style={{ minWidth: `50vw` }} color="orange" piled>
+				<h1>Login</h1>
+				<Divider />
+				<Form onSubmit={handleSubmit} className={loading ? `loading` : ``}>
+					<Form.Input
+						required
+						label="Username"
+						name="username"
+						onChange={(_, { name, value }) => setVariables({ ...variables, [name]: value })}
+						autoComplete="username"
+						placeholder="Enter username..."
+					/>
+					<Form.Input
+						required
+						label="Password"
+						name="password"
+						type="password"
+						onChange={(_, { name, value }) => setVariables({ ...variables, [name]: value })}
+						autoComplete="current-password"
+						placeholder="Enter password..."
+					/>
+					<div style={{ display: `flex`, justifyContent: `flex-end` }}>
+						<Button color="violet" content="Submit" style={{ marginRight: 0 }} />
+					</div>
+				</Form>
+				{notification.length > 0 && <Notify list={notification} />}
+			</Segment>
+		</div>
 	)
 }
 

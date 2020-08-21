@@ -1,5 +1,5 @@
 import React from "react"
-import Router from "./routes/router"
+import Router from "./routes/Router"
 import ApolloClient from "apollo-client"
 import * as serviceWorker from "./serviceWorker"
 

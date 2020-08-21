@@ -1,36 +1,39 @@
-import React, { useState } from "react";
-import Notify from "../../../common/Notify";
-import { useMutation } from "@apollo/react-hooks";
-import MUTATION_ADD_NOTE from "../../../queries/mutation/addNote";
-import { Segment, TextArea, Button, Input, Icon, Modal } from "semantic-ui-react";
+import React, { useState } from "react"
+import Notify from "../../common/Notify"
+import QUERY_NOTES from "../../queries/query/notes"
+import { useQuery, useMutation } from "@apollo/react-hooks"
+import MUTATION_ADD_NOTE from "../../queries/mutation/addNote"
+import { Segment, TextArea, Button, Input, Icon, Modal } from "semantic-ui-react"
 
-export default ({ dark, data, note, loading }) => {
-	const [modal, showModal] = useState(false);
-	const [variables, setVariables] = useState({});
-	const [notification, setNotification] = useState([]);
+const Notes = ({ theme, newNote }) => {
+	const [modal, showModal] = useState(false)
+	const [variables, setVariables] = useState({})
+	const [notification, setNotification] = useState([])
+	const { loading, error, data } = useQuery(QUERY_NOTES)
 
 	const [addNote, { loading: addingNote }] = useMutation(MUTATION_ADD_NOTE, {
 		update: (_, { data }) => {
-			setNotification([...notification, { message: data.addNote }]);
+			setNotification([...notification, { message: data.addNote }])
 		},
 		onError: ({ graphQLErrors, networkError, message }) => {
-			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }]);
-			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }]);
+			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }])
+			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }])
 		},
 		variables,
-	});
+	})
 
-	if (loading || addingNote) return <h1>Loading...</h1>;
+	if (loading || addingNote) return <h1>Loading...</h1>
+	if (error) return <h2>{error.toString().split(`: `)[2]}</h2>
 
 	return (
 		<>
-			{notification.length > 0 && <Segment inverted={dark} content={<Notify list={notification} />} />}
-			{note && (
-				<Segment inverted={dark}>
+			{notification.length > 0 && <Segment inverted={theme} content={<Notify list={notification} />} />}
+			{newNote && (
+				<Segment inverted={theme}>
 					<Input
 						style={{ display: `flex`, justifyContent: `space-between`, marginBottom: `0.25rem` }}
 						fluid
-						inverted={dark}
+						inverted={theme}
 						name="subject"
 						action={{
 							color: `grey`,
@@ -45,7 +48,7 @@ export default ({ dark, data, note, loading }) => {
 						rows="7"
 						name="description"
 						placeholder="Description..."
-						className={dark ? `textarea__dark` : `textarea__light`}
+						className={theme ? `textarea__dark` : `textarea__light`}
 						value={variables.description || ``}
 						onChange={(_, { name, value }) => setVariables({ ...variables, [name]: value })}
 					/>
@@ -61,8 +64,8 @@ export default ({ dark, data, note, loading }) => {
 				</Modal.Actions>
 			</Modal>
 			{data &&
-				data.notes.map((not) => (
-					<Segment inverted={dark} key={not._id}>
+				data.notes.map(not => (
+					<Segment inverted={theme} key={not._id}>
 						<h4 style={{ display: `flex`, justifyContent: `space-between`, marginBottom: 0 }}>
 							{not.subject}
 							<span>
@@ -77,5 +80,7 @@ export default ({ dark, data, note, loading }) => {
 					</Segment>
 				))}
 		</>
-	);
-};
+	)
+}
+
+export default Notes

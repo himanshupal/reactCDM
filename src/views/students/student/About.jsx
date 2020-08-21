@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import Constants from "../../../common/constants"
 import { Segment, Table, Icon } from "semantic-ui-react"
 
-export default ({ data, history, dark }) => {
+const About = ({ data, history, theme }) => {
 	const getDay = date => {
 		const str = date.split(`-`)
 		return Constants.months[Number(str[1]) - 1] + ` ` + str[2] + `, ` + +str[0]
@@ -11,12 +11,12 @@ export default ({ data, history, dark }) => {
 
 	return (
 		<>
-			<Segment inverted={dark} raised>
+			<Segment inverted={theme} raised>
 				<h3 style={{ display: `flex`, justifyContent: `space-between` }}>
 					Personal Details
-					<Icon onClick={() => history.push(`/updatestudent/` + data._id)} name="pen square" inverted={dark} />
+					<Icon onClick={() => history.push(`/updatestudent/` + data._id)} name="pen square" inverted={theme} />
 				</h3>
-				<Table inverted={dark} celled>
+				<Table inverted={theme} celled>
 					<Table.Body>
 						<Table.Row>
 							<Table.Cell content="Username" />
@@ -95,9 +95,9 @@ export default ({ data, history, dark }) => {
 					</Table.Body>
 				</Table>
 			</Segment>
-			<Segment inverted={dark} raised>
+			<Segment inverted={theme} raised>
 				<h3>Parent's Details</h3>
-				<Table inverted={dark} celled>
+				<Table inverted={theme} celled>
 					<Table.Body>
 						<Table.Row>
 							<Table.Cell colSpan="2" content="Father" icon="chevron down" />
@@ -140,9 +140,9 @@ export default ({ data, history, dark }) => {
 					</Table.Body>
 				</Table>
 			</Segment>
-			<Segment inverted={dark} raised>
+			<Segment inverted={theme} raised>
 				<h3>Other Details</h3>
-				<Table inverted={dark} celled>
+				<Table inverted={theme} celled>
 					<Table.Body>
 						<Table.Row>
 							<Table.Cell content="Registered on" />
@@ -170,3 +170,5 @@ export default ({ data, history, dark }) => {
 		</>
 	)
 }
+
+export default About
