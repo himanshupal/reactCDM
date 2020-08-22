@@ -1,41 +1,39 @@
-import { Form, Button, Segment, Divider } from "semantic-ui-react"
-import login_mut from "../../queries/mutation/login"
+import { Form, Button, Segment, Divider, Icon } from "semantic-ui-react"
+import MUTATION_LOGIN from "../../queries/mutation/login"
 import React, { useState, useContext } from "react"
 import { AuthContext } from "../../common/context"
 import { useMutation } from "@apollo/react-hooks"
 import Notify from "../../common/Notify"
+import { blake2bHex } from "blakejs"
 
 const usernameRegex = /^[a-zA-z0-9._-]+$/
 
 const Login = ({ history }) => {
-	const { login } = useContext(AuthContext),
-		[error, setError] = useState({}),
-		[variables, setVariables] = useState({}),
-		[notification, setNotification] = useState([]),
-		[loginUser, { loading }] = useMutation(login_mut, {
-			update: (_, { data }) => {
-				login(data.login)
-				history.push(`/`)
-			},
-			onError: ({ graphQLErrors, networkError, message }) => {
-				if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }])
-				else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }])
-			},
-			variables,
-		}),
-		handleSubmit = async e => {
-			e.preventDefault()
-			if (!usernameRegex.test(variables.username))
-				return setError({
-					...error,
-					regexError: `Invalid username !!!`,
-				})
-			setError({})
-			await loginUser()
-		}
+	const { login } = useContext(AuthContext)
+	const [hidden, setHidden] = useState(false)
+	const [variables, setVariables] = useState({})
+	const [notification, setNotification] = useState([])
+
+	const [loginUser, { loading }] = useMutation(MUTATION_LOGIN, {
+		update: (_, { data }) => {
+			login(data.login)
+			history.push(`/`)
+		},
+		onError: ({ graphQLErrors, networkError, message }) => {
+			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }])
+			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }])
+		},
+		variables,
+	})
+
+	const handleSubmit = async e => {
+		e.preventDefault()
+		if (!usernameRegex.test(variables.username)) return setNotification([...notification, { error: `Invalid username !!!` }])
+		loginUser()
+	}
 
 	return (
-		<div style={{ display: `grid`, minHeight: `100vh`, placeContent: `center` }}>
+		<div style={{ display: `grid`, minHeight: `100vh`, placeItems: `center` }}>
 			<Segment style={{ minWidth: `50vw` }} color="orange" piled>
 				<h1>Login</h1>
 				<Divider />
@@ -44,7 +42,10 @@ const Login = ({ history }) => {
 						required
 						label="Username"
 						name="username"
-						onChange={(_, { name, value }) => setVariables({ ...variables, [name]: value })}
+						onChange={(_, { name, value }) => {
+							setNotification([])
+							setVariables({ ...variables, [name]: value })
+						}}
 						autoComplete="username"
 						placeholder="Enter username..."
 					/>
@@ -52,8 +53,12 @@ const Login = ({ history }) => {
 						required
 						label="Password"
 						name="password"
-						type="password"
-						onChange={(_, { name, value }) => setVariables({ ...variables, [name]: value })}
+						type={hidden ? `text` : `password`}
+						icon={<Icon name={hidden ? `eye` : `eye slash`} link onClick={() => setHidden(hidden => !hidden)} />}
+						onChange={(_, { name, value }) => {
+							setNotification([])
+							setVariables({ ...variables, [name]: blake2bHex(value) })
+						}}
 						autoComplete="current-password"
 						placeholder="Enter password..."
 					/>
