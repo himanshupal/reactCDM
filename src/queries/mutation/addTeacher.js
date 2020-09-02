@@ -11,7 +11,7 @@ export default gql`
 		$email: String
 		$gender: String
 		$religion: String
-		$department: String
+		$department: ID
 		$designation: String
 		$dateOfBirth: String
 		$aadharNumber: String
@@ -49,6 +49,15 @@ export default gql`
 				alternativeContact: $alternativeContact
 				dateOfJoining: $dateOfJoining
 			}
-		)
+		) {
+			_id
+			name {
+				first
+				last
+			}
+			username
+			contactNumber
+			email
+		}
 	}
 `

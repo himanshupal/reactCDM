@@ -2,8 +2,10 @@ import React, { useReducer, createContext } from "react"
 import { verify } from "jsonwebtoken"
 
 const initial = {
-	user: localStorage.authToken ? verify(localStorage.authToken, process.env.REACT_APP_JWT_SECRET) : null,
-	theme: localStorage.theme === `true` ? true : false,
+	user: localStorage.authToken
+		? verify(localStorage.authToken, process.env.REACT_APP_JWT_SECRET)
+		: null,
+	theme: localStorage.dark === `true` ? true : false,
 	page: sessionStorage.onPage || null,
 }
 
@@ -60,12 +62,12 @@ const AuthProvider = props => {
 			localStorage.removeItem(`authToken`)
 		},
 		toggleTheme = () => {
-			const theme = localStorage.theme === `true` ? false : true || true
+			const theme = localStorage.dark === `true` ? false : true || true
 			dispatch({
 				type: `toggleTheme`,
 				theme,
 			})
-			localStorage.setItem(`theme`, theme)
+			localStorage.setItem(`dark`, theme)
 		},
 		setPage = page => {
 			dispatch({
@@ -75,7 +77,9 @@ const AuthProvider = props => {
 			sessionStorage.setItem(`onPage`, page)
 		}
 
-	return <AuthContext.Provider value={{ ...state, login, logout, toggleTheme, setPage }} {...props} />
+	return (
+		<AuthContext.Provider value={{ ...state, login, logout, toggleTheme, setPage }} {...props} />
+	)
 }
 
 export { AuthContext, AuthProvider }

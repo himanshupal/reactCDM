@@ -1,14 +1,11 @@
 import gql from "graphql-tag"
 
 export default gql`
-	query courses($department: ID) {
-		courses(department: $department) {
+	mutation updateDepartment($_id: ID!, $name: String, $director: ID) {
+		updateDepartment(_id: $_id, data: { name: $name, director: $director }) {
 			_id
 			name
-			duration
-			identifier
-			semesterBased
-			headOfDepartment {
+			director {
 				_id
 				username
 				name {

@@ -8,13 +8,13 @@ import Notify from "../../common/Notify"
 import React, { useState } from "react"
 import src from "../../common/ico.png"
 
-const TeacherProfile = ({ update }) => {
-	const { loading: dptFetch, error: fetchErr, data } = useQuery(QUERY_DEPARTMENTS)
+const TeacherProfile = ({ update, theme }) => {
+	const { loading: loadingDepartments, error: departmentsFetchError, data: departmentsList } = useQuery(QUERY_DEPARTMENTS)
 	const [notification, setNotification] = useState([])
 	const [variables, setVariables] = useState({})
 	const [addTeacher, { loading }] = useMutation(update ? MUTATION_UPDATETEACHER : MUTATION_ADDTEACHER, {
 		update: (_, { data }) => {
-			setNotification([...notification, { message: data.addTeacher }])
+			setNotification([...notification, { message: `Teacher Saved` }])
 		},
 		onError: ({ graphQLErrors, networkError, message }) => {
 			console.log(message)
@@ -24,8 +24,8 @@ const TeacherProfile = ({ update }) => {
 		variables,
 	})
 
-	if (dptFetch) return <h2>Loading...</h2>
-	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>
+	if (loadingDepartments) return <h2>Loading...</h2>
+	if (departmentsFetchError) return <h2>{departmentsFetchError.toString().split(`: `)[2]}</h2>
 
 	const onChange = (_, { name, value }) => {
 		if (notification.length > 0) setNotification([])
@@ -38,10 +38,11 @@ const TeacherProfile = ({ update }) => {
 	const maxDOB = date.getFullYear() - 25 + `-` + date.toISOString().slice(5, 10)
 
 	return (
-		<Segment className={loading ? `loading` : ``}>
+		<Segment loading={loading} inverted={theme}>
 			{update ? <h1>Update Teacher</h1> : <h1>Add New Teacher</h1>}
 			<Divider />
 			<Form
+				inverted={theme}
 				autoComplete="on"
 				widths="equal"
 				onSubmit={e => {
@@ -52,118 +53,47 @@ const TeacherProfile = ({ update }) => {
 				<Image size="small" centered bordered rounded src={src} />
 				<Divider />
 				<Form.Group>
-					<Form.Input type="file" transparent label="Upload Photo" />
+					{/* <Form.Input type="file" transparent label="Upload Photo" /> */}
 					{/* <Form.Field>
 						<label htmlFor="photo">Upload Photo</label>
 						<Button fluid as="p">
 							Choose
 						</Button>
 					</Form.Field> */}
-					{!update && (
-						<>
-							<Form.Select
-								fluid
-								search
-								required
-								onChange={onChange}
-								name="designation"
-								options={constants.designation}
-								label="Designation"
-								placeholder="Select Designation to assign"
-							/>
-							<Form.Input
-								fluid
-								required
-								onChange={onChange}
-								name="contactNumber"
-								label="Contact Number"
-								placeholder="XXX-XXX-XXXX"
-								pattern="[\d]{3}-[\d]{3}-[\d]{4}"
-							/>
-						</>
-					)}
-					{update && (
-						<>
-							<Form.Select
-								search
-								required
-								disabled={update}
-								name="department"
-								label="Department"
-								onChange={onChange}
-								placeholder="Select Department"
-								options={data.departments.departments.map(x => {
-									return {
-										text: x.name,
-										value: x._id,
-									}
-								})}
-							/>
-							<Form.Input
-								required
-								disabled={update}
-								onChange={onChange}
-								pattern="[\w]+"
-								name="username"
-								label="Username"
-								placeholder="Alphanumeric only"
-							/>
-						</>
-					)}
+					<Form.Select
+						fluid
+						search
+						required
+						onChange={onChange}
+						name="designation"
+						options={constants.designation}
+						label="Designation"
+						placeholder="Select Designation to assign"
+					/>
+					<Form.Select
+						search
+						required
+						name="department"
+						label="Department"
+						onChange={onChange}
+						placeholder="Select Department"
+						options={departmentsList.departments.map(x => {
+							return { text: x.name, value: x._id }
+						})}
+					/>
 				</Form.Group>
 				<Form.Group>
 					<Form.Input onChange={onChange} pattern="[\w-]+" name="registrationNumber" label="Registration Number" placeholder="Alphanumeric only" />
-					{update && (
-						<>
-							<Form.Select
-								fluid
-								search
-								required
-								onChange={onChange}
-								name="designation"
-								options={constants.designation}
-								label="Designation"
-								placeholder="Select Designation to assign"
-							/>
-							<Form.Input
-								fluid
-								required
-								onChange={onChange}
-								name="contactNumber"
-								label="Contact Number"
-								placeholder="XXX-XXX-XXXX"
-								pattern="[\d]{3}-[\d]{3}-[\d]{4}"
-							/>
-						</>
-					)}
-					{!update && (
-						<>
-							<Form.Select
-								search
-								required
-								disabled={update}
-								name="department"
-								label="Department"
-								onChange={onChange}
-								placeholder="Select Department"
-								options={data.departments.departments.map(x => {
-									return {
-										text: x.name,
-										value: x._id,
-									}
-								})}
-							/>
-							<Form.Input
-								required
-								disabled={update}
-								onChange={onChange}
-								pattern="[\w]+"
-								name="username"
-								label="Username"
-								placeholder="Alphanumeric only"
-							/>
-						</>
-					)}
+					<Form.Input
+						fluid
+						required
+						onChange={onChange}
+						name="contactNumber"
+						label="Contact Number"
+						placeholder="XXX-XXX-XXXX"
+						pattern="[\d]{3}-[\d]{3}-[\d]{4}"
+					/>
+					<Form.Input required onChange={onChange} pattern="[\w]+" name="username" label="Username" placeholder="Alphanumeric only" />
 				</Form.Group>
 				<Form.Group>
 					<Form.Input onChange={onChange} pattern="[\w\s]+" name="firstName" required label="First Name" placeholder="First + Middle Name" />
@@ -202,16 +132,6 @@ const TeacherProfile = ({ update }) => {
 						name="dateOfBirth"
 						label="Date of Birth"
 					/>
-					{!update && (
-						<Form.Input
-							required
-							onChange={onChange}
-							name="contactNumber"
-							label="Contact Number"
-							pattern="[\d]{3}-[\d]{3}-[\d]{4}"
-							placeholder="XXX-XXX-XXXX"
-						/>
-					)}
 				</Form.Group>
 				<Form.Group>
 					<Form.Select search required name="caste" label="Caste" onChange={onChange} options={constants.caste} placeholder="Select Caste" />

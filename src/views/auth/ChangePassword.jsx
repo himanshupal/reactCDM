@@ -23,12 +23,12 @@ const ChangePassword = ({ newPwd, setNewPwd }) => {
 			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }])
 			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }])
 		},
-		variables,
+		variables: { oldPassword: blake2bHex(variables.oldPassword || ``), newPassword: blake2bHex(variables.newPassword || ``) },
 	})
 
 	const handleInput = (_, { name, value }) => {
 		setNotification([])
-		setVariables({ ...variables, [name]: blake2bHex(value) })
+		setVariables({ ...variables, [name]: value })
 	}
 
 	const handleSubmit = () => {

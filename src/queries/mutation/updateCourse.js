@@ -1,16 +1,16 @@
 import gql from "graphql-tag"
 
 export default gql`
-	mutation addCourse(
+	mutation updateCourse(
+		$_id: ID!
 		$name: String
-		$department: ID!
 		$duration: String
 		$identifier: String
 		$headOfDepartment: ID
 		$semesterBased: Boolean
 	) {
-		addCourse(
-			department: $department
+		updateCourse(
+			_id: $_id
 			data: {
 				name: $name
 				duration: $duration

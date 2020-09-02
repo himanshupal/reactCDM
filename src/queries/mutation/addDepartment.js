@@ -1,14 +1,11 @@
 import gql from "graphql-tag"
 
 export default gql`
-	query courses($department: ID) {
-		courses(department: $department) {
+	mutation addDepartment($name: String!, $director: ID) {
+		addDepartment(data: { name: $name, director: $director }) {
 			_id
 			name
-			duration
-			identifier
-			semesterBased
-			headOfDepartment {
+			director {
 				_id
 				username
 				name {
@@ -16,7 +13,6 @@ export default gql`
 					last
 				}
 			}
-			createdAt
 			createdBy {
 				_id
 				username
@@ -25,7 +21,7 @@ export default gql`
 					last
 				}
 			}
-			updatedAt
+			createdAt
 			updatedBy {
 				_id
 				username
@@ -34,6 +30,7 @@ export default gql`
 					last
 				}
 			}
+			updatedAt
 		}
 	}
 `

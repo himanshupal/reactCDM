@@ -1,19 +1,36 @@
 import gql from "graphql-tag"
 
 export default gql`
-	{
+	query departments {
 		departments {
-			departments {
+			_id
+			name
+			director {
 				_id
-				name
-			}
-			teachers {
-				_id
+				username
 				name {
 					first
 					last
 				}
 			}
+			createdBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
+			createdAt
+			updatedBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
+			updatedAt
 		}
 	}
 `

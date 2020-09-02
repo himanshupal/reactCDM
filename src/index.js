@@ -4,28 +4,31 @@ import ApolloClient from "apollo-client"
 import * as serviceWorker from "./serviceWorker"
 
 import { render } from "react-dom"
+import { toast } from "react-toastify"
 import { setContext } from "apollo-link-context"
 import { createHttpLink } from "apollo-link-http"
 import { ApolloProvider } from "@apollo/react-hooks"
 import { InMemoryCache } from "apollo-cache-inmemory"
 
+import "react-toastify/dist/ReactToastify.css"
 import "semantic-ui-css/semantic.min.css"
 import "./common/root.css"
+
+toast.configure({ position: `bottom-right` })
 
 render(
 	<ApolloProvider
 		client={
 			new ApolloClient({
-				link: setContext(_ => {
-					const authToken = localStorage.authToken
-					return authToken
+				link: setContext(() =>
+					localStorage.authToken
 						? {
 								headers: {
-									Authorization: process.env.REACT_APP_AUTH_HEAD + `#` + authToken,
+									authorization: process.env.REACT_APP_AUTH_HEAD + `#` + localStorage.authToken,
 								},
 						  }
 						: null
-				}).concat(
+				).concat(
 					createHttpLink({
 						uri: process.env.REACT_APP_DB_LINK,
 					})
@@ -36,7 +39,7 @@ render(
 	>
 		<Router />
 	</ApolloProvider>,
-	document.getElementById(`root`)
+	document.querySelector(`main`)
 )
 
 serviceWorker.register()
