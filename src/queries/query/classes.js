@@ -5,6 +5,35 @@ export default gql`
 		classes(course: $course) {
 			_id
 			name
+			sessionStart
+			sessionEnd
+			totalStudents
+			classTeacher {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
+			createdAt
+			createdBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
+			updatedAt
+			updatedBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
 		}
 	}
 `

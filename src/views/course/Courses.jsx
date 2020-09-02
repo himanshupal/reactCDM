@@ -3,6 +3,7 @@ import {
 	Form,
 	Table,
 	Modal,
+	Dimmer,
 	Button,
 	Segment,
 	Divider,
@@ -17,7 +18,6 @@ import UPDATE_COURSE from "../../queries/mutation/updateCourse"
 import DELETE_COURSE from "../../queries/mutation/deleteCourse"
 
 import QUERY_COURSES from "../../queries/query/courses"
-import QUERY_TEACHERS from "../../queries/query/listOfTeachers"
 import QUERY_DEPARTMENTS from "../../queries/query/listOfDepartments"
 
 import React, { useState, useContext, useEffect } from "react"
@@ -34,7 +34,7 @@ import { getName, getTime } from "../shared/helpers"
 
 const permitted = [`Director`, `Head of Department`]
 
-const Courses = ({ location: { state }, theme }) => {
+const Courses = ({ history, location: { state }, theme }) => {
 	const {
 		user: { department, access },
 	} = useContext(AuthContext)
@@ -43,6 +43,7 @@ const Courses = ({ location: { state }, theme }) => {
 	const [direction, setDirection] = useState(`ascending`)
 	const [deleteModal, setDeleteModal] = useState(false)
 	const [variables, setVariables] = useState({})
+	const [teachers, setTeachers] = useState([])
 	const [courses, setCourses] = useState([])
 	const [modal, setModal] = useState(false)
 	const [column, setColumn] = useState(1)
@@ -55,28 +56,12 @@ const Courses = ({ location: { state }, theme }) => {
 		QUERY_DEPARTMENTS
 	)
 
-	const [getCourse, { loading: loadingCourses, data: courseList }] = useLazyQuery(QUERY_COURSES)
-
-	const [getTeachers, { loading: loadingTeachers, data: teachersList }] = useLazyQuery(
-		QUERY_TEACHERS
-	)
+	const [getCourses, { loading: loadingCourses, data: courseList }] = useLazyQuery(QUERY_COURSES)
 
 	const [deleteCourse, { loading: deletingCourse }] = useMutation(DELETE_COURSE, {
-		update: proxy => {
-			try {
-				const dpt =
-					(selectedDepartment && selectedDepartment._id) || (state && state._id) || department
-				const data = proxy.readQuery({
-					query: QUERY_COURSES,
-					variables: { department: dpt },
-				})
-				data.courses.filter(x => x._id !== variables._id)
-				proxy.writeQuery({ query: QUERY_COURSES, variables: { department: dpt }, data })
-			} catch (error) {
-				console.error(error)
-			}
-			toast.success(<h3>Course Deleted ✔</h3>)
+		update: () => {
 			setDeleteModal(false)
+			window.location.reload()
 		},
 		onError: e => MutationError(e),
 		variables,
@@ -117,16 +102,21 @@ const Courses = ({ location: { state }, theme }) => {
 		}
 	)
 
-	useEffect(
-		() => (courseList ? setCourses(courseList.courses) : setCourses(data && data.courses)),
-		[data, courseList]
-	)
+	useEffect(() => {
+		if (courseList) {
+			setCourses(courseList.courses)
+			setTeachers(courseList.teachers)
+		} else if (data) {
+			setCourses(data.courses)
+			setTeachers(data.courses)
+		}
+	}, [data, courseList])
 
 	if (loading) return <Loading />
 	if (error) return <Error />
 
 	const getDuration = duration => {
-		const [, year] = duration.split(/\s/)
+		const [year] = duration.match(/\d/)
 		return Number(year) === 1 ? `${year} year` : `${year} years`
 	}
 
@@ -198,7 +188,8 @@ const Courses = ({ location: { state }, theme }) => {
 	}
 
 	return (
-		<>
+		<Segment inverted={theme}>
+			<Dimmer active={loadingCourses || deletingCourse || savingCourse} inverted={!theme} />
 			<h1>Courses</h1>
 			<Divider />
 			{access === `Director` && (
@@ -206,12 +197,11 @@ const Courses = ({ location: { state }, theme }) => {
 					fluid
 					selection
 					onClick={getDepartments}
-					onFocus={getDepartments}
 					loading={loadingDepartments}
 					onChange={(_, { value }) => {
 						const { _id, name } = list.departments.filter(x => x._id === value)[0]
 						setSelectedDepartment({ _id, name: name.toLowerCase() })
-						getCourse({ variables: { department: value } })
+						getCourses({ variables: { department: value } })
 					}}
 					placeholder="Change Department"
 					style={{ marginBottom: `1rem` }}
@@ -231,12 +221,7 @@ const Courses = ({ location: { state }, theme }) => {
 							selectedDepartment.name || (state && state.name) || `your`
 						} department only`}
 					</h3>
-					<Segment
-						basic
-						loading={loadingCourses || deletingCourse}
-						className="table_overflow"
-						style={{ padding: `0.5rem 0`, marginBottom: `0.5rem` }}
-					>
+					<div className="table_overflow">
 						<Table celled unstackable sortable selectable striped singleLine inverted={theme}>
 							<Table.Header>
 								<Table.Row>
@@ -300,8 +285,34 @@ const Courses = ({ location: { state }, theme }) => {
 									courses.map((course, idx) => (
 										<Table.Row key={idx}>
 											<Table.Cell content={idx + 1} textAlign="center" />
-											<Table.Cell content={course.identifier} />
-											<Table.Cell content={course.name} />
+											<Table.Cell
+												selectable
+												content={
+													<Link to="/classes" onClick={e => e.preventDefault()}>
+														{course.identifier}
+													</Link>
+												}
+												onClick={() =>
+													history.push(`/classes`, {
+														_id: course._id,
+														name: course.name.toLowerCase(),
+													})
+												}
+											/>
+											<Table.Cell
+												selectable
+												content={
+													<Link to="/classes" onClick={e => e.preventDefault()}>
+														{course.name}
+													</Link>
+												}
+												onClick={() =>
+													history.push(`/classes`, {
+														_id: course._id,
+														name: course.name.toLowerCase(),
+													})
+												}
+											/>
 											<Table.Cell content={course.duration && getDuration(course.duration)} />
 											<Table.Cell content={course.semesterBased ? `Yes` : `No`} />
 											<Table.Cell
@@ -340,14 +351,6 @@ const Courses = ({ location: { state }, theme }) => {
 														textAlign="center"
 														content={<Icon inverted={theme} name="pencil square" />}
 														onClick={() => {
-															getTeachers({
-																variables: {
-																	department:
-																		(selectedDepartment && selectedDepartment._id) ||
-																		(state && state._id) ||
-																		department,
-																},
-															})
 															setVariables({ _id: course._id })
 															setModal(modal => !modal)
 														}}
@@ -368,7 +371,7 @@ const Courses = ({ location: { state }, theme }) => {
 									))}
 							</Table.Body>
 						</Table>
-					</Segment>
+					</div>
 				</>
 			) : (
 				<h3 className="list_not_available">There are no courses in this departments yet</h3>
@@ -380,17 +383,7 @@ const Courses = ({ location: { state }, theme }) => {
 					type="button"
 					animated="fade"
 					inverted={theme}
-					onClick={() => {
-						getTeachers({
-							variables: {
-								department:
-									(selectedDepartment && selectedDepartment._id) ||
-									(state && state._id) ||
-									department,
-							},
-						})
-						toggle()
-					}}
+					onClick={toggle}
 					content={
 						<>
 							<Button.Content visible content={<Icon name="add circle" />} />
@@ -441,7 +434,6 @@ const Courses = ({ location: { state }, theme }) => {
 							<Form.Group>
 								<Form.Select
 									required
-									clearable={!variables._id}
 									onChange={onChange}
 									value={
 										variables.duration ||
@@ -453,10 +445,7 @@ const Courses = ({ location: { state }, theme }) => {
 									options={constants.duration}
 								/>
 								<Form.Select
-									required
-									clearable={!variables._id}
 									onChange={onChange}
-									loading={loadingTeachers}
 									value={
 										variables.headOfDepartment ||
 										(variables._id &&
@@ -466,20 +455,15 @@ const Courses = ({ location: { state }, theme }) => {
 									}
 									label="Head of Department"
 									name="headOfDepartment"
-									options={
-										teachersList
-											? teachersList.teachers.map(x => {
-													return {
-														text: getName(x.name),
-														value: x._id,
-													}
-											  })
-											: []
-									}
+									options={teachers.map(x => {
+										return {
+											text: getName(x.name),
+											value: x._id,
+										}
+									})}
 								/>
 								<Form.Button
 									fluid
-									required
 									color="grey"
 									type="button"
 									onClick={() =>
@@ -529,12 +513,12 @@ const Courses = ({ location: { state }, theme }) => {
 			</Modal>
 
 			<AreYouSure
-				setConfirmModal={() => {
+				onCancel={() => {
 					setDeleteModal(false)
 					setVariables({})
 				}}
-				confirmModal={deleteModal}
-				confirmed={deleteCourse}
+				open={deleteModal}
+				onConfirm={deleteCourse}
 				theme={theme}
 				content={
 					<div className="distributed_ends">
@@ -546,7 +530,7 @@ const Courses = ({ location: { state }, theme }) => {
 					</div>
 				}
 			/>
-		</>
+		</Segment>
 	)
 }
 

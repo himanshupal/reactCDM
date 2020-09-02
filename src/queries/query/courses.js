@@ -1,7 +1,7 @@
 import gql from "graphql-tag"
 
 export default gql`
-	query courses($department: ID) {
+	query coursesWithTeachers($department: ID) {
 		courses(department: $department) {
 			_id
 			name
@@ -33,6 +33,13 @@ export default gql`
 					first
 					last
 				}
+			}
+		}
+		teachers(department: $department) {
+			_id
+			name {
+				first
+				last
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-import { Form, Button, Divider, Modal, Table, Icon } from "semantic-ui-react"
+import { Form, Button, Segment, Divider, Modal, Table, Icon, Dimmer } from "semantic-ui-react"
 import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks"
 
 import ADD_DEPARTMENT from "../../queries/mutation/addDepartment"
@@ -108,7 +108,8 @@ const Departments = ({ history, theme }) => {
 	}
 
 	return (
-		<>
+		<Segment inverted={theme}>
+			<Dimmer active={savingDepartment} inverted={!theme} />
 			<h1>Departments</h1>
 			<Divider />
 			{data.departments.length > 0 ? (
@@ -150,6 +151,7 @@ const Departments = ({ history, theme }) => {
 								<Table.HeaderCell content="Edit" />
 							</Table.Row>
 						</Table.Header>
+
 						<Table.Body>
 							{data.departments.map((department, idx) => (
 								<Table.Row key={idx}>
@@ -300,7 +302,7 @@ const Departments = ({ history, theme }) => {
 					}
 				/>
 			</Modal>
-		</>
+		</Segment>
 	)
 }
 

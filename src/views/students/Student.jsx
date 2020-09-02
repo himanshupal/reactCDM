@@ -1,7 +1,7 @@
-import { Segment, Grid, Image, Button, Menu, Transition, Icon } from "semantic-ui-react"
-import { useQuery, useLazyQuery } from "@apollo/react-hooks"
+import { Segment, Grid, Image, Button, Menu, Icon } from "semantic-ui-react"
 import QUERY_STUDENT from "../../queries/query/student"
 import Performance from "./student/Performance"
+import { useQuery } from "@apollo/react-hooks"
 import Attendence from "../shared/Attendence"
 import React, { useState } from "react"
 import src from "../../common/ico.png"
@@ -13,16 +13,30 @@ const Friends = ({ theme }) => <Segment inverted={theme}>{`friends`}</Segment>
 
 const Overview = ({ history, theme, data, tab, par, username }) => {
 	const [newNote, createNewNote] = useState(false)
-	const changeActive = (_, { name }) => history.push(`/students/` + username + `/` + par + `/` + name)
+	const changeActive = (_, { name }) =>
+		history.push(`/students/` + username + `/` + par + `/` + name)
 	return (
 		<>
 			<Menu pointing secondary inverted={theme} stackable>
 				<Menu.Item name="about" active={tab === `about`} onClick={changeActive} content="About" />
 				<Menu.Item name="notes" active={tab === `notes`} onClick={changeActive} content="Notes" />
-				<Menu.Item name="friends" active={tab === `friends`} onClick={changeActive} content="Friends" />
+				<Menu.Item
+					name="friends"
+					active={tab === `friends`}
+					onClick={changeActive}
+					content="Friends"
+				/>
 				<Menu.Menu
 					position="right"
-					content={<Menu.Item content={tab === `notes` && <Icon onClick={() => createNewNote(newNote => !newNote)} name="plus" />} />}
+					content={
+						<Menu.Item
+							content={
+								tab === `notes` && (
+									<Icon onClick={() => createNewNote(newNote => !newNote)} name="plus" />
+								)
+							}
+						/>
+					}
 				/>
 			</Menu>
 			<div style={{ maxHeight: 523 }}>
@@ -76,16 +90,46 @@ const Student = ({
 						</Segment>
 						<Segment.Group>
 							<Segment inverted={theme}>
-								<Image src={src} size="small" centered circular bordered style={{ marginBottom: `1rem` }} />
-								<h2 style={{ margin: 0 }}>{data.students[0].name.first + (` ` + data.students[0].name.last.toLowerCase() || ``)}</h2>
+								<Image
+									src={src}
+									size="small"
+									centered
+									circular
+									bordered
+									style={{ marginBottom: `1rem` }}
+								/>
+								<h2 style={{ margin: 0 }}>
+									{data.students[0].name.first +
+										(` ` + data.students[0].name.last.toLowerCase() || ``)}
+								</h2>
 								<h5 style={{ marginTop: `0.5rem` }}>{data.students[0].class.name}</h5>
 							</Segment>
 							<Segment raised inverted={theme}>
 								<Menu inverted={theme} fluid vertical pointing stackable>
-									<Menu.Item name="notices" active={tab === `notices`} onClick={changeView} content="Notices" />
-									<Menu.Item name="personal" active={tab === `personal`} onClick={changeView} content="Personal" />
-									<Menu.Item name="attendence" active={tab === `attendence`} onClick={changeView} content="Attendence" />
-									<Menu.Item name="performance" active={tab === `performance`} onClick={changeView} content="Performance" />
+									<Menu.Item
+										name="notices"
+										active={tab === `notices`}
+										onClick={changeView}
+										content="Notices"
+									/>
+									<Menu.Item
+										name="personal"
+										active={tab === `personal`}
+										onClick={changeView}
+										content="Personal"
+									/>
+									<Menu.Item
+										name="attendence"
+										active={tab === `attendence`}
+										onClick={changeView}
+										content="Attendence"
+									/>
+									<Menu.Item
+										name="performance"
+										active={tab === `performance`}
+										onClick={changeView}
+										content="Performance"
+									/>
 								</Menu>
 							</Segment>
 							<Segment inverted={theme}>
@@ -97,7 +141,14 @@ const Student = ({
 						{tab === `notices` ? (
 							<Notices theme={theme} />
 						) : tab === `personal` ? (
-							<Overview data={data.students[0]} history={history} theme={theme} tab={item} par={tab} username={username} />
+							<Overview
+								data={data.students[0]}
+								history={history}
+								theme={theme}
+								tab={item}
+								par={tab}
+								username={username}
+							/>
 						) : tab === `attendence` ? (
 							<Attendence theme={theme} />
 						) : tab === `performance` ? (
