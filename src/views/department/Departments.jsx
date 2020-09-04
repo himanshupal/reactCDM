@@ -1,4 +1,4 @@
-import { Form, Button, Segment, Divider, Modal, Table, Icon, Dimmer } from "semantic-ui-react"
+import { Form, Button, Divider, Modal, Table, Icon, Dimmer } from "semantic-ui-react"
 import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks"
 
 import ADD_DEPARTMENT from "../../queries/mutation/addDepartment"
@@ -108,9 +108,9 @@ const Departments = ({ history, theme }) => {
 	}
 
 	return (
-		<Segment inverted={theme}>
-			<Dimmer active={savingDepartment} inverted={!theme} />
+		<>
 			<h1>Departments</h1>
+			<Dimmer active={savingDepartment} inverted={!theme} />
 			<Divider />
 			{data.departments.length > 0 ? (
 				<div className="table_overflow">
@@ -215,7 +215,7 @@ const Departments = ({ history, theme }) => {
 					</Table>
 				</div>
 			) : (
-				<h3 className="list_not_available">There are no departments in database</h3>
+				<h3 className="highlight">There are no departments in database</h3>
 			)}
 
 			<Button
@@ -302,7 +302,7 @@ const Departments = ({ history, theme }) => {
 					}
 				/>
 			</Modal>
-		</Segment>
+		</>
 	)
 }
 

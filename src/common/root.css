@@ -47,7 +47,7 @@ textarea {
 	justify-content: flex-end;
 }
 
-.list_not_available {
+.highlight {
 	color: red;
 	text-align: center;
 	font-style: oblique;

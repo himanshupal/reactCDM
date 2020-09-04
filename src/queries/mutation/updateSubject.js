@@ -1,8 +1,24 @@
 import gql from "graphql-tag"
 
 export default gql`
-	query subjects($class: String!) {
-		subjects(class: $class) {
+	mutation updateSubject(
+		$_id: ID!
+		$name: String
+		$language: String
+		$subjectCode: String
+		$uniSubjectCode: String
+		$teacher: ID
+	) {
+		updateSubject(
+			_id: $_id
+			data: {
+				name: $name
+				language: $language
+				subjectCode: $subjectCode
+				uniSubjectCode: $uniSubjectCode
+				teacher: $teacher
+			}
+		) {
 			_id
 			name
 			language

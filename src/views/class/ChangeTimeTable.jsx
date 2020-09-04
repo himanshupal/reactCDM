@@ -1,111 +1,161 @@
+import { Accordion, Table, Form, Label, Divider, Dimmer } from "semantic-ui-react"
 import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks"
-import { Segment, Table, Form, Label, Divider } from "semantic-ui-react"
-import MUTATION_TIMETABLE from "../../queries/mutation/createTimeTable"
-import QUERY_SUBJECTS from "../../queries/query/subjects"
-import QUERY_COURSES from "../../queries/query/courses"
-import QUERY_CLASSES from "../../queries/query/classes"
-import constants from "../../common/constants"
-import Notify from "../../common/Notify"
-import React, { useState } from "react"
+import React, { useState, useEffect, useContext } from "react"
+import { AuthContext } from "../../common/context"
+import { toast } from "react-toastify"
 
-const ChangeTimeTable = () => {
-	const { loading: crsFetch, error: fetchErr, data } = useQuery(QUERY_COURSES)
-	const [getClasses, { loading: loadingClasses, data: classList }] = useLazyQuery(QUERY_CLASSES)
-	const [getSubjects, { loading: loadingSubjects, data: subjectsList }] = useLazyQuery(QUERY_SUBJECTS)
-	const [timeArray, changeTimeArray] = useState(new Array(1).fill())
-	const [notification, setNotification] = useState([])
-	const [courseArray, setCourseArray] = useState([])
+import QUERY_CLASSES from "../../queries/query/classes"
+import QUERY_COURSES from "../../queries/query/courses"
+import QUERY_SUBJECTS from "../../queries/query/subjects"
+import QUERY_DEPARTMENTS from "../../queries/query/listOfDepartments"
+
+import MUTATION_TIMETABLE from "../../queries/mutation/createTimeTable"
+
+import constants from "../../common/constants"
+
+import MutationError from "../shared/MutationError"
+import Loading from "../shared/Loading"
+import Error from "../shared/Error"
+
+const ChangeTimeTable = ({ history, location: { state }, theme }) => {
+	const {
+		user: { department, access },
+	} = useContext(AuthContext)
+
+	const initial = state
+		? { query: QUERY_CLASSES, variables: { course: state._id } }
+		: { query: QUERY_COURSES, variables: { department } }
+
+	const [courses, setCourses] = useState()
+	const [classes, setClasses] = useState()
 	const [variables, setVariables] = useState({})
 
-	const [changeTimeTable, { loading }] = useMutation(MUTATION_TIMETABLE, {
-		update: (_, { data }) => {
-			setNotification([...notification, { message: data.createTimeTable }])
+	const { loading, error, data } = useQuery(initial.query, { variables: initial.variables })
+
+	const [getDepartments, { loading: loadingDepartments, data: list }] = useLazyQuery(
+		QUERY_DEPARTMENTS
+	)
+
+	const [getCourses, { loading: loadingCourses, data: courseList }] = useLazyQuery(QUERY_COURSES)
+
+	const [getClasses, { loading: loadingClasses, data: classList }] = useLazyQuery(QUERY_CLASSES)
+
+	const [getSubjects, { loading: loadingSubjects, data: subjectList }] = useLazyQuery(
+		QUERY_SUBJECTS
+	)
+
+	useEffect(() => (state ? setClasses(data && data.classes) : setCourses(data && data.courses)), [
+		data,
+		state,
+	])
+
+	useEffect(() => courseList && setCourses(courseList.courses), [courseList])
+
+	useEffect(() => classList && setClasses(classList.classes), [classList])
+
+	const [timeArray, changeTimeArray] = useState(new Array(1).fill())
+
+	const [changeTimeTable, { loading: saving }] = useMutation(MUTATION_TIMETABLE, {
+		update: () => {
+			toast.success(<h3>Time Table Changed</h3>)
+			history.push(`/timetable`)
 		},
-		onError: ({ graphQLErrors, networkError, message }) => {
-			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }])
-			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }])
-		},
+		onError: e => MutationError(e),
 		variables,
 	})
 
-	if (crsFetch) return <h2>Loading...</h2>
-	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>
+	if (loading) return <Loading />
+	if (error) return <Error />
 
-	const onChange = (_, { name, value }) => {
-		if (notification.length > 0) setNotification([])
-		setVariables({ ...variables, [name]: value })
-	}
+	const onChange = (_, { name, value }) => setVariables({ ...variables, [name]: value })
+
 	const getTeacher = value => {
-		const list = subjectsList.subjects.filter(_ => _._id === value)
+		const list = subjectList.subjects.filter(_ => _._id === value)
 		return list.length > 0 ? list[0].teacher._id : null
 	}
+
 	const getTeacherName = value => {
-		const list = subjectsList.subjects.filter(_ => _._id === value)
+		const list = subjectList.subjects.filter(_ => _._id === value)
 		return list.length > 0 ? list[0].teacher.name.first + ` ` + list[0].teacher.name.last : `NONE`
 	}
 
 	return (
-		<Segment className={loading || loadingSubjects ? `loading` : ``}>
+		<>
 			<h1>Create Time Table</h1>
+			<Dimmer active={saving || loadingSubjects} inverted={!theme} />
 			<Divider />
 			<Form
+				widths="equal"
+				inverted={theme}
 				onSubmit={e => {
 					e.preventDefault()
 					changeTimeTable()
 				}}
 			>
-				<Form.Group widths="equal">
+				<Form.Group>
+					{access === `Director` && (
+						<Accordion
+							as={Form.Field}
+							inverted={theme}
+							onClick={getDepartments}
+							panels={[
+								{
+									key: `department`,
+									title: `Change Department`,
+									content: {
+										loading: loadingDepartments,
+										placeholder: `Select department to get list of courses`,
+										as: Form.Select,
+										options: list
+											? list.departments.map(x => {
+													return { text: x.name, value: x._id }
+											  })
+											: [],
+										onChange: (_, { value }) => getCourses({ variables: { department: value } }),
+									},
+								},
+							]}
+						/>
+					)}
+				</Form.Group>
+				<Form.Group>
 					<Form.Select
 						fluid
-						name="department"
-						label="Department"
-						placeholder="Select a Department to get Course list of"
-						options={data.departments.departments.map(x => {
-							return { text: x.name, value: x._id }
-						})}
-						onChange={(_, { value }) => setCourseArray(data.departments.departments.filter(x => x._id === value)[0].courses)}
-					/>
-					<Form.Select
-						fluid
-						name="course"
 						label="Course"
+						loading={loadingCourses}
 						placeholder="Select a Course to get Class list of"
-						options={courseArray.map(x => {
-							return { text: x.name, value: x._id }
-						})}
-						onChange={(_, { value }) => {
-							getClasses({
-								variables: { course: value },
-							})
-						}}
+						options={
+							courses
+								? courses.map(x => {
+										return { text: x.name, value: x._id }
+								  })
+								: []
+						}
+						onChange={(_, { value }) => getClasses({ variables: { course: value } })}
 					/>
 					<Form.Select
 						fluid
-						name="class_id"
+						name="class"
 						label="Class"
 						loading={loadingClasses}
 						placeholder="Select a Class to add Subjects to"
 						options={
-							classList
-								? classList.classes.map(x => {
-										return { key: x._id, text: x.name, value: x.name }
+							classes
+								? classes.map(x => {
+										return { text: x.name, value: x.name }
 								  })
 								: []
 						}
 						onChange={(_, { value }) => {
-							setVariables({ ...variables, className: value })
-							getSubjects({
-								variables: {
-									className: value,
-								},
-							})
+							setVariables({ ...variables, class: value })
+							getSubjects({ variables: { class: value } })
 						}}
 					/>
 				</Form.Group>
-				{subjectsList && (
+				{subjectList && (
 					<>
-						<div style={{ overflowX: `scroll`, overflowY: `hidden`, margin: `1em 0`, paddingBottom: `0.5rem` }}>
-							<Table definition celled columns={7}>
+						<div className="table_overflow">
+							<Table definition celled columns={7} unstackable inverted={theme}>
 								<Table.Header>
 									<Table.Row textAlign="center">
 										<Table.HeaderCell />
@@ -154,7 +204,10 @@ const ChangeTimeTable = () => {
 																	search
 																	label="Subject"
 																	name={`day` + odx + idx}
-																	options={[...subjectsList.subjects, { _id: `Recess`, name: `Recess` }].map(_ => {
+																	options={[
+																		...subjectList.subjects,
+																		{ _id: `Recess`, name: `Recess` },
+																	].map(_ => {
 																		return { key: _._id, value: _._id, text: _.name }
 																	})}
 																	onChange={(_, { name, value }) =>
@@ -168,7 +221,9 @@ const ChangeTimeTable = () => {
 																{variables[`subjectId` + odx + idx] && (
 																	<>
 																		<Form.Field label="Teacher" />
-																		<Label>{getTeacherName(variables[`subjectId` + odx + idx])}</Label>
+																		<Label>
+																			{getTeacherName(variables[`subjectId` + odx + idx])}
+																		</Label>
 																	</>
 																)}
 															</>
@@ -190,7 +245,7 @@ const ChangeTimeTable = () => {
 								width={timeArray.length > 1 ? 3 : 6}
 								onClick={() => {
 									if (timeArray.length >= 9)
-										setNotification([...notification, { error: `You need to specify atleast one time period to add Time Table.` }])
+										toast.warning(`You need to specify atleast one time period to add Time Table`)
 									else changeTimeArray(timeArray => new Array(timeArray.length + 1).fill())
 								}}
 							/>
@@ -202,7 +257,6 @@ const ChangeTimeTable = () => {
 									type="button"
 									content="Remove Time Period"
 									onClick={() => {
-										setNotification([])
 										setVariables(variables => {
 											const len = timeArray.length
 											delete variables[`from` + (len - 1)]
@@ -221,8 +275,7 @@ const ChangeTimeTable = () => {
 					</>
 				)}
 			</Form>
-			{notification.length > 0 && <Notify list={notification} />}
-		</Segment>
+		</>
 	)
 }
 

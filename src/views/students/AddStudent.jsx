@@ -1,52 +1,80 @@
-import MUTATION_UPDATESTUDENT from "../../queries/mutation/updateStudent"
+import { Form, Image, Button, Divider, Dimmer, Accordion } from "semantic-ui-react"
 import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks"
-import { Form, Image, Button, Divider, Segment } from "semantic-ui-react"
-import MUTATION_ADDSTUDENT from "../../queries/mutation/addStudent"
-import QUERY_COURSES from "../../queries/query/courses"
-import QUERY_CLASSES from "../../queries/query/classes"
-import React, { useState, useContext } from "react"
+import React, { useState, useEffect, useContext } from "react"
 import { AuthContext } from "../../common/context"
+
+import QUERY_CLASSES from "../../queries/query/classes"
+import QUERY_COURSES from "../../queries/query/coursesOnly"
+import QUERY_DEPARTMENTS from "../../queries/query/listOfDepartments"
+
+import MUTATION_ADDSTUDENT from "../../queries/mutation/addStudent"
+import MUTATION_UPDATESTUDENT from "../../queries/mutation/updateStudent"
+
+import MutationError from "../shared/MutationError"
+import Loading from "../shared/Loading"
+import Error from "../shared/Error"
+
 import constants from "../../common/constants"
-import Notify from "../../common/Notify"
+import { toast } from "react-toastify"
 import src from "../../common/ico.png"
 
-const AddStudent = ({ update }) => {
-	const { user } = useContext(AuthContext)
-	const privAccess = user && user.access === `Director`
-	const { loading: crsFetch, error: fetchErr, data } = useQuery(QUERY_COURSES)
-	const [getClasses, { loading: loadingClasses, data: classList }] = useLazyQuery(QUERY_CLASSES)
-	const [notification, setNotification] = useState([])
-	const [courseArray, setCourseArray] = useState([])
+const AddStudent = ({ location: { state }, update, theme }) => {
+	const {
+		user: { access, department },
+	} = useContext(AuthContext)
+
+	const initial = state
+		? { query: QUERY_CLASSES, variables: { course: state._id } }
+		: { query: QUERY_COURSES, variables: { department } }
+
+	const [courses, setCourses] = useState()
+	const [classes, setClasses] = useState()
 	const [variables, setVariables] = useState({})
-	const [addStudent, { loading }] = useMutation(update ? MUTATION_UPDATESTUDENT : MUTATION_ADDSTUDENT, {
-		update: (_, { data }) => {
-			setNotification([...notification, { message: data.addStudent }])
-		},
-		onError: ({ graphQLErrors, networkError, message }) => {
-			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }])
-			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }])
-		},
-		variables,
-	})
 
-	if (crsFetch) return <h2>Loading...</h2>
-	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>
+	const { loading, error, data } = useQuery(initial.query, { variables: initial.variables })
 
-	const onChange = (_, { name, value }) => {
-		if (notification.length > 0) setNotification([])
-		setVariables({ ...variables, [name]: value })
-	}
+	const [getDepartments, { loading: loadingDepartments, data: list }] = useLazyQuery(
+		QUERY_DEPARTMENTS
+	)
+
+	const [getCourses, { loading: loadingCourses, data: courseList }] = useLazyQuery(QUERY_COURSES)
+
+	const [getClasses, { loading: loadingClasses, data: classList }] = useLazyQuery(QUERY_CLASSES)
+
+	useEffect(() => (state ? setClasses(data && data.classes) : setCourses(data && data.courses)), [
+		data,
+		state,
+	])
+
+	useEffect(() => courseList && setCourses(courseList.courses), [courseList])
+
+	useEffect(() => classList && setClasses(classList.classes), [classList])
+
+	const [addStudent, { loading: savingStudent }] = useMutation(
+		update ? MUTATION_UPDATESTUDENT : MUTATION_ADDSTUDENT,
+		{
+			update: () => toast.success(<h3>{update ? `Student Updated` : `Student Added`}</h3>),
+			onError: e => MutationError(e),
+			variables,
+		}
+	)
+
+	if (loading) return <Loading />
+	if (error) return <Error />
+
+	const onChange = (_, { name, value }) => setVariables({ ...variables, [name]: value })
 
 	const date = new Date()
 	const minDOB = date.getFullYear() - 55 + `-` + date.toISOString().slice(5, 10)
 	const maxDOB = date.getFullYear() - 16 + `-` + date.toISOString().slice(5, 10)
 
 	return (
-		<Segment className={loading || loadingClasses ? `loading` : ``}>
+		<>
 			{update ? <h1>Update Student</h1> : <h1>Add New Student</h1>}
+			<Dimmer active={savingStudent} inverted={!theme} />
 			<Divider />
 			<Form
-				autoComplete="on"
+				inverted={theme}
 				widths="equal"
 				onSubmit={e => {
 					e.preventDefault()
@@ -66,49 +94,56 @@ const AddStudent = ({ update }) => {
 				</div>
 
 				{/* <Form.Input fluid action="Upload Image" type="file" content="none" /> */}
-
 				<Form.Group>
-					{privAccess && (
-						<Form.Select
-							search
-							name="department"
-							label="Department"
-							placeholder="Select a Department to get course list"
-							options={data.departments.departments.map(x => {
-								return { text: x.name, value: x._id }
-							})}
-							onChange={(_, { value }) => setCourseArray(data.departments.departments.filter(x => x._id === value)[0].courses)}
+					{access === `Director` && (
+						<Accordion
+							as={Form.Field}
+							inverted={theme}
+							onClick={getDepartments}
+							panels={[
+								{
+									key: `department`,
+									title: `Change Department`,
+									content: {
+										loading: loadingDepartments,
+										placeholder: `Select department to get list of courses`,
+										as: Form.Select,
+										options: list
+											? list.departments.map(x => {
+													return { text: x.name, value: x._id }
+											  })
+											: [],
+										onChange: (_, { value }) => getCourses({ variables: { department: value } }),
+									},
+								},
+							]}
 						/>
 					)}
+				</Form.Group>
+				<Form.Group>
 					<Form.Select
-						search
-						name="course"
 						label="Course"
-						placeholder="Select a Course to get list of Classes"
+						loading={loadingCourses}
+						placeholder="Select a course to get list of classes"
 						options={
-							privAccess
-								? courseArray.map(x => {
+							courses
+								? courses.map(x => {
 										return { text: x.name, value: x._id }
 								  })
-								: data.departments.departments[0].courses.map(y => {
-										return { text: y.name, value: y._id }
-								  })
+								: []
 						}
-						onChange={(_, { value }) => {
-							getClasses({
-								variables: { course: value },
-							})
-						}}
+						onChange={(_, { value }) => getClasses({ variables: { course: value } })}
 					/>
 					<Form.Select
 						search
 						required
 						name="class"
 						label="Class"
-						placeholder="Select a Class to add Student in"
+						loading={loadingClasses}
+						placeholder="Select a class to add student in"
 						options={
-							classList
-								? classList.classes.map(x => {
+							classes
+								? classes.map(x => {
 										return { key: x._id, text: x.name, value: x._id }
 								  })
 								: []
@@ -118,8 +153,22 @@ const AddStudent = ({ update }) => {
 				</Form.Group>
 
 				<Form.Group>
-					<Form.Input min="1" name="enrollmentNumber" label="Enrollment Number" onChange={onChange} placeholder="Enrollment Number" type="number" />
-					<Form.Input min="1" name="rollNumber" label="Roll Number" onChange={onChange} placeholder="Roll Number" type="number" />
+					<Form.Input
+						min="1"
+						name="enrollmentNumber"
+						label="Enrollment Number"
+						onChange={onChange}
+						placeholder="Enrollment Number"
+						type="number"
+					/>
+					<Form.Input
+						min="1"
+						name="rollNumber"
+						label="Roll Number"
+						onChange={onChange}
+						placeholder="Roll Number"
+						type="number"
+					/>
 					<Form.Input
 						required
 						name="registrationNumber"
@@ -131,8 +180,21 @@ const AddStudent = ({ update }) => {
 				</Form.Group>
 
 				<Form.Group>
-					<Form.Input required name="firstName" label="First Name" onChange={onChange} placeholder="First Name" pattern="[\w\s]+" />
-					<Form.Input name="lastName" label="Last Name" onChange={onChange} placeholder="Last Name" pattern="[\w]+" />
+					<Form.Input
+						required
+						name="firstName"
+						label="First Name"
+						onChange={onChange}
+						placeholder="First Name"
+						pattern="[\w\s]+"
+					/>
+					<Form.Input
+						name="lastName"
+						label="Last Name"
+						onChange={onChange}
+						placeholder="Last Name"
+						pattern="[\w]+"
+					/>
 					<Form.Input
 						required
 						name="dateOfBirth"
@@ -146,12 +208,36 @@ const AddStudent = ({ update }) => {
 				</Form.Group>
 
 				<Form.Group>
-					<Form.Select search required name="caste" label="Caste" options={constants.caste} onChange={onChange} placeholder="Caste" />
-					<Form.Select search required name="religion" label="Religion" options={constants.religion} onChange={onChange} placeholder="Religion" />
+					<Form.Select
+						search
+						required
+						name="caste"
+						label="Caste"
+						options={constants.caste}
+						onChange={onChange}
+						placeholder="Caste"
+					/>
+					<Form.Select
+						search
+						required
+						name="religion"
+						label="Religion"
+						options={constants.religion}
+						onChange={onChange}
+						placeholder="Religion"
+					/>
 				</Form.Group>
 
 				<Form.Group>
-					<Form.Select search required name="gender" label="Gender" options={constants.gender} onChange={onChange} placeholder="Gender" />
+					<Form.Select
+						search
+						required
+						name="gender"
+						label="Gender"
+						options={constants.gender}
+						onChange={onChange}
+						placeholder="Gender"
+					/>
 					<Form.Select
 						search
 						required
@@ -164,7 +250,14 @@ const AddStudent = ({ update }) => {
 				</Form.Group>
 
 				<Form.Group>
-					<Form.Input required name="fatherName" label="Father's Name" onChange={onChange} placeholder="Father's Name" pattern="[\w\s]+" />
+					<Form.Input
+						required
+						name="fatherName"
+						label="Father's Name"
+						onChange={onChange}
+						placeholder="Father's Name"
+						pattern="[\w\s]+"
+					/>
 					<Form.Input
 						required
 						name="fatherOccupation"
@@ -185,7 +278,14 @@ const AddStudent = ({ update }) => {
 				</Form.Group>
 
 				<Form.Group>
-					<Form.Input required name="motherName" label="Mother's Name" onChange={onChange} placeholder="Mother's Name" pattern="[\w\s]+" />
+					<Form.Input
+						required
+						name="motherName"
+						label="Mother's Name"
+						onChange={onChange}
+						placeholder="Mother's Name"
+						pattern="[\w\s]+"
+					/>
 					<Form.Input
 						name="motherOccupation"
 						label="Mother's Occupation"
@@ -241,7 +341,14 @@ const AddStudent = ({ update }) => {
 						label="Username"
 						placeholder="Alphanumeric only"
 					/>
-					<Form.Input required type="email" label="Email Address" name="email" onChange={onChange} placeholder="email.address@site.domain" />
+					<Form.Input
+						required
+						type="email"
+						label="Email Address"
+						name="email"
+						onChange={onChange}
+						placeholder="email.address@site.domain"
+					/>
 					<Form.Input
 						required
 						onChange={onChange}
@@ -256,9 +363,28 @@ const AddStudent = ({ update }) => {
 					<b>Current Address*</b>
 				</label>
 				<Form.Group>
-					<Form.Input required onChange={onChange} pattern="[\w\s.,-]+" name="addressCurrentLocality" placeholder="Locality" />
-					<Form.Input required onChange={onChange} pattern="[\w\s.,-]+" name="addressCurrentTehsil" placeholder="Tehsil" />
-					<Form.Select search required name="addressCurrentDistrict" onChange={onChange} placeholder="District" options={constants.district} />
+					<Form.Input
+						required
+						onChange={onChange}
+						pattern="[\w\s.,-]+"
+						name="addressCurrentLocality"
+						placeholder="Locality"
+					/>
+					<Form.Input
+						required
+						onChange={onChange}
+						pattern="[\w\s.,-]+"
+						name="addressCurrentTehsil"
+						placeholder="Tehsil"
+					/>
+					<Form.Select
+						search
+						required
+						name="addressCurrentDistrict"
+						onChange={onChange}
+						placeholder="District"
+						options={constants.district}
+					/>
 				</Form.Group>
 				<label>
 					<b
@@ -298,12 +424,11 @@ const AddStudent = ({ update }) => {
 						options={constants.district}
 					/>
 				</Form.Group>
-				<Button color="purple" fluid disabled={notification.length > 0 || !variables[`class`]}>
+				<Button color="purple" fluid disabled={!variables[`class`]}>
 					Submit
 				</Button>
 			</Form>
-			{(notification.length > 0 || !variables[`class`]) && <Notify list={notification} />}
-		</Segment>
+		</>
 	)
 }
 

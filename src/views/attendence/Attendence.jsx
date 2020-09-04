@@ -3,7 +3,7 @@ import { Segment, Table, Button, Input, Divider } from "semantic-ui-react"
 import { useQuery, useMutation } from "@apollo/react-hooks"
 import QUERY_STUDENTS from "../../queries/query/students"
 import React, { useState, useEffect } from "react"
-import Notify from "../../common/Notify"
+import { toast } from "react-toastify"
 
 const StudentsList = ({ students, present, setPresent, holiday }) =>
 	students.map((student, idx) => (
@@ -18,7 +18,11 @@ const StudentsList = ({ students, present, setPresent, holiday }) =>
 					fluid
 					disabled={holiday}
 					color={present.includes(student._id) ? `green` : `youtube`}
-					onClick={() => (present.includes(student._id) ? setPresent(present.filter(x => x !== student._id)) : setPresent([...present, student._id]))}
+					onClick={() =>
+						present.includes(student._id)
+							? setPresent(present.filter(x => x !== student._id))
+							: setPresent([...present, student._id])
+					}
 				>
 					{present.includes(student._id) ? `Yes` : `No`}
 				</Button>
@@ -38,7 +42,11 @@ const Attendence = props => {
 		},
 		onError: ({ graphQLErrors, networkError, message }) => {
 			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }])
-			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }])
+			else
+				setNotification([
+					...notification,
+					{ message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error },
+				])
 		},
 		variables,
 	})
@@ -89,7 +97,12 @@ const Attendence = props => {
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
-							<StudentsList students={data.students} present={present} setPresent={setPresent} holiday={holiday} />
+							<StudentsList
+								students={data.students}
+								present={present}
+								setPresent={setPresent}
+								holiday={holiday}
+							/>
 						</Table.Body>
 						<Table.Footer fullWidth>
 							<Table.Row>
@@ -115,11 +128,20 @@ const Attendence = props => {
 								</Table.HeaderCell>
 								{holiday && (
 									<Table.HeaderCell colSpan="2">
-										<Input fluid label="Reason :" onChange={(_, { value }) => setVariables({ ...variables, holiday: value })} />
+										<Input
+											fluid
+											label="Reason :"
+											onChange={(_, { value }) => setVariables({ ...variables, holiday: value })}
+										/>
 									</Table.HeaderCell>
 								)}
 								<Table.HeaderCell colSpan={holiday ? 1 : 3} textAlign="right">
-									<Button fluid disabled={!variables.holiday && !variables.students} as="p" onClick={() => addAttendence()}>
+									<Button
+										fluid
+										disabled={!variables.holiday && !variables.students}
+										as="p"
+										onClick={() => addAttendence()}
+									>
 										Submit
 									</Button>
 								</Table.HeaderCell>
@@ -128,11 +150,11 @@ const Attendence = props => {
 					</Table>
 				</>
 			)}
-			{data && data.students.length === 0 ? (
-				<Notify list={[{ message: `Class doesn't have any students registered yet !` }]} />
-			) : (
-				notification.length > 0 && <Notify list={notification} />
-			)}
+			{data &&
+				data.students.length === 0 &&
+				toast.warning(
+					<h3 className="highlight">Class doesn't have any students registered yet</h3>
+				)}
 		</Segment>
 	)
 }

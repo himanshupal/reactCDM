@@ -7,7 +7,7 @@ import { AuthProvider } from "../common/context"
 import Dashboard from "../views/Dashboard"
 
 import NewSession from "../views/course/NewSesssion"
-import AddSubject from "../views/class/AddSubject"
+import AddSubjects from "../views/class/AddSubjects"
 
 import Teachers from "../views/teachers/Teachers"
 import Teacher from "../views/teachers/Teacher"
@@ -28,6 +28,7 @@ import NotFound from "../views/NotFound"
 
 import Departments from "../views/department/Departments"
 import Courses from "../views/course/Courses"
+import Classes from "../views/class/Classes"
 
 const Router = () => (
 	<AuthProvider>
@@ -35,7 +36,7 @@ const Router = () => (
 			<Switch>
 				<WithNavigation exact path="/" component={Dashboard} />
 				<WithNavigation exact path="/newsession" component={NewSession} />
-				<WithNavigation exact path="/addsubject" component={AddSubject} />
+				<WithNavigation exact path="/addsubjects" component={AddSubjects} />
 				<WithNavigation exact path="/teachers" component={Teachers} />
 				<WithNavigation exact path="/addteacher" component={AddTeacher} />
 				<WithNavigation exact path="/teacher/:username" component={Teacher} />
@@ -51,13 +52,18 @@ const Router = () => (
 				{/* Side Menu Tab */}
 				<WithNavigation exact path="/students/:username/:tab/:item" component={Student} />
 				{/* Top Menu Item */}
-				<WithNavigation exact path="/updatestudent" component={() => <AddStudent update />} />
+				<WithNavigation
+					exact
+					path="/updatestudent"
+					component={props => <AddStudent update {...props} />}
+				/>
 				<WithNavigation exact path="/attendence" component={Attendence} />
 				<WithNavigation exact path="/attendencemonth" component={AttendenceMonth} />
 				<WithNavigation exact path="/timetable" component={TimeTable} />
 				<WithNavigation exact path="/addtimetable" component={CreateTimeTable} />
 				<WithNavigation exact path="/departments" component={Departments} />
 				<WithNavigation exact path="/courses" component={Courses} />
+				<WithNavigation exact path="/classes" component={Classes} />
 				<LoginReturnLock exact path="/login" component={Login} />
 				<Route component={NotFound} />
 			</Switch>

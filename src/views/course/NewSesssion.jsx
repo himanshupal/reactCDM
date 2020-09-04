@@ -1,4 +1,4 @@
-import { Segment, Form, Divider, Button, Icon, Dimmer } from "semantic-ui-react"
+import { Segment, Form, Divider, Button, Icon, Dimmer, Popup } from "semantic-ui-react"
 import { useQuery, useMutation, useLazyQuery } from "@apollo/react-hooks"
 
 import QUERY_CLASSES from "../../queries/query/classes"
@@ -49,6 +49,7 @@ const NewSesssion = ({ theme }) => {
 				// 	variables: { course: variables.course },
 				// })
 				// data.classes.push(...newSession)
+
 				proxy.writeQuery({
 					query: QUERY_CLASSES,
 					variables: { course: variables.course },
@@ -67,8 +68,7 @@ const NewSesssion = ({ theme }) => {
 		variables,
 	})
 
-	const getFullYear = timestamp =>
-		timestamp ? new Date(timestamp).getFullYear() : new Date().getFullYear()
+	const timeElapsed = new Date().getFullYear() - new Date(course.createdAt).getFullYear()
 
 	useEffect(() => {
 		if (courseList) {
@@ -84,19 +84,26 @@ const NewSesssion = ({ theme }) => {
 	if (error) return <Error />
 
 	return (
-		<Segment inverted={theme}>
-			<Dimmer active={savingSession} inverted={!theme} />
-			<div className="distributed_ends">
-				<h1 style={{ marginBottom: 0 }}>New Session</h1>
-				<div className="shift_right">
-					{variables.course && (
-						<Button
-							onClick={() => {
-								setVariables({ course: variables.course })
-								setOverride(override => !override)
-							}}
-							icon="flag"
-							color={override ? `red` : theme ? `black` : `brown`}
+		<>
+			<h1 className="distributed_ends">
+				<Dimmer active={savingSession} inverted={!theme} />
+				<div>New Session</div>
+				<div className="floated right">
+					{variables.course && timeElapsed < course.duration && (
+						<Popup
+							style={{ opacity: `93%` }}
+							trigger={
+								<Button
+									onClick={() => {
+										setVariables({ course: variables.course })
+										setOverride(override => !override)
+									}}
+									icon="flag"
+									color={override ? `red` : theme ? `black` : `brown`}
+								/>
+							}
+							content="Currently the system hides some classes if the course is introduced recently, use this flag to OVERRIDE this feature"
+							inverted={theme}
 						/>
 					)}
 					{course.semesterBased && (
@@ -112,7 +119,7 @@ const NewSesssion = ({ theme }) => {
 						</Button>
 					)}
 				</div>
-			</div>
+			</h1>
 			<Divider />
 			<Form
 				widths="equal"
@@ -142,6 +149,7 @@ const NewSesssion = ({ theme }) => {
 					)}
 					<Form.Select
 						fluid
+						required
 						label="Select Course"
 						loading={loadingCourses}
 						placeholder="Select a Course to change session of"
@@ -164,8 +172,8 @@ const NewSesssion = ({ theme }) => {
 					<Segment.Group>
 						{[
 							...Array(
-								getFullYear() - getFullYear(course.createdAt) < course.duration && !override
-									? getFullYear() - getFullYear(course.createdAt) + 1
+								timeElapsed < course.duration && !override
+									? timeElapsed + 1
 									: session
 									? course.duration
 									: course.duration + 1
@@ -207,7 +215,7 @@ const NewSesssion = ({ theme }) => {
 				onCancel={() => setModal(false)}
 				content={`This transaction will add new Classes to ${course.name} course.`}
 			/>
-		</Segment>
+		</>
 	)
 }
 

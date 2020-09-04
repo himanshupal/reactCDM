@@ -55,11 +55,18 @@ const SideMenu = ({ page, theme, visible, handleClick }) => {
 				<Menu.Header content="Class" />
 				<Menu.Menu>
 					<Menu.Item
-						name="add subject"
-						active={page === "add subject"}
+						name="classes"
+						active={page === "classes"}
 						onClick={handleClick}
 						as={Link}
-						to="/addsubject"
+						to="/classes"
+					/>
+					<Menu.Item
+						name="add subjects"
+						active={page === "add subjects"}
+						onClick={handleClick}
+						as={Link}
+						to="/addsubjects"
 					/>
 					<Menu.Item
 						name="timetable"

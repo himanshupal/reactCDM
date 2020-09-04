@@ -5,7 +5,6 @@ import {
 	Modal,
 	Dimmer,
 	Button,
-	Segment,
 	Divider,
 	Checkbox,
 	Dropdown,
@@ -188,9 +187,9 @@ const Courses = ({ history, location: { state }, theme }) => {
 	}
 
 	return (
-		<Segment inverted={theme}>
-			<Dimmer active={loadingCourses || deletingCourse || savingCourse} inverted={!theme} />
+		<>
 			<h1>Courses</h1>
+			<Dimmer active={loadingCourses || deletingCourse || savingCourse} inverted={!theme} />
 			<Divider />
 			{access === `Director` && (
 				<Dropdown
@@ -216,10 +215,10 @@ const Courses = ({ history, location: { state }, theme }) => {
 			)}
 			{courses && courses.length > 0 ? (
 				<>
-					<h3 className="list_not_available">
+					<h3 className="highlight">
 						{`Showing courses from ${
 							selectedDepartment.name || (state && state.name) || `your`
-						} department only`}
+						} department`}
 					</h3>
 					<div className="table_overflow">
 						<Table celled unstackable sortable selectable striped singleLine inverted={theme}>
@@ -281,100 +280,99 @@ const Courses = ({ history, location: { state }, theme }) => {
 							</Table.Header>
 
 							<Table.Body>
-								{courses &&
-									courses.map((course, idx) => (
-										<Table.Row key={idx}>
-											<Table.Cell content={idx + 1} textAlign="center" />
-											<Table.Cell
-												selectable
-												content={
-													<Link to="/classes" onClick={e => e.preventDefault()}>
-														{course.identifier}
+								{courses.map((course, idx) => (
+									<Table.Row key={idx}>
+										<Table.Cell content={idx + 1} textAlign="center" />
+										<Table.Cell
+											selectable
+											content={
+												<Link to="/classes" onClick={e => e.preventDefault()}>
+													{course.identifier}
+												</Link>
+											}
+											onClick={() =>
+												history.push(`/classes`, {
+													_id: course._id,
+													name: course.name.toLowerCase(),
+												})
+											}
+										/>
+										<Table.Cell
+											selectable
+											content={
+												<Link to="/classes" onClick={e => e.preventDefault()}>
+													{course.name}
+												</Link>
+											}
+											onClick={() =>
+												history.push(`/classes`, {
+													_id: course._id,
+													name: course.name.toLowerCase(),
+												})
+											}
+										/>
+										<Table.Cell content={course.duration && getDuration(course.duration)} />
+										<Table.Cell content={course.semesterBased ? `Yes` : `No`} />
+										<Table.Cell
+											selectable
+											content={
+												course.headOfDepartment && (
+													<Link to={`teacher/` + course.headOfDepartment.username}>
+														{getName(course.headOfDepartment.name)}
 													</Link>
-												}
-												onClick={() =>
-													history.push(`/classes`, {
-														_id: course._id,
-														name: course.name.toLowerCase(),
-													})
-												}
-											/>
-											<Table.Cell
-												selectable
-												content={
-													<Link to="/classes" onClick={e => e.preventDefault()}>
-														{course.name}
+												)
+											}
+										/>
+										<Table.Cell
+											selectable
+											content={
+												<Link to={`teacher/` + course.createdBy.username}>
+													{getName(course.createdBy.name)}
+												</Link>
+											}
+										/>
+										<Table.Cell content={getTime(course.createdAt)} />
+										<Table.Cell
+											selectable
+											content={
+												course.updatedBy && (
+													<Link to={`teacher/` + course.updatedBy.username}>
+														{getName(course.updatedBy.name)}
 													</Link>
-												}
-												onClick={() =>
-													history.push(`/classes`, {
-														_id: course._id,
-														name: course.name.toLowerCase(),
-													})
-												}
-											/>
-											<Table.Cell content={course.duration && getDuration(course.duration)} />
-											<Table.Cell content={course.semesterBased ? `Yes` : `No`} />
-											<Table.Cell
-												selectable
-												content={
-													course.headOfDepartment && (
-														<Link to={`teacher/` + course.headOfDepartment.username}>
-															{getName(course.headOfDepartment.name)}
-														</Link>
-													)
-												}
-											/>
-											<Table.Cell
-												selectable
-												content={
-													<Link to={`teacher/` + course.createdBy.username}>
-														{getName(course.createdBy.name)}
-													</Link>
-												}
-											/>
-											<Table.Cell content={getTime(course.createdAt)} />
-											<Table.Cell
-												selectable
-												content={
-													course.updatedBy && (
-														<Link to={`teacher/` + course.updatedBy.username}>
-															{getName(course.updatedBy.name)}
-														</Link>
-													)
-												}
-											/>
-											<Table.Cell content={course.updatedAt && getTime(course.updatedAt)} />
-											{permitted.includes(access) && (
-												<>
-													<Table.Cell
-														textAlign="center"
-														content={<Icon inverted={theme} name="pencil square" />}
-														onClick={() => {
-															setVariables({ _id: course._id })
-															setModal(modal => !modal)
-														}}
-														style={{ cursor: `pointer` }}
-													/>
-													<Table.Cell
-														textAlign="center"
-														content={<Icon inverted={theme} color="red" name="delete" />}
-														onClick={() => {
-															setVariables({ _id: course._id })
-															setDeleteModal(true)
-														}}
-														style={{ cursor: `pointer` }}
-													/>
-												</>
-											)}
-										</Table.Row>
-									))}
+												)
+											}
+										/>
+										<Table.Cell content={getTime(course.updatedAt)} />
+										{permitted.includes(access) && (
+											<>
+												<Table.Cell
+													textAlign="center"
+													content={<Icon inverted={theme} name="pencil square" />}
+													onClick={() => {
+														setVariables({ _id: course._id })
+														setModal(modal => !modal)
+													}}
+													style={{ cursor: `pointer` }}
+												/>
+												<Table.Cell
+													textAlign="center"
+													content={<Icon inverted={theme} color="red" name="delete" />}
+													onClick={() => {
+														setVariables({ _id: course._id })
+														setDeleteModal(true)
+													}}
+													style={{ cursor: `pointer` }}
+												/>
+											</>
+										)}
+									</Table.Row>
+								))}
 							</Table.Body>
 						</Table>
 					</div>
 				</>
 			) : (
-				<h3 className="list_not_available">There are no courses in this departments yet</h3>
+				<h3 className="highlight">There are no courses in this departments yet</h3>
 			)}
 
 			{permitted.includes(access) && (
@@ -530,7 +528,7 @@ const Courses = ({ history, location: { state }, theme }) => {
 					</div>
 				}
 			/>
-		</Segment>
+		</>
 	)
 }
 

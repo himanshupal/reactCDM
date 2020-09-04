@@ -1,23 +1,27 @@
-import { Form, Segment, Divider, Table, Button } from "semantic-ui-react"
+import { Form, Divider, Table, Button, Dimmer, Accordion } from "semantic-ui-react"
 import React, { useState, useEffect, useContext } from "react"
 import { useQuery, useLazyQuery } from "@apollo/react-hooks"
-import QUERY_STUDENTS from "../../queries/query/students"
-import QUERY_COURSES from "../../queries/query/courses"
-import QUERY_CLASSES from "../../queries/query/classes"
 import { AuthContext } from "../../common/context"
-import Notify from "../../common/Notify"
 import { Link } from "react-router-dom"
+
+import QUERY_STUDENTS from "../../queries/query/students"
+import QUERY_COURSES from "../../queries/query/coursesOnly"
+import QUERY_CLASSES from "../../queries/query/classesNameOnly"
+import QUERY_DEPARTMENTS from "../../queries/query/listOfDepartments"
+
+import Loading from "../shared/Loading"
+import Error from "../shared/Error"
 
 const StudentsTable = ({ students }) => (
 	<Table sortable celled striped color="red">
 		<Table.Header>
 			<Table.Row>
-				<Table.HeaderCell>S. No.</Table.HeaderCell>
-				<Table.HeaderCell>Roll No.</Table.HeaderCell>
-				<Table.HeaderCell>Username</Table.HeaderCell>
-				<Table.HeaderCell>First Name</Table.HeaderCell>
-				<Table.HeaderCell>Last Name</Table.HeaderCell>
-				<Table.HeaderCell>Contact</Table.HeaderCell>
+				<Table.HeaderCell content="S. No." />
+				<Table.HeaderCell content="Roll No." />
+				<Table.HeaderCell content="Username" />
+				<Table.HeaderCell content="First Name" />
+				<Table.HeaderCell content="Last Name" />
+				<Table.HeaderCell content="Contact" />
 			</Table.Row>
 		</Table.Header>
 		<Table.Body>
@@ -31,7 +35,9 @@ const StudentsTable = ({ students }) => (
 					<Table.Cell>{student.name.first}</Table.Cell>
 					<Table.Cell>{student.name.last ? student.name.last : `- - -`}</Table.Cell>
 					<Table.Cell>
-						{student.contactNumber && <a href={`tel:${student.contactNumber}`}>{student.contactNumber}</a>}
+						{student.contactNumber && (
+							<a href={`tel:${student.contactNumber}`}>{student.contactNumber}</a>
+						)}
 						{student.email && (
 							<>
 								<br />
@@ -55,86 +61,135 @@ const StudentsTable = ({ students }) => (
 	</Table>
 )
 
-const Students = props => {
-	const { user } = useContext(AuthContext)
-	const privAccess = user && user.access === `Director`
-	const { loading: crsFetch, error: fetchErr, data } = useQuery(QUERY_COURSES)
+const Students = ({ location: { state }, theme }) => {
+	const {
+		user: { access, department, classTeacherOf },
+	} = useContext(AuthContext)
+
+	const initial = state
+		? { query: QUERY_CLASSES, variables: { course: state._id } }
+		: !!classTeacherOf
+		? { query: QUERY_STUDENTS, variables: { class: classTeacherOf } }
+		: { query: QUERY_COURSES, variables: { department } }
+
+	const { loading, error, data } = useQuery(initial.query, { variables: initial.variables })
+
+	const [getDepartments, { loading: loadingDepartments, data: list }] = useLazyQuery(
+		QUERY_DEPARTMENTS
+	)
+
+	const [getCourses, { loading: loadingCourses, data: courseList }] = useLazyQuery(QUERY_COURSES)
+
 	const [getClasses, { loading: loadingClasses, data: classList }] = useLazyQuery(QUERY_CLASSES)
-	const [getStudents, { loading: loadingStudents, data: studentsList }] = useLazyQuery(QUERY_STUDENTS)
-	const [courseArray, setCourseArray] = useState([])
-	const [studentsArray, setStudentsArray] = useState([])
+
+	const [getStudents, { loading: loadingStudents, data: studentsList }] = useLazyQuery(
+		QUERY_STUDENTS
+	)
+
+	const [courses, setCourses] = useState()
+	const [classes, setClasses] = useState()
+	const [students, setStudents] = useState()
+
+	useEffect(() => (state ? setClasses(data && data.classes) : setCourses(data && data.courses)), [
+		data,
+		state,
+	])
+
+	useEffect(() => courseList && setCourses(courseList.courses), [courseList])
+
+	useEffect(() => classList && setClasses(classList.classes), [classList])
 
 	useEffect(() => {
 		if (sessionStorage.Students) {
 			if (studentsList) {
-				setStudentsArray(JSON.parse(sessionStorage.Students))
+				setStudents(JSON.parse(sessionStorage.Students))
 				sessionStorage.setItem(`Students`, JSON.stringify(studentsList.students))
 			}
-			setStudentsArray(JSON.parse(sessionStorage.Students))
+			setStudents(JSON.parse(sessionStorage.Students))
 		} else {
 			if (studentsList) {
+				setStudents(studentsList.students)
 				sessionStorage.setItem(`Students`, JSON.stringify(studentsList.students))
-				setStudentsArray(studentsList.students)
 			}
 		}
 	}, [studentsList])
 
-	if (crsFetch) return <h2>Loading...</h2>
-	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>
+	if (loading) return <Loading />
+	if (error) return <Error />
 
 	return (
-		<Segment className={loadingStudents || loadingClasses ? `loading` : ``}>
+		<>
 			<h1>Students</h1>
+			<Dimmer active={loadingStudents} inverted={!theme} />
 			<Divider />
-			<Form widths="equal">
+			<Form widths="equal" inverted={theme}>
 				<Form.Group>
-					{privAccess && (
-						<Form.Select
-							search
-							name="department"
-							label="Department"
-							placeholder="Select a Department to get course list"
-							options={data.departments.departments.map(x => {
-								return { text: x.name, value: x._id }
-							})}
-							onChange={(_, { value }) => setCourseArray(data.departments.departments.filter(x => x._id === value)[0].courses)}
+					{access === `Director` && (
+						<Accordion
+							as={Form.Field}
+							inverted={theme}
+							onClick={getDepartments}
+							panels={[
+								{
+									key: `department`,
+									title: `Change Department`,
+									content: {
+										loading: loadingDepartments,
+										placeholder: `Select department to get list of courses`,
+										as: Form.Select,
+										options: list
+											? list.departments.map(x => {
+													return { text: x.name, value: x._id }
+											  })
+											: [],
+										onChange: (_, { value }) => getCourses({ variables: { department: value } }),
+									},
+								},
+							]}
 						/>
 					)}
+				</Form.Group>
+				<Form.Group>
 					<Form.Select
-						search
-						name="course"
 						label="Course"
-						placeholder="Select a Course to get list of Classes"
+						loading={loadingCourses}
+						onClick={() => !list && getCourses({ variables: { department } })}
+						placeholder="Select a course to get list of classes"
 						options={
-							privAccess
-								? courseArray.map(x => {
+							courses
+								? courses.map(x => {
 										return { text: x.name, value: x._id }
 								  })
-								: data.departments.departments[0].courses.map(y => {
-										return { text: y.name, value: y._id }
-								  })
+								: []
 						}
 						onChange={(_, { value }) => getClasses({ variables: { course: value } })}
 					/>
 					<Form.Select
-						search
-						name="class"
+						required
 						label="Class"
+						loading={loadingClasses}
 						placeholder="Select a Class to get Student of"
 						options={
-							classList
-								? classList.classes.map(x => {
-										return { key: x._id, text: x.name, value: x._id }
+							classes
+								? classes.map(x => {
+										return { text: x.name, value: x._id }
 								  })
 								: []
 						}
-						onChange={(_, { value }) => getStudents({ variables: { cid: value } })}
+						onChange={(_, { value }) => getStudents({ variables: { class: value } })}
 					/>
 				</Form.Group>
 			</Form>
-			{studentsArray.length > 0 && <StudentsTable students={studentsArray} />}
-			{studentsList && studentsList.students.length === 0 && <Notify list={[{ message: `Class doesn't have any students registered yet !` }]} />}
-		</Segment>
+			{students ? (
+				students.length === 0 ? (
+					<h3 className="highlight">There are no students in this class yet</h3>
+				) : (
+					<StudentsTable students={students} />
+				)
+			) : (
+				<h3 className="highlight">Please select a class first to get list of students</h3>
+			)}
+		</>
 	)
 }
 

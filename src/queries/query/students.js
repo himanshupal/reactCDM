@@ -1,8 +1,8 @@
 import gql from "graphql-tag"
 
 export default gql`
-	query students($cid: ID) {
-		students(cid: $cid) {
+	query students($class: ID) {
+		students(class: $class) {
 			_id
 			username
 			rollNumber
