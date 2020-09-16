@@ -202,12 +202,13 @@ const Departments = ({ history, theme }) => {
 									<Table.Cell content={department.updatedAt && getTime(department.updatedAt)} />
 									<Table.Cell
 										textAlign="center"
-										content={<Icon inverted={theme} size="large" name="pencil square" />}
+										content={<Icon inverted={theme} name="pencil square" />}
 										onClick={() => {
 											getTeachers()
 											setModal(modal => !modal)
 											setVariables({ ...variables, _id: department._id })
 										}}
+										style={{ cursor: `pointer` }}
 									/>
 								</Table.Row>
 							))}

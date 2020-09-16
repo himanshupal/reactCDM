@@ -40,23 +40,20 @@ const Router = () => (
 				<WithNavigation exact path="/teachers" component={Teachers} />
 				<WithNavigation exact path="/addteacher" component={AddTeacher} />
 				<WithNavigation exact path="/teacher/:username" component={Teacher} />
+				<WithNavigation exact path="/teacher/:username/update" component={AddTeacher} />
 				<WithNavigation
 					exact
-					path="/updateteacher"
+					path="/teacher/update/:id"
 					component={props => <AddTeacher update {...props} />}
 				/>
 				<WithNavigation exact path="/students" component={Students} />
 				<WithNavigation exact path="/addstudent" component={AddStudent} />
-				<WithNavigation exact path="/students/:username/" component={Student} />
-				<WithNavigation exact path="/students/:username/:tab" component={Student} />
+				<WithNavigation exact path="/student/:username" component={Student} />
+				<WithNavigation exact path="/student/:username/update" component={AddStudent} />
+				<WithNavigation exact path="/student/:username/:tab" component={Student} />
 				{/* Side Menu Tab */}
 				<WithNavigation exact path="/students/:username/:tab/:item" component={Student} />
 				{/* Top Menu Item */}
-				<WithNavigation
-					exact
-					path="/updatestudent"
-					component={props => <AddStudent update {...props} />}
-				/>
 				<WithNavigation exact path="/attendence" component={Attendence} />
 				<WithNavigation exact path="/attendencemonth" component={AttendenceMonth} />
 				<WithNavigation exact path="/timetable" component={TimeTable} />

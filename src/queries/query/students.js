@@ -10,11 +10,31 @@ export default gql`
 				first
 				last
 			}
-			class {
-				_id
+			father {
+				name
+				contactNumber
 			}
 			email
 			contactNumber
+			dateOfBirth
+			createdAt
+			createdBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
+			updatedAt
+			updatedBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
 		}
 	}
 `

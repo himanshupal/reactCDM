@@ -1,8 +1,8 @@
 import gql from "graphql-tag"
 
 export default gql`
-	query students($sid: ID) {
-		students(sid: $sid) {
+	query student($username: String!) {
+		student(username: $username) {
 			_id
 			username
 			rollNumber
@@ -24,10 +24,6 @@ export default gql`
 				annualSalary
 				contactNumber
 			}
-			class {
-				_id
-				name
-			}
 			bloodGroup
 			gender
 			caste
@@ -48,8 +44,6 @@ export default gql`
 			email
 			aadharNumber
 			contactNumber
-			createdAt
-			updatedAt
 		}
 	}
 `

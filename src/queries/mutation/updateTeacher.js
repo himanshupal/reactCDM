@@ -2,7 +2,7 @@ import gql from "graphql-tag"
 
 export default gql`
 	mutation updateTeacher(
-		$teacherId: ID!
+		$_id: ID!
 		$firstName: String
 		$lastName: String
 		$bloodGroup: String
@@ -27,7 +27,7 @@ export default gql`
 		$addressPermanentLocality: String
 	) {
 		updateTeacher(
-			tid: $teacherId
+			_id: $_id
 			data: {
 				name: { first: $firstName, last: $lastName }
 				bloodGroup: $bloodGroup
@@ -42,13 +42,72 @@ export default gql`
 				contactNumber: $contactNumber
 				registrationNumber: $registrationNumber
 				address: {
-					current: { locality: $addressCurrentLocality, tehsil: $addressCurrentTehsil, district: $addressCurrentDistrict }
-					permanent: { locality: $addressPermanentLocality, tehsil: $addressPermanentTehsil, district: $addressPermanentDistrict }
+					current: {
+						locality: $addressCurrentLocality
+						tehsil: $addressCurrentTehsil
+						district: $addressCurrentDistrict
+					}
+					permanent: {
+						locality: $addressPermanentLocality
+						tehsil: $addressPermanentTehsil
+						district: $addressPermanentDistrict
+					}
 				}
 				alternativeContact: $alternativeContact
 				dateOfJoining: $dateOfJoining
 				dateOfLeaving: $dateOfLeaving
 			}
-		)
+		) {
+			_id
+			username
+			designation
+			registrationNumber
+			name {
+				first
+				last
+			}
+			bloodGroup
+			gender
+			caste
+			religion
+			dateOfBirth
+			address {
+				current {
+					locality
+					district
+					tehsil
+				}
+				permanent {
+					locality
+					district
+					tehsil
+				}
+			}
+			aadharNumber
+			photo
+			email
+			contactNumber
+			alternativeContact
+			dateOfJoining
+			dateOfLeaving
+			createdAt
+			createdBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
+			updatedAt
+			updatedBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
+		}
 	}
 `

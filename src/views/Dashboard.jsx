@@ -1,6 +1,6 @@
 import Clock from "react-clock"
 import { blake2bHex } from "blakejs"
-import { Segment, Input, Modal, Button, Icon, List } from "semantic-ui-react"
+import { Segment, Input, Modal, Button,  List } from "semantic-ui-react"
 import React, { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import Calendar from "react-calendar"
@@ -42,7 +42,7 @@ const Home = ({ theme }) => {
 				<Clock value={time} />
 			</Segment>
 
-			<Segment>This is be homepage which can be made public & customized to replace existing college site, if the authorities decide so. Currently it is showing some of components used within, but it will show various navlinks, statistics and updates as the project approach completion.</Segment>
+			<Segment inverted={theme}>This is homepage which can be made public & customized to replace existing college site, if the authorities decide so. Currently it is showing some of components used within, but it will show various navlinks, statistics and updates as the project approach completion.</Segment>
 
 			<Segment inverted={theme}>
 				<Calendar

@@ -6,43 +6,13 @@ export default gql`
 			_id
 			username
 			designation
-			registrationNumber
-			department {
-				_id
-				name
-			}
 			name {
 				first
 				last
 			}
-			bloodGroup
-			gender
-			caste
-			religion
-			dateOfBirth
-			dateOfJoining
-			dateOfLeaving
-			address {
-				current {
-					locality
-					district
-					tehsil
-				}
-				permanent {
-					locality
-					district
-					tehsil
-				}
-			}
-			aadharNumber
-			photo
 			email
-			teaches {
-				_id
-				name
-			}
+			dateOfBirth
 			contactNumber
-			alternativeContact
 			classTeacherOf {
 				_id
 				name

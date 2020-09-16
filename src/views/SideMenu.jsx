@@ -1,9 +1,15 @@
 import Clock from "react-clock"
 import { Link } from "react-router-dom"
 import { Menu, Sidebar } from "semantic-ui-react"
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useContext } from "react"
+
+import { AuthContext } from "../common/context"
 
 const SideMenu = ({ page, theme, visible, handleClick }) => {
+	const {
+		user: { access },
+	} = useContext(AuthContext)
+
 	const [time, setTime] = useState(new Date())
 
 	useEffect(() => {
@@ -139,13 +145,15 @@ const SideMenu = ({ page, theme, visible, handleClick }) => {
 			<Menu.Item>
 				<Menu.Header content="Department" />
 				<Menu.Menu>
-					<Menu.Item
-						name="departments"
-						active={page === "departments"}
-						onClick={handleClick}
-						as={Link}
-						to="/departments"
-					/>
+					{access === `Director` && (
+						<Menu.Item
+							name="departments"
+							active={page === "departments"}
+							onClick={handleClick}
+							as={Link}
+							to="/departments"
+						/>
+					)}
 					<Menu.Item
 						name="courses"
 						active={page === "courses"}

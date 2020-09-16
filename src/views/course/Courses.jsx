@@ -141,24 +141,24 @@ const Courses = ({ history, location: { state }, theme }) => {
 					courses.sort((p, n) => (p.name.toLowerCase() < n.name.toLowerCase() ? -1 : 1))
 					break
 				case 3:
-					courses.sort((p, n) => {
-						if (p.duration && n.duration)
-							return p.duration.split(/\s/)[1] < n.duration.split(/\s/)[1] ? -1 : 1
-						else return null
-					})
+					courses.sort((p, n) =>
+						p.duration && n.duration && p.duration.split(/\s/)[1] < n.duration.split(/\s/)[1]
+							? -1
+							: 1
+					)
 					break
 				case 4:
 					courses.sort(x => (x.semesterBased ? -1 : 1))
 					break
 				case 5:
-					courses.sort((p, n) => {
-						if (p.headOfDepartment && n.headOfDepartment)
-							return p.headOfDepartment.name.first.toLowerCase() <
-								n.headOfDepartment.name.first.toLowerCase()
-								? -1
-								: 1
-						else return null
-					})
+					courses.sort((p, n) =>
+						p.headOfDepartment &&
+						n.headOfDepartment &&
+						p.headOfDepartment.name.first.toLowerCase() <
+							n.headOfDepartment.name.first.toLowerCase()
+							? -1
+							: 1
+					)
 					break
 				case 6:
 					courses.sort((p, n) =>
@@ -169,13 +169,13 @@ const Courses = ({ history, location: { state }, theme }) => {
 					courses.sort((p, n) => p.createdAt - n.createdAt)
 					break
 				case 8:
-					courses.sort((p, n) => {
-						if (p.updatedBy && n.updatedBy)
-							return p.updatedBy.name.first.toLowerCase() < n.updatedBy.name.first.toLowerCase()
-								? -1
-								: 1
-						else return null
-					})
+					courses.sort((p, n) =>
+						p.updatedBy &&
+						n.updatedBy &&
+						p.updatedBy.name.first.toLowerCase() < n.updatedBy.name.first.toLowerCase()
+							? -1
+							: 1
+					)
 					break
 				case 9:
 					courses.sort((p, n) => p.updatedAt - n.updatedAt)

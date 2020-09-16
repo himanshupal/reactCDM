@@ -74,7 +74,7 @@ const Login = ({ theme, history }) => {
 						content={
 							<>
 								<Button.Content visible content="Login" />
-								<Button.Content hidden content={<Icon name="long arrow right" />} />
+								<Button.Content hidden content={<Icon name="arrow right" />} />
 							</>
 						}
 					/>

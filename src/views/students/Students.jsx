@@ -1,8 +1,7 @@
-import { Form, Divider, Table, Button, Dimmer, Accordion } from "semantic-ui-react"
+import { Form, Divider, Button, Dimmer, Accordion } from "semantic-ui-react"
 import React, { useState, useEffect, useContext } from "react"
 import { useQuery, useLazyQuery } from "@apollo/react-hooks"
 import { AuthContext } from "../../common/context"
-import { Link } from "react-router-dom"
 
 import QUERY_STUDENTS from "../../queries/query/students"
 import QUERY_COURSES from "../../queries/query/coursesOnly"
@@ -11,64 +10,16 @@ import QUERY_DEPARTMENTS from "../../queries/query/listOfDepartments"
 
 import Loading from "../shared/Loading"
 import Error from "../shared/Error"
+import SingleStudent from "./SingleStudent"
 
-const StudentsTable = ({ students }) => (
-	<Table sortable celled striped color="red">
-		<Table.Header>
-			<Table.Row>
-				<Table.HeaderCell content="S. No." />
-				<Table.HeaderCell content="Roll No." />
-				<Table.HeaderCell content="Username" />
-				<Table.HeaderCell content="First Name" />
-				<Table.HeaderCell content="Last Name" />
-				<Table.HeaderCell content="Contact" />
-			</Table.Row>
-		</Table.Header>
-		<Table.Body>
-			{students.map((student, idx) => (
-				<Table.Row key={idx} children="button">
-					<Table.Cell>{idx + 1}</Table.Cell>
-					<Table.Cell>{student.rollNumber ? student.rollNumber : `- - -`}</Table.Cell>
-					<Table.Cell>
-						<Link to={`/students/${student.username}`}>{student.username}</Link>
-					</Table.Cell>
-					<Table.Cell>{student.name.first}</Table.Cell>
-					<Table.Cell>{student.name.last ? student.name.last : `- - -`}</Table.Cell>
-					<Table.Cell>
-						{student.contactNumber && (
-							<a href={`tel:${student.contactNumber}`}>{student.contactNumber}</a>
-						)}
-						{student.email && (
-							<>
-								<br />
-								<a href={`mailto:${student.email}`}>{student.email}</a>
-							</>
-						)}
-						{!student.contactNumber && !student.email && `- - -`}
-					</Table.Cell>
-				</Table.Row>
-			))}
-		</Table.Body>
-		<Table.Footer fullWidth>
-			<Table.Row>
-				<Table.HeaderCell colSpan="6" textAlign="right">
-					<Button as={Link} to="/addstudent">
-						Add Student
-					</Button>
-				</Table.HeaderCell>
-			</Table.Row>
-		</Table.Footer>
-	</Table>
-)
-
-const Students = ({ location: { state }, theme }) => {
+const Students = ({ history, location: { state }, theme }) => {
 	const {
 		user: { access, department, classTeacherOf },
 	} = useContext(AuthContext)
 
 	const initial = state
 		? { query: QUERY_CLASSES, variables: { course: state._id } }
-		: !!classTeacherOf
+		: classTeacherOf
 		? { query: QUERY_STUDENTS, variables: { class: classTeacherOf } }
 		: { query: QUERY_COURSES, variables: { department } }
 
@@ -89,30 +40,40 @@ const Students = ({ location: { state }, theme }) => {
 	const [courses, setCourses] = useState()
 	const [classes, setClasses] = useState()
 	const [students, setStudents] = useState()
+	const [selected, setSelected] = useState()
 
-	useEffect(() => (state ? setClasses(data && data.classes) : setCourses(data && data.courses)), [
-		data,
-		state,
-	])
+	useEffect(
+		() =>
+			state
+				? setClasses(data && data.classes)
+				: classTeacherOf
+				? setStudents(data && data.students)
+				: setCourses(data && data.courses),
+		[data, state, classTeacherOf]
+	)
 
 	useEffect(() => courseList && setCourses(courseList.courses), [courseList])
 
 	useEffect(() => classList && setClasses(classList.classes), [classList])
 
 	useEffect(() => {
-		if (sessionStorage.Students) {
-			if (studentsList) {
-				setStudents(JSON.parse(sessionStorage.Students))
-				sessionStorage.setItem(`Students`, JSON.stringify(studentsList.students))
-			}
-			setStudents(JSON.parse(sessionStorage.Students))
-		} else {
-			if (studentsList) {
-				setStudents(studentsList.students)
-				sessionStorage.setItem(`Students`, JSON.stringify(studentsList.students))
-			}
+		// if (sessionStorage.Students) {
+		// if (studentsList) {
+		// setStudents(JSON.parse(sessionStorage.Students))
+		// sessionStorage.setItem(`Students`, JSON.stringify(studentsList.students))
+		// }
+		// setStudents(JSON.parse(sessionStorage.Students))
+		// } else {
+		if (studentsList) {
+			setStudents(studentsList.students)
+			// sessionStorage.setItem(`Students`, JSON.stringify(studentsList.students))
+			// }
 		}
 	}, [studentsList])
+
+	console.log(courses, classes, students)
+
+	document.title = `Students`
 
 	if (loading) return <Loading />
 	if (error) return <Error />
@@ -176,7 +137,10 @@ const Students = ({ location: { state }, theme }) => {
 								  })
 								: []
 						}
-						onChange={(_, { value }) => getStudents({ variables: { class: value } })}
+						onChange={(_, { value }) => {
+							setSelected(value)
+							getStudents({ variables: { class: value } })
+						}}
 					/>
 				</Form.Group>
 			</Form>
@@ -184,11 +148,18 @@ const Students = ({ location: { state }, theme }) => {
 				students.length === 0 ? (
 					<h3 className="highlight">There are no students in this class yet</h3>
 				) : (
-					<StudentsTable students={students} />
+					<SingleStudent students={students} theme={theme} selected={selected} history={history} />
 				)
 			) : (
 				<h3 className="highlight">Please select a class first to get list of students</h3>
 			)}
+			<Button
+				type="button"
+				floated="right"
+				to="/addstudent"
+				onClick={() => history.push(`/addStudent`, { class: selected })}
+				content="Add Student"
+			/>
 		</>
 	)
 }

@@ -2,6 +2,7 @@ import gql from "graphql-tag"
 
 export default gql`
 	mutation addStudent(
+		$class: ID!
 		$username: String
 		$rollNumber: String
 		$registrationNumber: String
@@ -19,7 +20,6 @@ export default gql`
 		$bloodGroup: String
 		$gender: String
 		$caste: String
-		$class: String
 		$religion: String
 		$dateOfBirth: String
 		$aadharNumber: String
@@ -35,17 +35,27 @@ export default gql`
 	) {
 		addStudent(
 			data: {
+				class: $class
 				username: $username
 				rollNumber: $rollNumber
 				registrationNumber: $registrationNumber
 				enrollmentNumber: $enrollmentNumber
 				name: { first: $firstName, last: $lastName }
-				father: { name: $fatherName, occupation: $fatherOccupation, annualSalary: $fatherAnnualIncome, contactNumber: $fatherContactNumber }
-				mother: { name: $motherName, occupation: $motherOccupation, annualSalary: $motherAnnualIncome, contactNumber: $motherContactNumber }
+				father: {
+					name: $fatherName
+					occupation: $fatherOccupation
+					annualSalary: $fatherAnnualIncome
+					contactNumber: $fatherContactNumber
+				}
+				mother: {
+					name: $motherName
+					occupation: $motherOccupation
+					annualSalary: $motherAnnualIncome
+					contactNumber: $motherContactNumber
+				}
 				bloodGroup: $bloodGroup
 				gender: $gender
 				caste: $caste
-				class: $class
 				religion: $religion
 				dateOfBirth: $dateOfBirth
 				aadharNumber: $aadharNumber
@@ -53,10 +63,33 @@ export default gql`
 				email: $email
 				contactNumber: $contactNumber
 				address: {
-					current: { locality: $addressCurrentLocality, district: $addressCurrentDistrict, tehsil: $addressCurrentTehsil }
-					permanent: { locality: $addressPermanentLocality, district: $addressPermanentDistrict, tehsil: $addressPermanentTehsil }
+					current: {
+						locality: $addressCurrentLocality
+						district: $addressCurrentDistrict
+						tehsil: $addressCurrentTehsil
+					}
+					permanent: {
+						locality: $addressPermanentLocality
+						district: $addressPermanentDistrict
+						tehsil: $addressPermanentTehsil
+					}
 				}
 			}
-		)
+		) {
+			_id
+			username
+			rollNumber
+			name {
+				first
+				last
+			}
+			father {
+				name
+				contactNumber
+			}
+			email
+			contactNumber
+			dateOfBirth
+		}
 	}
 `
