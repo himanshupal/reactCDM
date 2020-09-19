@@ -71,7 +71,7 @@ const Teachers = ({ theme, history }) => {
 					/>
 				)
 			) : (
-				[]
+				<h3 className="highlight">Please select a department first to get list of teachers</h3>
 			)}
 			<Button
 				type="button"

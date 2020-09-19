@@ -111,6 +111,8 @@ const Courses = ({ history, location: { state }, theme }) => {
 		}
 	}, [data, courseList])
 
+	document.title = `Courses`
+
 	if (loading) return <Loading />
 	if (error) return <Error />
 

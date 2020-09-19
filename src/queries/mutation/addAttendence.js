@@ -1,7 +1,7 @@
 import gql from "graphql-tag"
 
 export default gql`
-	mutation addAttendence($day: String, $class: String, $holiday: String, $students: [String]) {
-		addAttendence(data: { day: $day, class: $class, holiday: $holiday, students: $students })
+	mutation addAttendence($class: ID, $holiday: String, $students: [ID]) {
+		addAttendence(class: $class, data: { holiday: $holiday, students: $students })
 	}
 `

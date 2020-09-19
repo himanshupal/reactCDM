@@ -1,8 +1,8 @@
 import gql from "graphql-tag"
 
 export default gql`
-	mutation addAttendenceMany(
-		$cid: ID!
+	mutation attendenceMonth(
+		$class: ID
 		$day0: String
 		$day1: String
 		$day2: String
@@ -34,37 +34,37 @@ export default gql`
 		$day28: String
 		$day29: String
 		$day30: String
-		$students0: [String]
-		$students1: [String]
-		$students2: [String]
-		$students3: [String]
-		$students4: [String]
-		$students5: [String]
-		$students6: [String]
-		$students7: [String]
-		$students8: [String]
-		$students9: [String]
-		$students10: [String]
-		$students11: [String]
-		$students12: [String]
-		$students13: [String]
-		$students14: [String]
-		$students15: [String]
-		$students16: [String]
-		$students17: [String]
-		$students18: [String]
-		$students19: [String]
-		$students20: [String]
-		$students21: [String]
-		$students22: [String]
-		$students23: [String]
-		$students24: [String]
-		$students25: [String]
-		$students26: [String]
-		$students27: [String]
-		$students28: [String]
-		$students29: [String]
-		$students30: [String]
+		$students0: [ID]
+		$students1: [ID]
+		$students2: [ID]
+		$students3: [ID]
+		$students4: [ID]
+		$students5: [ID]
+		$students6: [ID]
+		$students7: [ID]
+		$students8: [ID]
+		$students9: [ID]
+		$students10: [ID]
+		$students11: [ID]
+		$students12: [ID]
+		$students13: [ID]
+		$students14: [ID]
+		$students15: [ID]
+		$students16: [ID]
+		$students17: [ID]
+		$students18: [ID]
+		$students19: [ID]
+		$students20: [ID]
+		$students21: [ID]
+		$students22: [ID]
+		$students23: [ID]
+		$students24: [ID]
+		$students25: [ID]
+		$students26: [ID]
+		$students27: [ID]
+		$students28: [ID]
+		$students29: [ID]
+		$students30: [ID]
 		$holiday0: String
 		$holiday1: String
 		$holiday2: String
@@ -97,8 +97,8 @@ export default gql`
 		$holiday29: String
 		$holiday30: String
 	) {
-		addAttendenceMany(
-			cid: $cid
+		attendenceMonth(
+			class: $class
 			data: [
 				{ day: $day0, students: $students0, holiday: $holiday0 }
 				{ day: $day1, students: $students1, holiday: $holiday1 }
@@ -132,6 +132,13 @@ export default gql`
 				{ day: $day29, students: $students29, holiday: $holiday29 }
 				{ day: $day30, students: $students30, holiday: $holiday30 }
 			]
-		)
+		) {
+			_id
+			day
+			holiday
+			students {
+				_id
+			}
+		}
 	}
 `

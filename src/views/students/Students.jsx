@@ -18,7 +18,7 @@ const Students = ({ history, location: { state }, theme }) => {
 	} = useContext(AuthContext)
 
 	const initial = state
-		? { query: QUERY_CLASSES, variables: { course: state._id } }
+		? { query: QUERY_STUDENTS, variables: { class: state._id } }
 		: classTeacherOf
 		? { query: QUERY_STUDENTS, variables: { class: classTeacherOf } }
 		: { query: QUERY_COURSES, variables: { department } }
@@ -44,9 +44,7 @@ const Students = ({ history, location: { state }, theme }) => {
 
 	useEffect(
 		() =>
-			state
-				? setClasses(data && data.classes)
-				: classTeacherOf
+			state || classTeacherOf
 				? setStudents(data && data.students)
 				: setCourses(data && data.courses),
 		[data, state, classTeacherOf]
@@ -56,22 +54,7 @@ const Students = ({ history, location: { state }, theme }) => {
 
 	useEffect(() => classList && setClasses(classList.classes), [classList])
 
-	useEffect(() => {
-		// if (sessionStorage.Students) {
-		// if (studentsList) {
-		// setStudents(JSON.parse(sessionStorage.Students))
-		// sessionStorage.setItem(`Students`, JSON.stringify(studentsList.students))
-		// }
-		// setStudents(JSON.parse(sessionStorage.Students))
-		// } else {
-		if (studentsList) {
-			setStudents(studentsList.students)
-			// sessionStorage.setItem(`Students`, JSON.stringify(studentsList.students))
-			// }
-		}
-	}, [studentsList])
-
-	console.log(courses, classes, students)
+	useEffect(() => studentsList && setStudents(studentsList.students), [studentsList])
 
 	document.title = `Students`
 

@@ -2,7 +2,7 @@ import CalendarTab from "react-calendar"
 import React, { useState, useEffect } from "react"
 import { useQuery, useLazyQuery } from "@apollo/react-hooks"
 import { Segment, Modal, Button, List } from "semantic-ui-react"
-import QUERY_ATTENDENCE_MONTH from "../../queries/query/attendenceMonth"
+import QUERY_ATTENDENCE_MONTH from "../../queries/query/attendence"
 
 const Calendar = ({ theme }) => {
 	const [modal, showModal] = useState(false)
@@ -47,9 +47,13 @@ const Calendar = ({ theme }) => {
 				tileContent={({ date, view }) =>
 					view === "month" && date.getDay() === 0 ? (
 						<em>S</em>
-					) : view === "month" && attendence && attendence.filter(_ => _.day === date.getDate() && _.holiday).length > 0 ? (
+					) : view === "month" &&
+					  attendence &&
+					  attendence.filter(_ => _.day === date.getDate() && _.holiday).length > 0 ? (
 						<em>H</em>
-					) : view === "month" && attendence && attendence.filter(_ => _.day === date.getDate()).length > 0 ? (
+					) : view === "month" &&
+					  attendence &&
+					  attendence.filter(_ => _.day === date.getDate()).length > 0 ? (
 						<em>{attendence.filter(_ => _.day === date.getDate())[0].totalStudents}</em>
 					) : (
 						view === "month" &&
@@ -61,13 +65,22 @@ const Calendar = ({ theme }) => {
 					)
 				}
 				onActiveStartDateChange={({ activeStartDate, view }) =>
-					view === `month` ? getAttendence({ variables: { month: activeStartDate.getMonth(), year: activeStartDate.getFullYear() } }) : null
+					view === `month`
+						? getAttendence({
+								variables: {
+									month: activeStartDate.getMonth(),
+									year: activeStartDate.getFullYear(),
+								},
+						  })
+						: null
 				}
 				onClickDay={date => {
 					setOnDate(date)
 					showModal(true)
 				}}
-				onClickMonth={date => getAttendence({ variables: { month: date.getMonth(), year: date.getFullYear() } })}
+				onClickMonth={date =>
+					getAttendence({ variables: { month: date.getMonth(), year: date.getFullYear() } })
+				}
 			/>
 			<Modal size="tiny" open={modal}>
 				<Modal.Header
@@ -82,18 +95,42 @@ const Calendar = ({ theme }) => {
 					content={
 						attendence && attendence.filter(_ => _.day === onDate.getDate()).length === 0 ? (
 							<List.Item content="Record Unavailable !" />
-						) : attendence && attendence.filter(_ => _.day === onDate.getDate() && _.holiday).length > 0 ? (
-							<List.Item content={attendence.filter(_ => _.day === onDate.getDate() && _.holiday)[0].holiday} />
-						) : attendence && attendence.filter(_ => _.day === onDate.getDate() && !_.holiday && _.totalStudents === 0).length > 0 ? (
+						) : attendence &&
+						  attendence.filter(_ => _.day === onDate.getDate() && _.holiday).length > 0 ? (
+							<List.Item
+								content={attendence.filter(_ => _.day === onDate.getDate() && _.holiday)[0].holiday}
+							/>
+						) : attendence &&
+						  attendence.filter(
+								_ => _.day === onDate.getDate() && !_.holiday && _.totalStudents === 0
+						  ).length > 0 ? (
 							<List.Item content="All students were absent !" />
 						) : (
 							attendence &&
 							attendence.filter(_ => _.day === onDate.getDate() && !_.holiday).length > 0 && (
 								<List as="ol" celled>
 									{data.students.map((student, idx) => {
-										if (attendence.filter(_ => _.day === onDate.getDate())[0].students.includes(student._id))
-											return <List.Item as="li" key={idx} content={student.name.first + ` ` + student.name.last} />
-										else return <List.Item as="li" style={{ color: `#ddd` }} key={idx} content={student.name.first + ` ` + student.name.last} />
+										if (
+											attendence
+												.filter(_ => _.day === onDate.getDate())[0]
+												.students.includes(student._id)
+										)
+											return (
+												<List.Item
+													as="li"
+													key={idx}
+													content={student.name.first + ` ` + student.name.last}
+												/>
+											)
+										else
+											return (
+												<List.Item
+													as="li"
+													style={{ color: `#ddd` }}
+													key={idx}
+													content={student.name.first + ` ` + student.name.last}
+												/>
+											)
 									})}
 								</List>
 							)
