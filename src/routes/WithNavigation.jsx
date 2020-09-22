@@ -12,7 +12,7 @@ const Navigator = ({ component: Component, ...props }) => {
 	const [newPwd, setNewPwd] = useState(false)
 	const { user, theme, toggleTheme, page, setPage, logout } = useContext(AuthContext)
 
-	if (user.exp + 60 <= Date.now() / 1000) {
+	if (user && user.exp + 60 <= Date.now() / 1000) {
 		logout()
 		toast.error(<h3>Session Expired!</h3>)
 	}
