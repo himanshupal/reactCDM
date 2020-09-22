@@ -1,13 +1,12 @@
 import gql from "graphql-tag"
 
 export default gql`
-	query notes($page: Int!) {
-		notes(page: $page) {
+	query notice($_id: ID!) {
+		notice(_id: $_id) {
 			_id
-			scope
 			edited
 			subject
-			validFor
+			description
 			createdAt
 			createdBy {
 				_id

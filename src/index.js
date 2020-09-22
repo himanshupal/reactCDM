@@ -10,7 +10,7 @@ import { createHttpLink } from "apollo-link-http"
 import { ApolloProvider } from "@apollo/react-hooks"
 import { InMemoryCache } from "apollo-cache-inmemory"
 
-import "react-toastify/dist/ReactToastify.css"
+import "react-toastify/dist/ReactToastify.min.css"
 import "semantic-ui-css/semantic.min.css"
 import "./common/root.css"
 

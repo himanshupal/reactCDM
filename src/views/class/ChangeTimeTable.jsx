@@ -16,6 +16,7 @@ import constants from "../../common/constants"
 import MutationError from "../shared/MutationError"
 import Loading from "../shared/Loading"
 import Error from "../shared/Error"
+import { getName } from "../shared/helpers"
 
 const ChangeTimeTable = ({ history, location: { state }, theme }) => {
 	const {
@@ -71,12 +72,12 @@ const ChangeTimeTable = ({ history, location: { state }, theme }) => {
 
 	const getTeacher = value => {
 		const list = subjectList.subjects.filter(_ => _._id === value)
-		return list.length > 0 ? list[0].teacher._id : null
+		return list.length > 0 && list[0].teacher ? list[0].teacher._id : null
 	}
 
 	const getTeacherName = value => {
 		const list = subjectList.subjects.filter(_ => _._id === value)
-		return list.length > 0 ? list[0].teacher.name.first + ` ` + list[0].teacher.name.last : `NONE`
+		return list.length > 0 && list[0].teacher ? getName(list[0].teacher.name) : `NONE`
 	}
 
 	return (

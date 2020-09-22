@@ -5,6 +5,8 @@ import LoginReturnLock from "./LoginReturnLock"
 import { AuthProvider } from "../common/context"
 
 import Dashboard from "../views/Dashboard"
+import Notices from "../views/notices/Notices"
+import Notice from "../views/notices/Notice"
 
 import NewSession from "../views/course/NewSesssion"
 import AddSubjects from "../views/class/AddSubjects"
@@ -35,29 +37,23 @@ const Router = () => (
 		<BrowserRouter>
 			<Switch>
 				<WithNavigation exact path="/" component={Dashboard} />
+				<WithNavigation exact path="/notices" component={Notices} />
+				<WithNavigation exact path="/notice/:_id" component={Notice} />
 				<WithNavigation exact path="/newsession" component={NewSession} />
 				<WithNavigation exact path="/addsubjects" component={AddSubjects} />
 				<WithNavigation exact path="/teachers" component={Teachers} />
 				<WithNavigation exact path="/addteacher" component={AddTeacher} />
 				<WithNavigation exact path="/teacher/:username" component={Teacher} />
 				<WithNavigation exact path="/teacher/:username/update" component={AddTeacher} />
-				<WithNavigation
-					exact
-					path="/teacher/update/:id"
-					component={props => <AddTeacher update {...props} />}
-				/>
 				<WithNavigation exact path="/students" component={Students} />
 				<WithNavigation exact path="/addstudent" component={AddStudent} />
 				<WithNavigation exact path="/student/:username" component={Student} />
 				<WithNavigation exact path="/student/:username/update" component={AddStudent} />
 				<WithNavigation exact path="/student/:username/:tab" component={Student} />
-				{/* Side Menu Tab */}
-				<WithNavigation exact path="/students/:username/:tab/:item" component={Student} />
-				{/* Top Menu Item */}
 				<WithNavigation exact path="/attendence" component={Attendence} />
 				<WithNavigation exact path="/attendencemonth" component={AttendenceMonth} />
 				<WithNavigation exact path="/timetable" component={TimeTable} />
-				<WithNavigation exact path="/addtimetable" component={CreateTimeTable} />
+				<WithNavigation exact path="/edittimetable" component={CreateTimeTable} />
 				<WithNavigation exact path="/departments" component={Departments} />
 				<WithNavigation exact path="/courses" component={Courses} />
 				<WithNavigation exact path="/classes" component={Classes} />

@@ -142,7 +142,8 @@ const ClassTable = ({ history, location, getSubjects, department, classes, theme
 								onClick={() => sortColumn(5)}
 								content="Class Teacher"
 							/>
-							<Table.HeaderCell content="Attendence" colSpan={2} />
+							<Table.HeaderCell textAlign="center" content="Attendence" colSpan={2} />
+							<Table.HeaderCell textAlign="center" content="Time Table" colSpan={2} />
 							<Table.HeaderCell
 								sorted={column === 6 ? direction : null}
 								onClick={() => sortColumn(6)}
@@ -230,6 +231,38 @@ const ClassTable = ({ history, location, getSubjects, department, classes, theme
 												<>
 													<Button.Content visible content={<Icon name="calendar" />} />
 													<Button.Content hidden content="Month" />
+												</>
+											}
+										/>
+									}
+								/>
+								<Table.Cell
+									content={
+										<Button
+											fluid
+											size="tiny"
+											animated="fade"
+											onClick={() => history.push(`/timetable`, cls._id)}
+											content={
+												<>
+													<Button.Content visible content={<Icon name="eye" />} />
+													<Button.Content hidden content="View" />
+												</>
+											}
+										/>
+									}
+								/>
+								<Table.Cell
+									content={
+										<Button
+											fluid
+											size="tiny"
+											animated="fade"
+											onClick={() => history.push(`/edittimetable`, cls._id)}
+											content={
+												<>
+													<Button.Content visible content={<Icon name="edit" />} />
+													<Button.Content hidden content="Edit" />
 												</>
 											}
 										/>

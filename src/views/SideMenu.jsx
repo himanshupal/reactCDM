@@ -7,7 +7,7 @@ import { AuthContext } from "../common/context"
 
 const SideMenu = ({ page, theme, visible, handleClick }) => {
 	const {
-		user: { access },
+		user: { access, username },
 	} = useContext(AuthContext)
 
 	const [time, setTime] = useState(new Date())
@@ -24,152 +24,200 @@ const SideMenu = ({ page, theme, visible, handleClick }) => {
 			<Menu.Item>
 				<Clock size={106} value={time} />
 			</Menu.Item>
-			<Menu.Item
-				name="dashboard"
-				active={page === "dashboard"}
-				onClick={handleClick}
-				as={Link}
-				to="/"
-			/>
-			<Menu.Item
-				name="notice board"
-				active={page === "notice board"}
-				onClick={handleClick}
-				as={Link}
-				to="/notice"
-			/>
-			<Menu.Item>
-				<Menu.Header content="Attendence" />
-				<Menu.Menu>
+			{access === `Student` ? (
+				<>
 					<Menu.Item
-						name="day"
-						active={page === "day"}
+						name="notice board"
+						active={page === "notice board"}
 						onClick={handleClick}
 						as={Link}
-						to="/attendence"
+						to="/notices"
 					/>
-					<Menu.Item
-						name="month"
-						active={page === "month"}
-						onClick={handleClick}
-						as={Link}
-						to="/attendencemonth"
-					/>
-				</Menu.Menu>
-			</Menu.Item>
-			<Menu.Item>
-				<Menu.Header content="Class" />
-				<Menu.Menu>
-					<Menu.Item
-						name="classes"
-						active={page === "classes"}
-						onClick={handleClick}
-						as={Link}
-						to="/classes"
-					/>
-					<Menu.Item
-						name="add subjects"
-						active={page === "add subjects"}
-						onClick={handleClick}
-						as={Link}
-						to="/addsubjects"
-					/>
-					<Menu.Item
-						name="timetable"
-						active={page === "timetable"}
-						onClick={handleClick}
-						as={Link}
-						to="/timetable"
-					/>
-					<Menu.Item
-						name="change timetable"
-						active={page === "change timetable"}
-						onClick={handleClick}
-						as={Link}
-						to="/addtimetable"
-					/>
-				</Menu.Menu>
-			</Menu.Item>
-			<Menu.Item>
-				<Menu.Header content="Student" />
-				<Menu.Menu>
-					<Menu.Item
-						name="students"
-						active={page === "students"}
-						onClick={handleClick}
-						as={Link}
-						to="/students"
-					/>
-					<Menu.Item
-						name="add student"
-						active={page === "add student"}
-						onClick={handleClick}
-						as={Link}
-						to="/addstudent"
-					/>
-					<Menu.Item
-						name="update student"
-						active={page === "update student"}
-						onClick={handleClick}
-						as={Link}
-						to="/updatestudent"
-					/>
-				</Menu.Menu>
-			</Menu.Item>
-			<Menu.Item>
-				<Menu.Header content="Teacher" />
-				<Menu.Menu>
-					<Menu.Item
-						name="teachers"
-						active={page === "teachers"}
-						onClick={handleClick}
-						as={Link}
-						to="/teachers"
-					/>
-					<Menu.Item
-						name="add teacher"
-						active={page === "add teacher"}
-						onClick={handleClick}
-						as={Link}
-						to="/addteacher"
-					/>
-					<Menu.Item
-						name="update teacher"
-						active={page === "update teacher"}
-						onClick={handleClick}
-						as={Link}
-						to="/updateteacher"
-					/>
-				</Menu.Menu>
-			</Menu.Item>
-			<Menu.Item>
-				<Menu.Header content="Department" />
-				<Menu.Menu>
-					{access === `Director` && (
+					<Menu.Item>
+						<Menu.Header content="Profile" />
+					</Menu.Item>
+					<Menu.Menu>
 						<Menu.Item
-							name="departments"
-							active={page === "departments"}
+							name="about"
+							active={page === `about`}
 							onClick={handleClick}
 							as={Link}
-							to="/departments"
+							to={`/student/` + username + `/about`}
 						/>
-					)}
+						<Menu.Item
+							name="attendence"
+							active={page === `attendence`}
+							onClick={handleClick}
+							as={Link}
+							to={`/student/` + username + `/attendence`}
+						/>
+					</Menu.Menu>
 					<Menu.Item
-						name="courses"
-						active={page === "courses"}
+						name="notes"
+						active={page === "notes"}
 						onClick={handleClick}
 						as={Link}
-						to="/courses"
+						to={`/student/` + username + `/notes`}
 					/>
 					<Menu.Item
-						name="new session"
-						active={page === "new session"}
+						name="friends"
+						active={page === "friends"}
 						onClick={handleClick}
 						as={Link}
-						to="/newsession"
+						to={`/student/` + username + `/friends`}
 					/>
-				</Menu.Menu>
-			</Menu.Item>
+				</>
+			) : (
+				<>
+					{" "}
+					<Menu.Item
+						name="dashboard"
+						active={page === "dashboard"}
+						onClick={handleClick}
+						as={Link}
+						to="/"
+					/>
+					<Menu.Item
+						name="notice board"
+						active={page === "notice board"}
+						onClick={handleClick}
+						as={Link}
+						to="/notices"
+					/>
+					<Menu.Item>
+						<Menu.Header content="Attendence" />
+						<Menu.Menu>
+							<Menu.Item
+								name="day"
+								active={page === "day"}
+								onClick={handleClick}
+								as={Link}
+								to="/attendence"
+							/>
+							<Menu.Item
+								name="month"
+								active={page === "month"}
+								onClick={handleClick}
+								as={Link}
+								to="/attendencemonth"
+							/>
+						</Menu.Menu>
+					</Menu.Item>
+					<Menu.Item>
+						<Menu.Header content="Class" />
+						<Menu.Menu>
+							<Menu.Item
+								name="classes"
+								active={page === "classes"}
+								onClick={handleClick}
+								as={Link}
+								to="/classes"
+							/>
+							<Menu.Item
+								name="add subjects"
+								active={page === "add subjects"}
+								onClick={handleClick}
+								as={Link}
+								to="/addsubjects"
+							/>
+							<Menu.Item
+								name="timetable"
+								active={page === "timetable"}
+								onClick={handleClick}
+								as={Link}
+								to="/timetable"
+							/>
+							<Menu.Item
+								name="change timetable"
+								active={page === "change timetable"}
+								onClick={handleClick}
+								as={Link}
+								to="/edittimetable"
+							/>
+						</Menu.Menu>
+					</Menu.Item>
+					<Menu.Item>
+						<Menu.Header content="Student" />
+						<Menu.Menu>
+							<Menu.Item
+								name="students"
+								active={page === "students"}
+								onClick={handleClick}
+								as={Link}
+								to="/students"
+							/>
+							<Menu.Item
+								name="add student"
+								active={page === "add student"}
+								onClick={handleClick}
+								as={Link}
+								to="/addstudent"
+							/>
+							<Menu.Item
+								name="update student"
+								active={page === "update student"}
+								onClick={handleClick}
+								as={Link}
+								to="/updatestudent"
+							/>
+						</Menu.Menu>
+					</Menu.Item>
+					<Menu.Item>
+						<Menu.Header content="Teacher" />
+						<Menu.Menu>
+							<Menu.Item
+								name="teachers"
+								active={page === "teachers"}
+								onClick={handleClick}
+								as={Link}
+								to="/teachers"
+							/>
+							<Menu.Item
+								name="add teacher"
+								active={page === "add teacher"}
+								onClick={handleClick}
+								as={Link}
+								to="/addteacher"
+							/>
+							<Menu.Item
+								name="update teacher"
+								active={page === "update teacher"}
+								onClick={handleClick}
+								as={Link}
+								to="/updateteacher"
+							/>
+						</Menu.Menu>
+					</Menu.Item>
+					<Menu.Item>
+						<Menu.Header content="Department" />
+						<Menu.Menu>
+							{access === `Director` && (
+								<Menu.Item
+									name="departments"
+									active={page === "departments"}
+									onClick={handleClick}
+									as={Link}
+									to="/departments"
+								/>
+							)}
+							<Menu.Item
+								name="courses"
+								active={page === "courses"}
+								onClick={handleClick}
+								as={Link}
+								to="/courses"
+							/>
+							<Menu.Item
+								name="new session"
+								active={page === "new session"}
+								onClick={handleClick}
+								as={Link}
+								to="/newsession"
+							/>
+						</Menu.Menu>
+					</Menu.Item>
+				</>
+			)}
 		</Sidebar>
 	)
 }

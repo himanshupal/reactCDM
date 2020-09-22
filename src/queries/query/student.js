@@ -6,6 +6,21 @@ export default gql`
 			_id
 			username
 			rollNumber
+			class {
+				_id
+				name
+				sessionStart
+				sessionEnd
+				totalStudents
+				classTeacher {
+					name {
+						first
+						last
+					}
+					dateOfBirth
+					contactNumber
+				}
+			}
 			registrationNumber
 			enrollmentNumber
 			name {
@@ -44,6 +59,24 @@ export default gql`
 			email
 			aadharNumber
 			contactNumber
+			createdAt
+			createdBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
+			updatedAt
+			updatedBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
 		}
 	}
 `

@@ -6,7 +6,7 @@ import constants from "../../common/constants"
 import ADD_ATTENDENCE_MONTH from "../../queries/mutation/attendenceMonth"
 import QUERY_ATTENDENCE from "../../queries/query/attendence"
 
-import { getName } from "../shared/helpers"
+import { getName, getSundays } from "../shared/helpers"
 import Error from "../shared/Error"
 import Loading from "../shared/Loading"
 import AreYouSure from "../shared/AreYouSure"
@@ -30,15 +30,6 @@ const MonthView = ({ location, theme }) => {
 	const [getAttendence, { loading: change, data: newData }] = useLazyQuery(QUERY_ATTENDENCE, {
 		variables: { ...currentMonth, class: location.state },
 	})
-
-	const getSundays = (month, year) => {
-		let dates = []
-		const firstDay = new Date(year, month, 1).getDay()
-		if (firstDay === 0) dates = [...dates, 0]
-		for (let d = 7 - firstDay; d <= new Date(year, month + 1, 0).getDate(); d += 7)
-			dates = [...dates, d]
-		return dates
-	}
 
 	const [disDates, setDisDates] = useState([])
 	const [confirm, setConfirm] = useState(false)
@@ -294,16 +285,7 @@ const MonthView = ({ location, theme }) => {
 					</Grid>
 
 					<div className="table_overflow">
-						<Table
-							compact
-							striped
-							celled
-							sortable
-							selectable
-							unstackable
-							size="small"
-							inverted={theme}
-						>
+						<Table striped celled sortable selectable unstackable size="small" inverted={theme}>
 							<Table.Header>
 								<Table.Row>
 									<Table.HeaderCell verticalAlign="middle" content="Date →" />
@@ -331,7 +313,7 @@ const MonthView = ({ location, theme }) => {
 											onDoubleClick={() => onNameDoubleClick(student)}
 										/>
 										{numberOfDays.map((_, idx) => (
-											<Table.Cell verticalAlign="middle" textAlign="center" key={idx}>
+											<Table.Cell verticalAlign="middle" textAlign="center" key={idx} selectable>
 												{sundays.includes(idx) ? (
 													<em>S</em>
 												) : disDates.includes(idx) ? (

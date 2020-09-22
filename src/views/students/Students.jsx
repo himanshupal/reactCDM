@@ -137,9 +137,7 @@ const Students = ({ history, location: { state }, theme }) => {
 				<h3 className="highlight">Please select a class first to get list of students</h3>
 			)}
 			<Button
-				type="button"
 				floated="right"
-				to="/addstudent"
 				onClick={() => history.push(`/addStudent`, { class: selected })}
 				content="Add Student"
 			/>

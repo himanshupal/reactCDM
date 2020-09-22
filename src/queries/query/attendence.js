@@ -6,12 +6,14 @@ export default gql`
 			_id
 			day
 			holiday
+			totalStudents
 			students {
 				_id
 			}
 		}
 		students(class: $class) {
 			_id
+			username
 			name {
 				first
 				last
