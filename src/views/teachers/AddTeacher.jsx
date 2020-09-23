@@ -358,7 +358,9 @@ const AddOrUpdateTeacher = ({
 						placeholder="Locality"
 						value={
 							variables.addressPermanentLocality ||
-							(teacher.address && teacher.address.permanent.locality) ||
+							(teacher.address &&
+								teacher.address.permanent &&
+								teacher.address.permanent.locality) ||
 							``
 						}
 					/>
@@ -369,7 +371,7 @@ const AddOrUpdateTeacher = ({
 						placeholder="Tehsil"
 						value={
 							variables.addressPermanentTehsil ||
-							(teacher.address && teacher.address.permanent.tehsil) ||
+							(teacher.address && teacher.address.permanent && teacher.address.permanent.tehsil) ||
 							``
 						}
 					/>
@@ -380,7 +382,9 @@ const AddOrUpdateTeacher = ({
 						placeholder="District"
 						value={
 							variables.addressPermanentDistrict ||
-							(teacher.address && teacher.address.permanent.district) ||
+							(teacher.address &&
+								teacher.address.permanent &&
+								teacher.address.permanent.district) ||
 							``
 						}
 						options={constants.district}

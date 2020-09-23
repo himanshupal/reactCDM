@@ -136,65 +136,68 @@ const SingleTeacher = ({ history, location, teachers, access, theme }) => {
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
-						{teachers.map((teacher, idx) => (
-							<Table.Row key={idx}>
-								<Table.Cell textAlign="center" content={idx + 1} />
-								<Table.Cell
-									selectable
-									content={<Link to={`/teacher/` + teacher.username}>{getName(teacher.name)}</Link>}
-								/>
-								<Table.Cell content={teacher.designation} />
-								<Table.Cell content={teacher.classTeacherOf.name} />
-								<Table.Cell
-									selectable
-									content={<a href={`tel:` + teacher.contactNumber}>{teacher.contactNumber}</a>}
-								/>
-								<Table.Cell
-									selectable
-									content={<a href={`mailto:` + teacher.email}>{teacher.email}</a>}
-								/>
-								<Table.Cell content={getDate(teacher.dateOfBirth)} />
-								<Table.Cell
-									selectable
-									content={
-										<Link to={`teacher/` + teacher.createdBy.username}>
-											{getName(teacher.createdBy.name)}
-										</Link>
-									}
-								/>
-								<Table.Cell content={getTime(teacher.createdAt)} />
-								<Table.Cell
-									selectable
-									content={
-										teacher.updatedBy && (
-											<Link to={`teacher/` + teacher.updatedBy.username}>
-												{getName(teacher.updatedBy.name)}
+						{teachers &&
+							teachers.map((teacher, idx) => (
+								<Table.Row key={idx}>
+									<Table.Cell textAlign="center" content={idx + 1} />
+									<Table.Cell
+										selectable
+										content={
+											<Link to={`/teacher/` + teacher.username}>{getName(teacher.name)}</Link>
+										}
+									/>
+									<Table.Cell content={teacher.designation} />
+									<Table.Cell content={teacher.classTeacherOf && teacher.classTeacherOf.name} />
+									<Table.Cell
+										selectable
+										content={<a href={`tel:` + teacher.contactNumber}>{teacher.contactNumber}</a>}
+									/>
+									<Table.Cell
+										selectable
+										content={<a href={`mailto:` + teacher.email}>{teacher.email}</a>}
+									/>
+									<Table.Cell content={getDate(teacher.dateOfBirth)} />
+									<Table.Cell
+										selectable
+										content={
+											<Link to={`teacher/` + teacher.createdBy.username}>
+												{getName(teacher.createdBy.name)}
 											</Link>
-										)
-									}
-								/>
-								<Table.Cell content={getTime(teacher.updatedAt)} />
-								{senior.includes(access) && (
-									<>
-										<Table.Cell
-											textAlign="center"
-											content={<Icon inverted={theme} name="pencil square" />}
-											onClick={() => history.push(`teacher/${teacher.username}/update`)}
-											style={{ cursor: `pointer` }}
-										/>
-										<Table.Cell
-											textAlign="center"
-											content={<Icon inverted={theme} color="red" name="delete" />}
-											onClick={() => {
-												setTeacher(teacher)
-												setDeleteModal(modal => !modal)
-											}}
-											style={{ cursor: `pointer` }}
-										/>
-									</>
-								)}
-							</Table.Row>
-						))}
+										}
+									/>
+									<Table.Cell content={getTime(teacher.createdAt)} />
+									<Table.Cell
+										selectable
+										content={
+											teacher.updatedBy && (
+												<Link to={`teacher/` + teacher.updatedBy.username}>
+													{getName(teacher.updatedBy.name)}
+												</Link>
+											)
+										}
+									/>
+									<Table.Cell content={getTime(teacher.updatedAt)} />
+									{senior.includes(access) && (
+										<>
+											<Table.Cell
+												textAlign="center"
+												content={<Icon inverted={theme} name="pencil square" />}
+												onClick={() => history.push(`teacher/${teacher.username}/update`)}
+												style={{ cursor: `pointer` }}
+											/>
+											<Table.Cell
+												textAlign="center"
+												content={<Icon inverted={theme} color="red" name="delete" />}
+												onClick={() => {
+													setTeacher(teacher)
+													setDeleteModal(modal => !modal)
+												}}
+												style={{ cursor: `pointer` }}
+											/>
+										</>
+									)}
+								</Table.Row>
+							))}
 					</Table.Body>
 				</Table>
 			</div>

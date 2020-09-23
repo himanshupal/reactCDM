@@ -285,7 +285,16 @@ const MonthView = ({ location, theme }) => {
 					</Grid>
 
 					<div className="table_overflow">
-						<Table striped celled sortable selectable unstackable size="small" inverted={theme}>
+						<Table
+							striped
+							celled
+							sortable
+							singleLine
+							selectable
+							unstackable
+							size="small"
+							inverted={theme}
+						>
 							<Table.Header>
 								<Table.Row>
 									<Table.HeaderCell verticalAlign="middle" content="Date →" />

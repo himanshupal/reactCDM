@@ -69,7 +69,6 @@ const SideMenu = ({ page, theme, visible, handleClick }) => {
 				</>
 			) : (
 				<>
-					{" "}
 					<Menu.Item
 						name="dashboard"
 						active={page === "dashboard"}

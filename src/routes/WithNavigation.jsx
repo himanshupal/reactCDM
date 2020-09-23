@@ -15,6 +15,7 @@ const Navigator = ({ component: Component, ...props }) => {
 	if (user && user.exp + 60 <= Date.now() / 1000) {
 		logout()
 		toast.error(<h3>Session Expired!</h3>)
+		window.location.replace(`/login`)
 	}
 
 	const handleClick = (_, { name }) => {

@@ -11,7 +11,7 @@ export default gql`
 		$email: String
 		$gender: String
 		$religion: String
-		$department: ID
+		$department: ID!
 		$designation: String
 		$dateOfBirth: String
 		$aadharNumber: String
@@ -27,6 +27,7 @@ export default gql`
 		$addressPermanentLocality: String
 	) {
 		addTeacher(
+			department: $department
 			data: {
 				name: { first: $firstName, last: $lastName }
 				bloodGroup: $bloodGroup
@@ -36,15 +37,22 @@ export default gql`
 				email: $email
 				gender: $gender
 				religion: $religion
-				department: $department
 				designation: $designation
 				dateOfBirth: $dateOfBirth
 				aadharNumber: $aadharNumber
 				contactNumber: $contactNumber
 				registrationNumber: $registrationNumber
 				address: {
-					current: { locality: $addressCurrentLocality, tehsil: $addressCurrentTehsil, district: $addressCurrentDistrict }
-					permanent: { locality: $addressPermanentLocality, tehsil: $addressPermanentTehsil, district: $addressPermanentDistrict }
+					current: {
+						locality: $addressCurrentLocality
+						tehsil: $addressCurrentTehsil
+						district: $addressCurrentDistrict
+					}
+					permanent: {
+						locality: $addressPermanentLocality
+						tehsil: $addressPermanentTehsil
+						district: $addressPermanentDistrict
+					}
 				}
 				alternativeContact: $alternativeContact
 				dateOfJoining: $dateOfJoining
