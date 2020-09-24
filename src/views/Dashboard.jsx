@@ -1,6 +1,6 @@
 import Clock from "react-clock"
 import { blake2bHex } from "blakejs"
-import { Segment, Input, Modal, Button,  List } from "semantic-ui-react"
+import { Segment, Input, Modal, Button, List } from "semantic-ui-react"
 import React, { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import Calendar from "react-calendar"
@@ -18,6 +18,8 @@ const Home = ({ theme }) => {
 	}, [])
 
 	const toggle = () => setModal(modal => !modal)
+
+	document.title = `Dashboard`
 
 	return (
 		<Segment.Group>
@@ -42,7 +44,11 @@ const Home = ({ theme }) => {
 				<Clock value={time} />
 			</Segment>
 
-			<Segment inverted={theme}>This is homepage which can be made public & customized to replace existing college site, if the authorities decide so. Currently it is showing some of components used within, but it will show various navlinks, statistics and updates as the project approach completion.</Segment>
+			<Segment inverted={theme}>
+				This is homepage which can be made public & customized to replace existing college site, if
+				the authorities decide so. Currently it is showing some of components used within, but it
+				will show various navlinks, statistics and updates as the project approach completion.
+			</Segment>
 
 			<Segment inverted={theme}>
 				<Calendar
@@ -82,13 +88,15 @@ const Home = ({ theme }) => {
 						<List.Item header="Attendence can be taken on daily/monthly basis & updated on monthly basis." />
 						<List.Item>
 							<List.Header>
-								CRUD operation on <Link to="/departments">Department</Link>, <Link to="/courses">Courses</Link>, <Link to="/classes">Classes & Subjects</Link> is
+								CRUD operation on <Link to="/departments">Department</Link>,{" "}
+								<Link to="/courses">Courses</Link>, <Link to="/classes">Classes & Subjects</Link> is
 								already functional <em>(Access levels yet to configure)</em>
 							</List.Header>
 						</List.Item>
 						<List.Item>
 							<List.Header>
-								<Link to="/newsession">Classes</Link> & <Link to="/addsubjects">Subjects</Link> `addition` page is also functional <em>(Access levels yet to configure)</em>
+								<Link to="/newsession">Classes</Link> & <Link to="/addsubjects">Subjects</Link>{" "}
+								`addition` page is also functional <em>(Access levels yet to configure)</em>
 							</List.Header>
 						</List.Item>
 						<List.Item header="Once you select a duration for a course, the app automatically generates the class names based on course, session & if the course follows semester pattern; every detail of which is editable at the creation time & can also be change later if need arises" />
@@ -107,9 +115,7 @@ const Home = ({ theme }) => {
 						</List.Item>
 					</List>
 				</Modal.Content>
-				<Modal.Actions
-					content={<Button onClick={toggle} color="youtube" content="O K A Y" />}
-				/>
+				<Modal.Actions content={<Button onClick={toggle} color="youtube" content="O K A Y" />} />
 			</Modal>
 		</Segment.Group>
 	)

@@ -7,7 +7,7 @@ import { AuthContext } from "../common/context"
 
 const SideMenu = ({ page, theme, visible, handleClick }) => {
 	const {
-		user: { access, username },
+		user: { access, username, classTeacherOf },
 	} = useContext(AuthContext)
 
 	const [time, setTime] = useState(new Date())
@@ -26,6 +26,7 @@ const SideMenu = ({ page, theme, visible, handleClick }) => {
 			</Menu.Item>
 			{access === `Student` ? (
 				<>
+					<Menu.Item name="home" active={page === "home"} onClick={handleClick} as={Link} to="/" />
 					<Menu.Item
 						name="notice board"
 						active={page === "notice board"}
@@ -35,23 +36,23 @@ const SideMenu = ({ page, theme, visible, handleClick }) => {
 					/>
 					<Menu.Item>
 						<Menu.Header content="Profile" />
+						<Menu.Menu>
+							<Menu.Item
+								name="about"
+								active={page === `about`}
+								onClick={handleClick}
+								as={Link}
+								to={`/student/` + username + `/about`}
+							/>
+							<Menu.Item
+								name="attendence"
+								active={page === `attendence`}
+								onClick={handleClick}
+								as={Link}
+								to={`/student/` + username + `/attendence`}
+							/>
+						</Menu.Menu>
 					</Menu.Item>
-					<Menu.Menu>
-						<Menu.Item
-							name="about"
-							active={page === `about`}
-							onClick={handleClick}
-							as={Link}
-							to={`/student/` + username + `/about`}
-						/>
-						<Menu.Item
-							name="attendence"
-							active={page === `attendence`}
-							onClick={handleClick}
-							as={Link}
-							to={`/student/` + username + `/attendence`}
-						/>
-					</Menu.Menu>
 					<Menu.Item
 						name="notes"
 						active={page === "notes"}
@@ -83,25 +84,27 @@ const SideMenu = ({ page, theme, visible, handleClick }) => {
 						as={Link}
 						to="/notices"
 					/>
-					<Menu.Item>
-						<Menu.Header content="Attendence" />
-						<Menu.Menu>
-							<Menu.Item
-								name="day"
-								active={page === "day"}
-								onClick={handleClick}
-								as={Link}
-								to="/attendence"
-							/>
-							<Menu.Item
-								name="month"
-								active={page === "month"}
-								onClick={handleClick}
-								as={Link}
-								to="/attendencemonth"
-							/>
-						</Menu.Menu>
-					</Menu.Item>
+					{(access === `Director` || access === `Head of Department` || classTeacherOf) && (
+						<Menu.Item>
+							<Menu.Header content="Attendence" />
+							<Menu.Menu>
+								<Menu.Item
+									name="day"
+									active={page === "day"}
+									onClick={handleClick}
+									as={Link}
+									to="/attendence"
+								/>
+								<Menu.Item
+									name="month"
+									active={page === "month"}
+									onClick={handleClick}
+									as={Link}
+									to="/attendencemonth"
+								/>
+							</Menu.Menu>
+						</Menu.Item>
+					)}
 					<Menu.Item>
 						<Menu.Header content="Class" />
 						<Menu.Menu>

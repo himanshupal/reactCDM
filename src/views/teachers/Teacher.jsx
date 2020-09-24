@@ -22,6 +22,8 @@ const Teacher = ({
 	if (loading) return <Loading />
 	if (error) return <Error />
 
+	document.title = data ? getName(data.teacher.name) : username
+
 	return (
 		<Modal open onClose={() => history.goBack()}>
 			<Modal.Content
@@ -44,7 +46,10 @@ const Teacher = ({
 											</Table.Row>
 											<Table.Row>
 												<Table.Cell content={<b>Class Teacher of</b>} />
-												<Table.Cell colSpan={2} content={data.teacher.classTeacherOf.name} />
+												<Table.Cell
+													colSpan={2}
+													content={data.teacher.classTeacherOf && data.teacher.classTeacherOf.name}
+												/>
 												<Table.Cell content={<b>Designation</b>} />
 												<Table.Cell colSpan={2} content={data.teacher.designation} />
 											</Table.Row>
@@ -124,17 +129,21 @@ const Teacher = ({
 													/>
 												</Table.Row>
 											)}
-											<Table.Row>
-												<Table.Cell colSpan={6} content="Teaches" icon="chevron down" />
-											</Table.Row>
-											{data.teacher.teaches.map((subject, idx) => (
-												<Table.Row key={idx}>
-													<Table.Cell content={<b>Subject</b>} />
-													<Table.Cell colSpan={2} content={subject.name} />
-													<Table.Cell content={<b>Class</b>} />
-													<Table.Cell colSpan={2} content={subject.class} />
-												</Table.Row>
-											))}
+											{data.teacher.teaches.length > 0 && (
+												<>
+													<Table.Row>
+														<Table.Cell colSpan={6} content="Teaches" icon="chevron down" />
+													</Table.Row>
+													{data.teacher.teaches.map((subject, idx) => (
+														<Table.Row key={idx}>
+															<Table.Cell content={<b>Subject</b>} />
+															<Table.Cell colSpan={2} content={subject.name} />
+															<Table.Cell content={<b>Class</b>} />
+															<Table.Cell colSpan={2} content={subject.class} />
+														</Table.Row>
+													))}
+												</>
+											)}
 										</Table.Body>
 									</Table>
 								</div>

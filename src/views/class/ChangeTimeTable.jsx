@@ -80,6 +80,8 @@ const ChangeTimeTable = ({ history, location: { state }, theme }) => {
 		return list.length > 0 && list[0].teacher ? getName(list[0].teacher.name) : `NONE`
 	}
 
+	document.title = `Time Table | Update`
+
 	return (
 		<>
 			<h1>Create Time Table</h1>

@@ -34,6 +34,8 @@ const Teachers = ({ theme, history }) => {
 	if (loading) return <Loading />
 	if (error) return <Error />
 
+	document.title = `Teachers`
+
 	return (
 		<>
 			<h1>Teachers</h1>

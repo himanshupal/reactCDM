@@ -53,6 +53,8 @@ const Notice = ({
 	if (loading) return <Loading />
 	if (error) return <Error />
 
+	document.title = data ? `Notice | ` + getTime(data.notice.createdAt) : `Notice`
+
 	return (
 		<>
 			<div className="distributed_ends">
@@ -79,7 +81,7 @@ const Notice = ({
 				<MDEditor.Markdown source={data.notice.description || `***Description Not Provided***`} />
 			)}
 			<Divider />
-			<h4>
+			<h5 style={{ marginTop: `0.4rem` }}>
 				Created by{" "}
 				{user && user.access !== `Student` ? (
 					<Link to={`/teacher/` + data.notice.createdBy.username}>
@@ -89,9 +91,9 @@ const Notice = ({
 					getName(data.notice.createdBy.name)
 				)}{" "}
 				on {getTime(data.notice.createdAt)}
-			</h4>
+			</h5>
 			{data.notice.updatedAt && (
-				<h4>
+				<h6 style={{ marginTop: 0 }}>
 					Updated by{" "}
 					{user && user.access !== `Student` ? (
 						<Link to={`/teacher/` + data.notice.updatedBy.username}>
@@ -101,7 +103,7 @@ const Notice = ({
 						getName(data.notice.updatedBy.name)
 					)}{" "}
 					on {getTime(data.notice.updatedAt)}
-				</h4>
+				</h6>
 			)}
 			<NoticeModal
 				open={modal}

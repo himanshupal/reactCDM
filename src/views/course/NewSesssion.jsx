@@ -83,6 +83,8 @@ const NewSesssion = ({ theme }) => {
 	if (loading) return <Loading />
 	if (error) return <Error />
 
+	document.title = `New Session | ` + new Date().getFullYear()
+
 	return (
 		<>
 			<h1 className="distributed_ends">

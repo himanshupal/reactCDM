@@ -29,6 +29,8 @@ const Login = ({ theme, history }) => {
 		loginUser()
 	}
 
+	document.title = `Login`
+
 	return (
 		<div
 			style={{

@@ -107,6 +107,8 @@ const Departments = ({ history, theme }) => {
 		}
 	}
 
+	document.title = `Departments`
+
 	return (
 		<>
 			<h1>Departments</h1>

@@ -103,6 +103,8 @@ const Subjects = ({ location, theme, subjects, department }) => {
 		}
 	}
 
+	document.title = `Subjects`
+
 	return (
 		<>
 			<div className="table_overflow">

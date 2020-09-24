@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react"
-import { Table, Button, Input, Divider, Icon, Dimmer } from "semantic-ui-react"
-import { useQuery, useMutation } from "@apollo/react-hooks"
+import React, { useState, useEffect, useContext } from "react"
+import { Table, Button, Input, Divider, Icon, Dimmer, Form } from "semantic-ui-react"
+import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks"
 import { Link } from "react-router-dom"
 import { toast } from "react-toastify"
 
 import QUERY_STUDENTS from "../../queries/query/studentsForAttendence"
+import QUERY_DEPARTMENTS from "../../queries/query/listOfDepartments"
+import QUERY_COURSES from "../../queries/query/coursesOnly"
+import QUERY_CLASSES from "../../queries/query/classesNameOnly"
 import ADD_ATTENDENCE from "../../queries/mutation/addAttendence"
 
 import Loading from "../shared/Loading"
@@ -12,16 +15,31 @@ import Error from "../shared/Error"
 
 import MutationError from "../shared/MutationError"
 import { getName } from "../shared/helpers"
+import { AuthContext } from "../../common/context"
 
 const Attendence = ({ location, theme }) => {
+	const {
+		user: { access },
+	} = useContext(AuthContext)
+
 	const { loading, error, data } = useQuery(QUERY_STUDENTS, {
 		variables: { class: location.state },
 	})
+
+	const [getDepartments, { loading: gettingDepartments, data: dptList }] = useLazyQuery(
+		QUERY_DEPARTMENTS
+	)
+	const [getCourses, { loading: gettingCourses, data: crsList }] = useLazyQuery(QUERY_COURSES)
+	const [getClasses, { loading: gettingClasses, data: clsList }] = useLazyQuery(QUERY_CLASSES)
+	const [getStudents, { loading: gettingStudents, data: newData }] = useLazyQuery(QUERY_STUDENTS)
+
 	const [direction, setDirection] = useState(`ascending`)
 	const [variables, setVariables] = useState({})
 	const [holiday, setHoliday] = useState(false)
+	const [students, setStudents] = useState([])
 	const [present, setPresent] = useState([])
 	const [column, setColumn] = useState(1)
+
 	const [addAttendence, { loading: saving }] = useMutation(ADD_ATTENDENCE, {
 		update: (_, { data: { addAttendence } }) => toast.success(<h3>{addAttendence}</h3>),
 		onError: e => MutationError(e),
@@ -34,27 +52,32 @@ const Attendence = ({ location, theme }) => {
 		})
 	}, [present])
 
-	document.title = `Attendence | ${new Date().toDateString()}`
+	useEffect(() => (newData ? setStudents(newData.students) : setStudents(data && data.students)), [
+		newData,
+		data,
+	])
 
 	if (loading) return <Loading />
 	if (error) return <Error />
 
+	document.title = `Attendence | ${new Date().toDateString()}`
+
 	const sortColumn = field => {
 		if (column === field) {
-			data.students.reverse()
+			students.reverse()
 			setDirection(direction === `ascending` ? `descending` : `ascending`)
 		} else {
 			setColumn(field)
 			setDirection(`ascending`)
 			switch (field) {
 				case 1:
-					data.students.sort((p, n) => {
+					students.sort((p, n) => {
 						if (p.rollNumber && n.rollNumber) return p.rollNumber < n.rollNumber ? -1 : 1
 						else return null
 					})
 					break
 				case 2:
-					data.students.sort((p, n) =>
+					students.sort((p, n) =>
 						p.name.first.toLowerCase() < n.name.first.toLowerCase() ? -1 : 1
 					)
 					break
@@ -67,16 +90,63 @@ const Attendence = ({ location, theme }) => {
 	return (
 		<>
 			<h1>Attendence</h1>
-			<Dimmer active={saving} inverted={!theme} />
+			<Dimmer active={saving || gettingStudents} inverted={!theme} />
 			<Divider />
-			{new Date().getDay() === 0 ? (
-				<h3 className="highlight">Today is Sunday</h3>
-			) : data.students.length > 0 ? (
+			{(access === `Director` || access === `Head of Department`) && (
+				<Form widths="equal" inverted={theme}>
+					<Form.Group>
+						{access === `Director` && (
+							<Form.Select
+								onClick={getDepartments}
+								label="Change Department"
+								options={
+									dptList
+										? dptList.departments.map(x => {
+												return { text: x.name, value: x._id }
+										  })
+										: []
+								}
+								loading={gettingDepartments}
+								onChange={(_, { value }) => getCourses({ variables: { department: value } })}
+							/>
+						)}
+						<Form.Select
+							onClick={() => !dptList && getCourses()}
+							label="Change Course"
+							options={
+								crsList
+									? crsList.courses.map(x => {
+											return { text: x.name, value: x._id }
+									  })
+									: []
+							}
+							loading={gettingCourses}
+							onChange={(_, { value }) => getClasses({ variables: { course: value } })}
+						/>
+						<Form.Select
+							label="Change Class"
+							options={
+								clsList
+									? clsList.classes.map(x => {
+											return { text: x.name, value: x._id }
+									  })
+									: []
+							}
+							loading={gettingClasses}
+							onChange={(_, { value }) => {
+								setVariables({ ...variables, class: value })
+								getStudents({ variables: { class: value } })
+							}}
+						/>
+					</Form.Group>
+				</Form>
+			)}
+			{students && students.length > 0 ? (
 				<>
 					<Table color="violet" inverted={theme} unstackable>
 						<Table.Body>
 							<Table.Row textAlign="center">
-								<Table.Cell>Total Students: {data.students.length}</Table.Cell>
+								<Table.Cell>Total Students: {students.length}</Table.Cell>
 								<Table.Cell>Present Students: {present.length}</Table.Cell>
 							</Table.Row>
 						</Table.Body>
@@ -101,7 +171,7 @@ const Attendence = ({ location, theme }) => {
 								</Table.Row>
 							</Table.Header>
 							<Table.Body>
-								{data.students.map((student, idx) => (
+								{students.map((student, idx) => (
 									<Table.Row key={idx}>
 										<Table.Cell textAlign="center" content={idx + 1} />
 										<Table.Cell content={student.rollNumber} />

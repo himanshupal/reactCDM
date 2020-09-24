@@ -76,6 +76,8 @@ const AddSubjects = ({ location: { state }, theme }) => {
 
 	const onChange = (_, { name, value }) => setVariables({ ...variables, [name]: value })
 
+	document.title = `Add Subjects`
+
 	return (
 		<>
 			<h1>Add Subjects</h1>

@@ -87,9 +87,11 @@ const AddOrUpdateTeacher = ({
 	const minDOB = date.getFullYear() - 85 + `-` + date.toISOString().slice(5, 10)
 	const maxDOB = date.getFullYear() - 25 + `-` + date.toISOString().slice(5, 10)
 
+	document.title = username ? `Update Teacher` : `Add Teacher`
+
 	return (
 		<>
-			{username ? <h1>Update Teacher</h1> : <h1>Add New Teacher</h1>}
+			{username ? <h1>Update Teacher</h1> : <h1>Add Teacher</h1>}
 			<Dimmer active={savingTeacher} inverted={!theme} />
 			<Divider />
 			<Form

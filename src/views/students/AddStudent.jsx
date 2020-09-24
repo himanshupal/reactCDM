@@ -1,6 +1,6 @@
 import { Form, Icon, Image, Button, Divider, Dimmer, Accordion } from "semantic-ui-react"
 import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks"
-import React, { useState, useMemo, useEffect, useContext } from "react"
+import React, { useState, useEffect, useContext } from "react"
 import { AuthContext } from "../../common/context"
 
 import QUERY_STUDENT from "../../queries/query/student"
@@ -52,7 +52,7 @@ const AddOrUpdateStudent = ({
 
 	const [getClasses, { loading: loadingClasses, data: classList }] = useLazyQuery(QUERY_CLASSES)
 
-	useMemo(() => {
+	useEffect(() => {
 		if (data) {
 			if (username) {
 				setStudent(data.student)
@@ -63,7 +63,7 @@ const AddOrUpdateStudent = ({
 		}
 	}, [data, username])
 
-	useMemo(() => {
+	useEffect(() => {
 		if (!username)
 			state && state.class
 				? setVariables(variables => {
@@ -99,9 +99,11 @@ const AddOrUpdateStudent = ({
 	const minDOB = date.getFullYear() - 55 + `-` + date.toISOString().slice(5, 10)
 	const maxDOB = date.getFullYear() - 16 + `-` + date.toISOString().slice(5, 10)
 
+	document.title = username ? `Update Student` : `Add Student`
+
 	return (
 		<>
-			{username ? <h1>Update Student</h1> : <h1>Add New Student</h1>}
+			{username ? <h1>Update Student</h1> : <h1>Add Student</h1>}
 			<Dimmer active={savingStudent} inverted={!theme} />
 			<Divider />
 			<Form

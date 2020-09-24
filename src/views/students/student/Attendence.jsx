@@ -11,7 +11,7 @@ import Error from "../../shared/Error"
 import { getDate, getName, getSundays } from "../../shared/helpers"
 import { generate } from "c3"
 
-const Attendence = ({ theme, history }) => {
+const Attendence = ({ theme, history, classId, name }) => {
 	const [modal, showModal] = useState(false)
 	const [students, setStudents] = useState(0)
 	const [onDate, setOnDate] = useState(new Date())
@@ -24,7 +24,7 @@ const Attendence = ({ theme, history }) => {
 
 	const [daysInMonth, setDaysInMonth] = useState(30)
 
-	const { loading, error, data } = useQuery(ATTENDENCE_MONTH)
+	const { loading, error, data } = useQuery(ATTENDENCE_MONTH, { variables: { class: classId } })
 	const [getAttendence, { loading: change, data: newData }] = useLazyQuery(ATTENDENCE_MONTH)
 
 	useEffect(() => setDaysInMonth(new Date(range.year, range.month + 1, 0).getDate()), [range])
@@ -62,15 +62,15 @@ const Attendence = ({ theme, history }) => {
 		},
 		// axis: {
 		// 	y: {
-		// 		min: -students,
-		// 		max: students,
+		// 		min: -INT,
+		// 		max: INT,
 		// 	},
+		// },
+		// zoom: {
+		// 	enabled: true,
 		// },
 		subchart: {
 			show: true,
-		},
-		zoom: {
-			enabled: true,
 		},
 		tooltip: {
 			format: {
@@ -136,6 +136,8 @@ const Attendence = ({ theme, history }) => {
 	if (loading) return <Loading />
 	if (error) return <Error />
 
+	document.title = name + ` | Attendence`
+
 	return (
 		<>
 			<Dimmer active={change} inverted={!theme} />
@@ -177,6 +179,7 @@ const Attendence = ({ theme, history }) => {
 						view === `month` &&
 						getAttendence({
 							variables: {
+								class: classId,
 								month: activeStartDate.getMonth(),
 								year: activeStartDate.getFullYear(),
 							},

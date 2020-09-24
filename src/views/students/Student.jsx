@@ -12,6 +12,7 @@ import STUDENT from "../../queries/query/student"
 
 import Loading from "../shared/Loading"
 import Error from "../shared/Error"
+import { getName } from "../shared/helpers"
 
 const Student = ({
 	theme,
@@ -31,27 +32,32 @@ const Student = ({
 
 	const changeView = (_, { name }) => history.push(`/student/` + username + `/` + name)
 
+	const name = getName(data.student.name)
+
+	document.title = data ? name + ` | Select` : username
+
 	return (
 		<>
-			<Menu pointing secondary inverted={theme} stackable>
-				<Menu.Item name="about" active={tab === `about`} onClick={changeView} content="About" />
-				<Menu.Item name="notes" active={tab === `notes`} onClick={changeView} content="Notes" />
-				<Menu.Item
-					name="friends"
-					active={tab === `friends`}
-					onClick={changeView}
-					content="Friends"
-				/>
-				<Menu.Item
-					name="attendence"
-					active={tab === `attendence`}
-					onClick={changeView}
-					content="Attendence"
-				/>
-			</Menu>
+			{access !== `Student` && (
+				<Menu pointing secondary inverted={theme} stackable>
+					<Menu.Item name="about" active={tab === `about`} onClick={changeView} content="About" />
+					<Menu.Item
+						name="friends"
+						active={tab === `friends`}
+						onClick={changeView}
+						content="Friends"
+					/>
+					<Menu.Item
+						name="attendence"
+						active={tab === `attendence`}
+						onClick={changeView}
+						content="Attendence"
+					/>
+				</Menu>
+			)}
 
 			{tab === `attendence` ? (
-				<Attendence theme={theme} history={history} />
+				<Attendence theme={theme} history={history} classId={data.student.class._id} name={name} />
 			) : tab === `about` ? (
 				<About
 					theme={theme}
@@ -61,9 +67,9 @@ const Student = ({
 					data={data.student}
 				/>
 			) : tab === `notes` ? (
-				<Notes theme={theme} username={username} />
+				<Notes theme={theme} username={username} name={name} />
 			) : tab === `friends` ? (
-				<Friends theme={theme} username={username} />
+				<Friends theme={theme} username={username} name={name} />
 			) : (
 				<h3 className="highlight">Select a Tab</h3>
 			)}

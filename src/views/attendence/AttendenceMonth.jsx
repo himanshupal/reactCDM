@@ -1,9 +1,22 @@
-import { Table, Checkbox, Button, Grid, Dropdown, Dimmer, Icon, Divider } from "semantic-ui-react"
+import {
+	Table,
+	Checkbox,
+	Button,
+	Grid,
+	Dropdown,
+	Dimmer,
+	Icon,
+	Divider,
+	Form,
+} from "semantic-ui-react"
 import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks"
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useContext } from "react"
 import constants from "../../common/constants"
 
 import ADD_ATTENDENCE_MONTH from "../../queries/mutation/attendenceMonth"
+import QUERY_DEPARTMENTS from "../../queries/query/listOfDepartments"
+import QUERY_COURSES from "../../queries/query/coursesOnly"
+import QUERY_CLASSES from "../../queries/query/classesNameOnly"
 import QUERY_ATTENDENCE from "../../queries/query/attendence"
 
 import { getName, getSundays } from "../shared/helpers"
@@ -12,9 +25,15 @@ import Loading from "../shared/Loading"
 import AreYouSure from "../shared/AreYouSure"
 import MutationError from "../shared/MutationError"
 
+import { AuthContext } from "../../common/context"
+
 import { toast } from "react-toastify"
 
 const MonthView = ({ location, theme }) => {
+	const {
+		user: { access },
+	} = useContext(AuthContext)
+
 	const yearNow = new Date().getFullYear()
 	const monthNow = new Date().getMonth()
 
@@ -23,28 +42,37 @@ const MonthView = ({ location, theme }) => {
 		year: yearNow,
 	})
 
+	const [disDates, setDisDates] = useState([])
+	const [students, setStudents] = useState([])
+	const [confirm, setConfirm] = useState(false)
+	const [variables, setVariables] = useState({})
+	const [previousAttendence, setPreviousAttendence] = useState([])
+
 	const { loading, error, data } = useQuery(QUERY_ATTENDENCE, {
 		variables: { class: location.state },
 	})
 
+	const [getDepartments, { loading: gettingDepartments, data: dptList }] = useLazyQuery(
+		QUERY_DEPARTMENTS
+	)
+	const [getCourses, { loading: gettingCourses, data: crsList }] = useLazyQuery(QUERY_COURSES)
+	const [getClasses, { loading: gettingClasses, data: clsList }] = useLazyQuery(QUERY_CLASSES)
 	const [getAttendence, { loading: change, data: newData }] = useLazyQuery(QUERY_ATTENDENCE, {
-		variables: { ...currentMonth, class: location.state },
+		variables: { ...currentMonth, class: variables.class || location.state },
 	})
 
-	const [disDates, setDisDates] = useState([])
-	const [confirm, setConfirm] = useState(false)
-	const [variables, setVariables] = useState({})
-	const [previousAttendence, setPreviousAttendence] = useState([])
 	const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate()
+
 	const [sundays, setSundays] = useState(getSundays(currentMonth.month, currentMonth.year))
 	const [numberOfDays, setNumberOfDays] = useState(
 		new Array(daysInMonth(currentMonth.month, currentMonth.year)).fill()
 	)
+
 	const [addAttendenceMonth, { loading: saving }] = useMutation(ADD_ATTENDENCE_MONTH, {
 		update: () => {
 			setConfirm(false)
 			toast.success(<h3>Attendence Saved</h3>)
-			location.reload()
+			window.location.reload()
 		},
 		onError: e => MutationError(e),
 		variables: location.state ? { ...variables, class: location.state } : variables,
@@ -84,6 +112,7 @@ const MonthView = ({ location, theme }) => {
 					: x
 			)
 		)
+		newData ? setStudents(newData.students) : setStudents(data && data.students)
 	}, [data, newData, currentMonth])
 
 	useEffect(() => {
@@ -102,11 +131,11 @@ const MonthView = ({ location, theme }) => {
 		setConfirm(false)
 		if (sundays.includes(date)) return
 		setVariables(variables => {
-			data.students &&
-				data.students.forEach(() => {
+			students &&
+				students.forEach(() => {
 					variables = {
 						...variables,
-						[`students` + date]: data.students.map(x => x._id),
+						[`students` + date]: students.map(x => x._id),
 						[`day` + date]: `${date + 1}/${Number(currentMonth.month) + 1}/${currentMonth.year}`,
 					}
 				})
@@ -203,19 +232,68 @@ const MonthView = ({ location, theme }) => {
 			  })
 	}
 
+	if (loading) return <Loading />
+	if (error) return <Error />
+
 	document.title = `Attendence | ${
 		constants.months[currentMonth.month]
 	} ${currentMonth.year.toString()}`
-
-	if (loading) return <Loading />
-	if (error) return <Error />
 
 	return (
 		<>
 			<h1>Update Attendence</h1>
 			<Dimmer active={change || saving} inverted={!theme} />
 			<Divider />
-			{data.students.length > 0 ? (
+			{(access === `Director` || access === `Head of Department`) && (
+				<Form widths="equal" inverted={theme}>
+					<Form.Group>
+						{access === `Director` && (
+							<Form.Select
+								onClick={getDepartments}
+								label="Change Department"
+								options={
+									dptList
+										? dptList.departments.map(x => {
+												return { text: x.name, value: x._id }
+										  })
+										: []
+								}
+								loading={gettingDepartments}
+								onChange={(_, { value }) => getCourses({ variables: { department: value } })}
+							/>
+						)}
+						<Form.Select
+							onClick={() => !dptList && getCourses()}
+							label="Change Course"
+							options={
+								crsList
+									? crsList.courses.map(x => {
+											return { text: x.name, value: x._id }
+									  })
+									: []
+							}
+							loading={gettingCourses}
+							onChange={(_, { value }) => getClasses({ variables: { course: value } })}
+						/>
+						<Form.Select
+							label="Change Class"
+							options={
+								clsList
+									? clsList.classes.map(x => {
+											return { text: x.name, value: x._id }
+									  })
+									: []
+							}
+							loading={gettingClasses}
+							onChange={(_, { value }) => {
+								setVariables({ ...variables, class: value })
+								getAttendence({ variables: { class: value } })
+							}}
+						/>
+					</Form.Group>
+				</Form>
+			)}
+			{students && students.length > 0 ? (
 				<>
 					<Grid style={{ paddingBottom: `1rem` }}>
 						<Grid.Row columns={3}>
@@ -313,7 +391,7 @@ const MonthView = ({ location, theme }) => {
 							</Table.Header>
 
 							<Table.Body>
-								{data.students.map((student, idx) => (
+								{students.map((student, idx) => (
 									<Table.Row key={idx}>
 										<Table.Cell
 											verticalAlign="middle"

@@ -21,7 +21,7 @@ const SingleStudent = ({ history, location, students, theme }) => {
 		update: () => {
 			toast.success(<h3>Student Deleted ✔</h3>)
 			setDeleteModal(deleteModal => !deleteModal)
-			location.reload()
+			window.location.reload()
 		},
 		onError: e => MutationError(e),
 		variables: { _id: student && student._id },

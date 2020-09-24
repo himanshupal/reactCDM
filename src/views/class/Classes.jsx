@@ -53,10 +53,10 @@ const Classes = ({ history, location, theme }) => {
 
 	useEffect(() => classList && setClasses(classList.classes), [classList])
 
-	document.title = `Classes`
-
 	if (loading) return <Loading />
 	if (error) return <Error />
+
+	document.title = `Classes`
 
 	return (
 		<>

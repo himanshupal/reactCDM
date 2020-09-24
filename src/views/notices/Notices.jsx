@@ -23,6 +23,8 @@ const Notices = ({ theme }) => {
 	if (loading) return <Loading />
 	if (error) return <Error />
 
+	document.title = `Notices`
+
 	return (
 		<>
 			<h1>Notices</h1>

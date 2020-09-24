@@ -188,6 +188,8 @@ const Courses = ({ history, location: { state }, theme }) => {
 		}
 	}
 
+	document.title = `Courses`
+
 	return (
 		<>
 			<h1>Courses</h1>

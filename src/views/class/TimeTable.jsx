@@ -1,5 +1,5 @@
 import React from "react"
 
-const TimeTable = () => <div>TIMETABLE</div>
+const TimeTable = () => <div className="highlight">Coming Soon!</div>
 
 export default TimeTable
