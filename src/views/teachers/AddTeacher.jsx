@@ -1,115 +1,147 @@
-import { Form, Image, Segment, Divider } from "semantic-ui-react";
-import MUTATION_UPDATETEACHER from "../../queries/mutation/updateTeacher";
-import MUTATION_ADDTEACHER from "../../queries/mutation/addTeacher";
-import QUERY_DEPARTMENTS from "../../queries/query/departments";
-import { useQuery, useMutation } from "@apollo/react-hooks";
-import Notify from "../../common/Notify";
-import React, { useState } from "react";
-import constants from "../common";
-import src from "./logo512.png";
+import { Form, Image, Divider, Dimmer, Icon, Button } from "semantic-ui-react"
+import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks"
+import { toast } from "react-toastify"
+import React, { useState, useEffect, useContext } from "react"
+import { AuthContext } from "../../common/context"
 
-const TeacherProfile = ({ update }) => {
-	const { loading: dptFetch, error: fetchErr, data } = useQuery(QUERY_DEPARTMENTS);
-	const [notification, setNotification] = useState([]);
-	const [variables, setVariables] = useState({});
-	const [addTeacher, { loading }] = useMutation(update ? MUTATION_UPDATETEACHER : MUTATION_ADDTEACHER, {
-		update: (_, { data }) => {
-			setNotification([...notification, { message: data.addTeacher }]);
-		},
-		onError: ({ graphQLErrors, networkError, message }) => {
-			console.log(message);
-			if (networkError) setNotification([...notification, { error: message.split(`: `)[1] }]);
-			else setNotification([...notification, { message: message.split(`: `)[1], error: graphQLErrors[0].extensions.error }]);
-		},
-		variables,
-	});
+import QUERY_TEACHER from "../../queries/query/teacher"
+import ADD_TEACHER from "../../queries/mutation/addTeacher"
+import UPDATE_TEACHER from "../../queries/mutation/updateTeacher"
+import QUERY_DEPARTMENTS from "../../queries/query/listOfDepartments"
 
-	if (dptFetch) return <h2>Loading...</h2>;
-	if (fetchErr) return <h2>{fetchErr.toString().split(`: `)[2]}</h2>;
+import src from "../../common/ico.png"
+import constants from "../../common/constants"
 
-	const onChange = (_, { name, value }) => {
-		if (notification.length > 0) setNotification([]);
-		setVariables({ ...variables, [name]: value });
-	};
+import Error from "../shared/Error"
+import Loading from "../shared/Loading"
+import MutationError from "../shared/MutationError"
 
-	const date = new Date();
-	const today = date.toISOString().slice(0, 10);
-	const minDOB = date.getFullYear() - 85 + `-` + date.toISOString().slice(5, 10);
-	const maxDOB = date.getFullYear() - 25 + `-` + date.toISOString().slice(5, 10);
+const AddOrUpdateTeacher = ({
+	history,
+	match: {
+		params: { username },
+	},
+	theme,
+}) => {
+	const {
+		user: { access, username: editor },
+	} = useContext(AuthContext)
+
+	const initial = username
+		? { query: QUERY_TEACHER, variables: { username } }
+		: { query: QUERY_DEPARTMENTS }
+
+	const senior = [`Director`, `Head of Department`]
+
+	if (!senior.includes(access) && username !== editor) history.push(`/`)
+
+	const [dpts, setDpts] = useState([])
+	const [teacher, setTeacher] = useState({})
+	const [variables, setVariables] = useState({})
+
+	const { loading, error, data } = useQuery(initial.query, { variables: initial.variables })
+
+	const [getDepartments, { loading: loadingDepartments, data: departmentsList }] = useLazyQuery(
+		QUERY_DEPARTMENTS
+	)
+
+	useEffect(
+		() =>
+			departmentsList
+				? setDpts(departmentsList.departments)
+				: setDpts(!username && data && data.departments),
+		[data, username, departmentsList]
+	)
+
+	useEffect(() => {
+		if (username)
+			if (data) {
+				setTeacher(data.teacher)
+				setVariables(variables => {
+					return { ...variables, _id: data.teacher._id }
+				})
+			}
+	}, [data, username])
+
+	console.log(username, variables)
+
+	const [addTeacher, { loading: savingTeacher }] = useMutation(
+		username ? UPDATE_TEACHER : ADD_TEACHER,
+		{
+			update: () => {
+				toast.success(<h3>{username ? `Teacher Updated` : `Teacher Added`}</h3>)
+				history.push(`/teachers`)
+			},
+			onError: e => MutationError(e),
+			variables,
+		}
+	)
+
+	if (loading) return <Loading />
+	if (error) return <Error />
+
+	const onChange = (_, { name, value }) => setVariables({ ...variables, [name]: value })
+
+	const date = new Date()
+	const today = date.toISOString().slice(0, 10)
+	const minDOB = date.getFullYear() - 85 + `-` + date.toISOString().slice(5, 10)
+	const maxDOB = date.getFullYear() - 25 + `-` + date.toISOString().slice(5, 10)
+
+	document.title = username ? `Update Teacher` : `Add Teacher`
 
 	return (
-		<Segment className={loading ? `loading` : ``}>
-			{update ? <h1>Update Teacher</h1> : <h1>Add New Teacher</h1>}
+		<>
+			{username ? <h1>Update Teacher</h1> : <h1>Add Teacher</h1>}
+			<Dimmer active={savingTeacher} inverted={!theme} />
 			<Divider />
 			<Form
+				inverted={theme}
 				autoComplete="on"
 				widths="equal"
-				onSubmit={(e) => {
-					e.preventDefault();
-					addTeacher();
+				onSubmit={e => {
+					e.preventDefault()
+					addTeacher()
 				}}
 			>
 				<Image size="small" centered bordered rounded src={src} />
 				<Divider />
 				<Form.Group>
-					<Form.Input type="file" transparent label="Upload Photo" />
+					{/* <Form.Input type="file" transparent label="Upload Photo" /> */}
 					{/* <Form.Field>
 						<label htmlFor="photo">Upload Photo</label>
 						<Button fluid as="p">
 							Choose
 						</Button>
 					</Form.Field> */}
-					{!update && (
-						<>
-							<Form.Select
-								fluid
-								search
-								required
-								onChange={onChange}
-								name="designation"
-								options={constants.designation}
-								label="Designation"
-								placeholder="Select Designation to assign"
-							/>
-							<Form.Input
-								fluid
-								required
-								onChange={onChange}
-								name="contactNumber"
-								label="Contact Number"
-								placeholder="XXX-XXX-XXXX"
-								pattern="[\d]{3}-[\d]{3}-[\d]{4}"
-							/>
-						</>
-					)}
-					{update && (
-						<>
-							<Form.Select
-								search
-								required
-								disabled={update}
-								name="department"
-								label="Department"
-								onChange={onChange}
-								placeholder="Select Department"
-								options={data.departments.departments.map((x) => {
-									return {
-										text: x.name,
-										value: x.name,
-									};
-								})}
-							/>
-							<Form.Input
-								required
-								disabled={update}
-								onChange={onChange}
-								pattern="[\w]+"
-								name="username"
-								label="Username"
-								placeholder="Alphanumeric only"
-							/>
-						</>
-					)}
+					<Form.Select
+						fluid
+						search
+						required={!username}
+						onChange={onChange}
+						name="designation"
+						options={constants.designation}
+						label="Designation"
+						placeholder="Select Designation to assign"
+						value={variables.designation || teacher.designation || ``}
+					/>
+					<Form.Select
+						search
+						required={!username}
+						name="department"
+						label="Department"
+						onChange={onChange}
+						loading={loadingDepartments}
+						onMouseOver={username && getDepartments}
+						placeholder="Select Department"
+						options={
+							dpts
+								? dpts.map(x => {
+										return { text: x.name, value: x._id }
+								  })
+								: []
+						}
+						value={variables.department || ``}
+					/>
 				</Form.Group>
 				<Form.Group>
 					<Form.Input
@@ -118,82 +150,60 @@ const TeacherProfile = ({ update }) => {
 						name="registrationNumber"
 						label="Registration Number"
 						placeholder="Alphanumeric only"
+						value={variables.registrationNumber || teacher.registrationNumber || ``}
 					/>
-					{update && (
-						<>
-							<Form.Select
-								fluid
-								search
-								required
-								onChange={onChange}
-								name="designation"
-								options={constants.designation}
-								label="Designation"
-								placeholder="Select Designation to assign"
-							/>
-							<Form.Input
-								fluid
-								required
-								onChange={onChange}
-								name="contactNumber"
-								label="Contact Number"
-								placeholder="XXX-XXX-XXXX"
-								pattern="[\d]{3}-[\d]{3}-[\d]{4}"
-							/>
-						</>
-					)}
-					{!update && (
-						<>
-							<Form.Select
-								search
-								required
-								disabled={update}
-								name="department"
-								label="Department"
-								onChange={onChange}
-								placeholder="Select Department"
-								options={data.departments.departments.map((x) => {
-									return {
-										text: x.name,
-										value: x.name,
-									};
-								})}
-							/>
-							<Form.Input
-								required
-								disabled={update}
-								onChange={onChange}
-								pattern="[\w]+"
-								name="username"
-								label="Username"
-								placeholder="Alphanumeric only"
-							/>
-						</>
-					)}
+					<Form.Input
+						fluid
+						required={!username}
+						onChange={onChange}
+						name="contactNumber"
+						label="Contact Number"
+						placeholder="XXX-XXX-XXXX"
+						pattern="[\d]{3}-[\d]{3}-[\d]{4}"
+						value={variables.contactNumber || teacher.contactNumber || ``}
+					/>
+					<Form.Input
+						required={!username}
+						onChange={onChange}
+						pattern="[\w]+"
+						name="username"
+						label="Username"
+						placeholder="Alphanumeric only"
+						value={variables.username || teacher.username || ``}
+					/>
 				</Form.Group>
 				<Form.Group>
 					<Form.Input
 						onChange={onChange}
 						pattern="[\w\s]+"
 						name="firstName"
-						required
+						required={!username}
 						label="First Name"
 						placeholder="First + Middle Name"
+						value={variables.firstName || (teacher.name && teacher.name.first) || ``}
 					/>
-					<Form.Input onChange={onChange} pattern="[a-zA-Z]+" name="lastName" label="Last Name" placeholder="Last Name" />
+					<Form.Input
+						onChange={onChange}
+						pattern="[a-zA-Z]+"
+						name="lastName"
+						label="Last Name"
+						placeholder="Last Name"
+						value={variables.lastName || (teacher.name && teacher.name.last) || ``}
+					/>
 					<Form.Select
 						search
-						required
+						required={!username}
 						name="gender"
 						label="Gender"
 						onChange={onChange}
 						options={constants.gender}
 						placeholder="Select Gender"
+						value={variables.gender || teacher.gender || ``}
 					/>
 				</Form.Group>
 				<Form.Group>
 					<Form.Input
-						required
+						required={!username}
 						onChange={onChange}
 						type="date"
 						max={today}
@@ -202,9 +212,9 @@ const TeacherProfile = ({ update }) => {
 						name="dateOfJoining"
 						label="Date of Joining"
 					/>
-					{update && (
+					{username && (
 						<Form.Input
-							required
+							required={!username}
 							onChange={onChange}
 							type="date"
 							max={today}
@@ -223,86 +233,109 @@ const TeacherProfile = ({ update }) => {
 						name="dateOfBirth"
 						label="Date of Birth"
 					/>
-					{!update && (
-						<Form.Input
-							required
-							onChange={onChange}
-							name="contactNumber"
-							label="Contact Number"
-							pattern="[\d]{3}-[\d]{3}-[\d]{4}"
-							placeholder="XXX-XXX-XXXX"
-						/>
-					)}
 				</Form.Group>
 				<Form.Group>
 					<Form.Select
 						search
-						required
+						required={!username}
 						name="caste"
 						label="Caste"
 						onChange={onChange}
 						options={constants.caste}
 						placeholder="Select Caste"
+						value={variables.caste || teacher.caste || ``}
 					/>
 					<Form.Select
 						search
-						required
+						required={!username}
 						name="religion"
 						label="Religion"
 						onChange={onChange}
 						options={constants.religion}
 						placeholder="Select Religion"
+						value={variables.religion || teacher.religion || ``}
 					/>
 					<Form.Select
 						search
-						required
+						required={!username}
 						name="bloodGroup"
 						label="Blood Group"
 						onChange={onChange}
 						options={constants.bloodGroup}
 						placeholder="Select Bloodgroup"
+						value={variables.bloodGroup || teacher.bloodGroup || ``}
 					/>
 				</Form.Group>
 				<Form.Group>
 					<Form.Input
-						required
+						required={!username}
 						type="email"
 						label="Email Address"
 						name="email"
 						onChange={onChange}
 						placeholder="email.address@site.domain"
+						value={variables.email || teacher.email || ``}
 					/>
 					<Form.Input
-						required
+						required={!username}
 						type="phone"
 						onChange={onChange}
 						name="alternativeContact"
 						label="Alternative Contact"
 						pattern="[\d]{3}-[\d]{3}-[\d]{4}"
 						placeholder="XXX-XXX-XXXX"
+						value={variables.alternativeContact || teacher.alternativeContact || ``}
 					/>
 					<Form.Input
-						required
+						required={!username}
 						onChange={onChange}
 						pattern="[\d]{4} [\d]{4} [\d]{4}"
 						name="aadharNumber"
 						label="Aadhaar number"
 						placeholder="XXXX XXXX XXXX"
+						value={variables.aadharNumber || teacher.aadharNumber || ``}
 					/>
 				</Form.Group>
 				<label>
-					<b>Current Address*</b>
+					<b>Current Address{!username && `*`}</b>
 				</label>
 				<Form.Group>
-					<Form.Input required onChange={onChange} pattern="[\w\s.,-]+" name="addressCurrentLocality" placeholder="Locality" />
-					<Form.Input required onChange={onChange} pattern="[\w\s.,-]+" name="addressCurrentTehsil" placeholder="Tehsil" />
+					<Form.Input
+						required={!username}
+						onChange={onChange}
+						pattern="[\w\s.,-]+"
+						name="addressCurrentLocality"
+						placeholder="Locality"
+						value={
+							variables.addressCurrentLocality ||
+							(teacher.address && teacher.address.current.locality) ||
+							``
+						}
+					/>
+					<Form.Input
+						required={!username}
+						onChange={onChange}
+						pattern="[\w\s.,-]+"
+						name="addressCurrentTehsil"
+						placeholder="Tehsil"
+						value={
+							variables.addressCurrentTehsil ||
+							(teacher.address && teacher.address.current.tehsil) ||
+							``
+						}
+					/>
 					<Form.Select
 						search
-						required
+						required={!username}
 						name="addressCurrentDistrict"
 						onChange={onChange}
 						placeholder="District"
 						options={constants.district}
+						value={
+							variables.addressCurrentDistrict ||
+							(teacher.address && teacher.address.current.district) ||
+							``
+						}
 					/>
 				</Form.Group>
 				<label>
@@ -325,31 +358,56 @@ const TeacherProfile = ({ update }) => {
 						pattern="[\w\s.,-]+"
 						name="addressPermanentLocality"
 						placeholder="Locality"
-						value={variables.addressPermanentLocality || ``}
+						value={
+							variables.addressPermanentLocality ||
+							(teacher.address &&
+								teacher.address.permanent &&
+								teacher.address.permanent.locality) ||
+							``
+						}
 					/>
 					<Form.Input
 						onChange={onChange}
 						pattern="[\w\s.,-]+"
 						name="addressPermanentTehsil"
 						placeholder="Tehsil"
-						value={variables.addressPermanentTehsil || ``}
+						value={
+							variables.addressPermanentTehsil ||
+							(teacher.address && teacher.address.permanent && teacher.address.permanent.tehsil) ||
+							``
+						}
 					/>
 					<Form.Select
 						search
 						name="addressPermanentDistrict"
 						onChange={onChange}
 						placeholder="District"
-						value={variables.addressPermanentDistrict || ``}
+						value={
+							variables.addressPermanentDistrict ||
+							(teacher.address &&
+								teacher.address.permanent &&
+								teacher.address.permanent.district) ||
+							``
+						}
 						options={constants.district}
 					/>
 				</Form.Group>
-				<Form.Button color="purple" fluid disabled={Object.keys(variables).length < 16 || notification.length > 0}>
-					Submit
-				</Form.Button>
-			</Form>
-			{notification.length > 0 && <Notify list={notification} />}
-		</Segment>
-	);
-};
 
-export default TeacherProfile;
+				<Button
+					fluid
+					animated="fade"
+					inverted={theme}
+					disabled={username ? Object.keys(variables).length < 2 : !variables[`username`]}
+					content={
+						<>
+							<Button.Content visible content={<Icon name="add circle" />} />
+							<Button.Content hidden content={username ? `Update` : `Save`} />
+						</>
+					}
+				/>
+			</Form>
+		</>
+	)
+}
+
+export default AddOrUpdateTeacher

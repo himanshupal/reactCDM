@@ -1,7 +1,8 @@
-import gql from "graphql-tag";
+import gql from "graphql-tag"
+
 export default gql`
-	query students($cid: ID) {
-		students(cid: $cid) {
+	query students($class: ID) {
+		students(class: $class) {
 			_id
 			username
 			rollNumber
@@ -9,11 +10,31 @@ export default gql`
 				first
 				last
 			}
-			class {
-				_id
+			father {
+				name
+				contactNumber
 			}
 			email
 			contactNumber
+			dateOfBirth
+			createdAt
+			createdBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
+			updatedAt
+			updatedBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
 		}
 	}
-`;
+`

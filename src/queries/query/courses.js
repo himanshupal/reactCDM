@@ -1,27 +1,46 @@
-import gql from "graphql-tag";
+import gql from "graphql-tag"
 
 export default gql`
-	{
-		departments {
-			departments {
+	query coursesWithTeachers($department: ID) {
+		courses(department: $department) {
+			_id
+			name
+			duration
+			identifier
+			semesterBased
+			headOfDepartment {
 				_id
-				name
-				courses {
-					_id
-					name
-					duration
-					identifier
-					createdAt
-					semesterBased
+				username
+				name {
+					first
+					last
 				}
 			}
-			teachers {
+			createdAt
+			createdBy {
 				_id
+				username
+				name {
+					first
+					last
+				}
+			}
+			updatedAt
+			updatedBy {
+				_id
+				username
 				name {
 					first
 					last
 				}
 			}
 		}
+		teachers(department: $department) {
+			_id
+			name {
+				first
+				last
+			}
+		}
 	}
-`;
+`

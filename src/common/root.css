@@ -1,0 +1,535 @@
+abbr[title] {
+	border-bottom: none !important;
+	cursor: inherit !important;
+	text-decoration: none !important;
+}
+
+textarea {
+	min-width: -moz-available;
+	max-width: -moz-available;
+	min-width: -webkit-fill-available;
+	max-width: -webkit-fill-available;
+	border-radius: 5px;
+	padding: 0.3rem;
+}
+
+.textarea__dark {
+	border: 1px solid #2b2c2d;
+	background: #1b1c1d;
+	color: whitesmoke;
+}
+
+.textarea__dark::selection {
+	background: whitesmoke;
+	color: #1b1b1b;
+}
+
+.textarea__light {
+	border: 1px solid #dedede;
+	background: white;
+	color: #1b1c1d;
+}
+
+.textarea__light::selection {
+	background: #00f;
+	color: white;
+}
+
+.table_overflow {
+	overflow-x: scroll;
+	overflow-y: hidden;
+	margin-bottom: 0.5rem;
+	padding-bottom: 0.5rem;
+}
+
+.shift_right {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.highlight {
+	color: red;
+	text-align: center;
+	font-style: oblique;
+	font-variant: small-caps;
+}
+
+.distributed_ends {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+/* Calendar starts here...  */
+
+.calendar-dark {
+	opacity: 0.75;
+}
+
+.react-calendar {
+	border: 1px dashed darksalmon;
+	border-radius: 5px;
+	padding: 0.5rem;
+	background: white;
+}
+.react-calendar,
+.react-calendar *,
+.react-calendar *:before,
+.react-calendar *:after {
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.react-calendar button {
+	border: 0.1px solid #e5e5e5;
+	border-radius: 2.5px;
+	outline: none;
+}
+.react-calendar button:enabled:hover {
+	cursor: pointer;
+}
+.react-calendar__navigation {
+	height: 3.5rem;
+	margin-bottom: 1em;
+}
+.react-calendar__navigation__prev-button,
+.react-calendar__navigation__next-button {
+	font-size: xx-large;
+	margin: 2.5px;
+}
+.react-calendar__navigation__prev2-button,
+.react-calendar__navigation__next2-button {
+	display: none;
+}
+.react-calendar__navigation__label {
+	font-family: Lato;
+	border-radius: 5px;
+	font-weight: bold;
+	font-size: 2rem;
+	margin: 2.5px;
+}
+.react-calendar__navigation button {
+	border: none;
+	min-width: 50px;
+	background: none;
+	border-radius: 5px;
+}
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+	background-color: #eee;
+	border: none;
+}
+.react-calendar__navigation button[disabled] {
+	background-color: #f0f0f0;
+}
+.react-calendar__month-view__weekdays {
+	text-transform: uppercase;
+	border: 1px solid pink;
+	border-radius: 5px;
+	text-align: center;
+	font-weight: bold;
+	font-size: 1.5rem;
+	margin-bottom: 1.5rem;
+}
+.react-calendar__month-view__weekdays__weekday {
+	padding: 0.5em;
+	font-size: initial;
+	color: #2f002f;
+}
+.react-calendar__month-view__days__day {
+	display: flex;
+	flex-direction: column;
+	height: 4.1rem;
+	align-items: center;
+	justify-content: center;
+}
+.react-calendar__month-view__days__day em {
+	align-self: flex-end;
+}
+.react-calendar__month-view__days__day--weekend {
+	color: #ff3300;
+}
+.react-calendar__month-view__days__day--neighboringMonth {
+	color: #998f8f;
+}
+.react-calendar__month-view__days__day--neighboringMonth:hover {
+	color: blue;
+}
+.react-calendar__tile {
+	background: none;
+}
+.react-calendar__tile:disabled {
+	background-color: #f5f5f5;
+}
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+	background-color: #ddd;
+}
+.react-calendar__tile--now {
+	background: #375569;
+	color: white;
+}
+.react-calendar__tile--now:enabled:hover,
+.react-calendar__tile--now:enabled:focus {
+	background: #3499ff;
+}
+.react-calendar__tile--hasActive:enabled:hover,
+.react-calendar__tile--hasActive:enabled:focus {
+	background: #a9d4ff;
+}
+.react-calendar__tile--active:enabled:hover,
+.react-calendar__tile--active:enabled:focus {
+	background: #1087ff;
+	color: white;
+}
+.react-calendar__year-view .react-calendar__tile,
+.react-calendar__decade-view .react-calendar__tile,
+.react-calendar__century-view .react-calendar__tile {
+	padding: 2em 0.5em;
+}
+
+/* Clock starts here... */
+
+.react-clock {
+	display: block;
+	position: relative;
+}
+.react-clock,
+.react-clock *,
+.react-clock *:before,
+.react-clock *:after {
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.react-clock__face {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	border: 1px solid black;
+	border-radius: 50%;
+}
+.react-clock__hand {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 50%;
+	right: 50%;
+}
+.react-clock__hand__body {
+	position: absolute;
+	background-color: black;
+	transform: translateX(-50%);
+}
+.react-clock__mark {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 50%;
+	right: 50%;
+}
+.react-clock__mark__body {
+	position: absolute;
+	background-color: black;
+	transform: translateX(-50%);
+}
+.react-clock__mark__number {
+	position: absolute;
+	left: -40px;
+	width: 80px;
+	text-align: center;
+}
+.react-clock__second-hand__body {
+	background-color: red;
+}
+
+/* Loading Icon Starts Here */
+
+@keyframes loading_child {
+	0% {
+		transform: rotate(0deg);
+	}
+	50% {
+		transform: rotate(180deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+.loading_child div {
+	position: absolute;
+	animation: loading_child 1s linear infinite;
+	width: 160px;
+	height: 160px;
+	top: 20px;
+	left: 20px;
+	border-radius: 50%;
+	box-shadow: 0 4px 0 0 #e15b64;
+	transform-origin: 80px 82px;
+}
+.loading_parent {
+	width: 200px;
+	height: 200px;
+	display: inline-block;
+	overflow: hidden;
+}
+.loading_child {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	transform: translateZ(0) scale(1);
+	backface-visibility: hidden;
+	transform-origin: 0 0;
+}
+.loading_child div {
+	box-sizing: content-box;
+}
+
+/* c3 */
+
+.c3 svg {
+	font: 10px sans-serif;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.c3 path,
+.c3 line {
+	fill: none;
+	stroke: slategrey;
+}
+
+.c3 text {
+	fill: slategrey;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+}
+
+.c3-legend-item-tile,
+.c3-xgrid-focus,
+.c3-ygrid,
+.c3-event-rect,
+.c3-bars path {
+	shape-rendering: crispEdges;
+}
+
+.c3-chart-arc path {
+	stroke: #fff;
+}
+
+.c3-chart-arc rect {
+	stroke: white;
+	stroke-width: 1;
+}
+
+.c3-chart-arc text {
+	fill: #fff;
+	font-size: 13px;
+}
+
+/*-- Axis --*/
+/*-- Grid --*/
+.c3-grid line {
+	stroke: #aaa;
+}
+
+.c3-grid text {
+	fill: #aaa;
+}
+
+.c3-xgrid,
+.c3-ygrid {
+	stroke-dasharray: 3 3;
+}
+
+/*-- Text on Chart --*/
+.c3-text.c3-empty {
+	fill: #808080;
+	font-size: 2em;
+}
+
+/*-- Line --*/
+.c3-line {
+	stroke-width: 1.5px;
+}
+
+/*-- Point --*/
+.c3-circle {
+	fill: currentColor;
+}
+
+.c3-circle._expanded_ {
+	stroke-width: 1px;
+	stroke: white;
+}
+
+.c3-selected-circle {
+	fill: white;
+	stroke-width: 2px;
+}
+
+/*-- Bar --*/
+.c3-bar {
+	stroke-width: 0;
+}
+
+.c3-bar._expanded_ {
+	fill-opacity: 1;
+	fill-opacity: 0.75;
+}
+
+/*-- Focus --*/
+.c3-target.c3-focused {
+	opacity: 1;
+}
+
+.c3-target.c3-focused path.c3-line,
+.c3-target.c3-focused path.c3-step {
+	stroke-width: 2px;
+}
+
+.c3-target.c3-defocused {
+	opacity: 0.3 !important;
+}
+
+/*-- Region --*/
+.c3-region {
+	fill: steelblue;
+	fill-opacity: 0.1;
+}
+.c3-region text {
+	fill-opacity: 1;
+}
+
+/*-- Brush --*/
+.c3-brush .extent {
+	fill-opacity: 0.1;
+}
+
+/*-- Select - Drag --*/
+/*-- Legend --*/
+.c3-legend-item {
+	font-size: 12px;
+}
+
+.c3-legend-item-hidden {
+	opacity: 0.15;
+}
+
+.c3-legend-background {
+	opacity: 0.75;
+	stroke: lightgray;
+	stroke-width: 1;
+}
+
+/*-- Title --*/
+.c3-title {
+	font: 14px sans-serif;
+}
+
+/*-- Tooltip --*/
+.c3-tooltip-container {
+	z-index: 10;
+	color: #000;
+}
+
+.c3-tooltip {
+	border-collapse: collapse;
+	border-spacing: 0;
+	background-color: #fff;
+	empty-cells: show;
+	-webkit-box-shadow: 7px 7px 12px -9px #777777;
+	-moz-box-shadow: 7px 7px 12px -9px #777777;
+	box-shadow: 7px 7px 12px -9px #777777;
+	opacity: 0.9;
+}
+
+.c3-tooltip tr {
+	border: 1px solid #ccc;
+}
+
+.c3-tooltip th {
+	background-color: #aaa;
+	font-size: 14px;
+	padding: 2px 5px;
+	text-align: left;
+	color: #fff;
+}
+
+.c3-tooltip td {
+	font-size: 13px;
+	padding: 3px 6px;
+	background-color: #fff;
+	border-left: 1px dotted #999;
+}
+
+.c3-tooltip td > span {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	margin-right: 6px;
+}
+
+.c3-tooltip .value {
+	text-align: right;
+}
+
+/*-- Area --*/
+.c3-area {
+	stroke-width: 0;
+	opacity: 0.2;
+}
+
+/*-- Arc --*/
+.c3-chart-arcs-title {
+	dominant-baseline: middle;
+	font-size: 1.3em;
+}
+
+.c3-chart-arcs .c3-chart-arcs-background {
+	fill: #e0e0e0;
+	stroke: #fff;
+}
+
+.c3-chart-arcs .c3-chart-arcs-gauge-unit {
+	fill: #000;
+	font-size: 16px;
+}
+
+.c3-chart-arcs .c3-chart-arcs-gauge-max {
+	fill: #777;
+}
+
+.c3-chart-arcs .c3-chart-arcs-gauge-min {
+	fill: #777;
+}
+
+.c3-chart-arc .c3-gauge-value {
+	fill: #000;
+	font-size: 28px !important;
+}
+
+.c3-chart-arc.c3-target g path {
+	opacity: 1;
+}
+
+.c3-chart-arc.c3-target.c3-focused g path {
+	opacity: 1;
+}
+
+/*-- Zoom --*/
+.c3-drag-zoom.enabled {
+	pointer-events: all !important;
+	visibility: visible;
+}
+
+.c3-drag-zoom.disabled {
+	pointer-events: none !important;
+	visibility: hidden;
+}
+
+.c3-drag-zoom .extent {
+	fill-opacity: 0.1;
+}

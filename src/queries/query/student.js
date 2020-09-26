@@ -1,11 +1,26 @@
-import gql from "graphql-tag";
+import gql from "graphql-tag"
 
 export default gql`
-	query students($sid: ID) {
-		students(sid: $sid) {
+	query student($username: String!) {
+		student(username: $username) {
 			_id
 			username
 			rollNumber
+			class {
+				_id
+				name
+				sessionStart
+				sessionEnd
+				totalStudents
+				classTeacher {
+					name {
+						first
+						last
+					}
+					dateOfBirth
+					contactNumber
+				}
+			}
 			registrationNumber
 			enrollmentNumber
 			name {
@@ -23,9 +38,6 @@ export default gql`
 				occupation
 				annualSalary
 				contactNumber
-			}
-			class {
-				name
 			}
 			bloodGroup
 			gender
@@ -48,7 +60,23 @@ export default gql`
 			aadharNumber
 			contactNumber
 			createdAt
+			createdBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
 			updatedAt
+			updatedBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
 		}
 	}
-`;
+`

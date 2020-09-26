@@ -1,25 +1,55 @@
-import gql from "graphql-tag";
+import gql from "graphql-tag"
 
 export default gql`
 	mutation addCourse(
 		$name: String
-		$identifier: String
+		$department: ID!
 		$duration: String
+		$identifier: String
+		$headOfDepartment: ID
 		$semesterBased: Boolean
-		$director: String
-		$department: String
-		$headOfDepartment: String
 	) {
 		addCourse(
+			department: $department
 			data: {
 				name: $name
-				identifier: $identifier
 				duration: $duration
-				semesterBased: $semesterBased
-				director: $director
-				department: $department
+				identifier: $identifier
 				headOfDepartment: $headOfDepartment
+				semesterBased: $semesterBased
 			}
-		)
+		) {
+			_id
+			name
+			duration
+			identifier
+			semesterBased
+			headOfDepartment {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
+			createdAt
+			createdBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
+			updatedAt
+			updatedBy {
+				_id
+				username
+				name {
+					first
+					last
+				}
+			}
+		}
 	}
-`;
+`
