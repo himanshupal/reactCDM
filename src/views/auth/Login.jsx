@@ -42,6 +42,9 @@ const Login = ({ theme, history }) => {
 		>
 			<Segment style={{ minWidth: `50vw` }} inverted={theme} loading={loading} clearing>
 				<h1>Login</h1>
+				<h3 style={{ marginTop: 0 }}>
+					Use <em>dhanishtandon</em> in both fields
+				</h3>
 				<Divider />
 				<Form onSubmit={handleSubmit} inverted={theme}>
 					<Form.Input
